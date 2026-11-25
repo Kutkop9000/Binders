@@ -1,5 +1,5 @@
 // Pokédex Binders service worker: offline app shell + cached card images and card lists.
-const SHELL = 'pb-shell-v10', IMG = 'pb-img-v1', API = 'pb-api-v1';
+const SHELL = 'pb-shell-v11', IMG = 'pb-img-v1', API = 'pb-api-v1';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './sync.js?v=8', './firebase-config.js', './set-names.js?v=8', './names-intl.json', './art-fill.json'];
 
 self.addEventListener('install', e => {
@@ -33,7 +33,7 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  if (['assets.tcgdex.net', 'images.pokemontcg.io', 'images.scrydex.com'].includes(url.hostname)) return e.respondWith(cacheFirst(req, IMG));
+  if (['assets.tcgdex.net', 'images.pokemontcg.io', 'images.scrydex.com', 'limitlesstcg.nyc3.cdn.digitaloceanspaces.com'].includes(url.hostname)) return e.respondWith(cacheFirst(req, IMG));
   // Firebase SDK (versioned URLs): keep a copy so sign-in still loads offline.
   if (url.hostname === 'www.gstatic.com' && url.pathname.startsWith('/firebasejs/')) return e.respondWith(cacheFirst(req, SHELL));
   if (url.hostname === 'api.tcgdex.net') {
