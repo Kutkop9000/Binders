@@ -239,7 +239,15 @@ function setEn(name,cardId){if(!nonLatin(name))return name||'';if(typeof SET_EN!
 const isCustom=id=>typeof id==='string'&&id.startsWith('custom:');
 Object.assign(LTAG,{ko:'KR',other:'Other'});
 // TCGdex pictures come in sizes; your own photos and links are used as they are.
-const pic=(img,q)=>/^https:\/\/assets\.tcgdex\.net\//.test(img)?`${img}/${q}.webp`:img;
+// Other hosts: pokemontcg.io (small .png, large _hires.png) and scrydex (/small, /large) fill in art TCGdex doesn't have.
+const pic=(img,q)=>/^https:\/\/assets\.tcgdex\.net\//.test(img)?`${img}/${q}.webp`
+ :/^https:\/\/images\.pokemontcg\.io\/.+\.png$/.test(img)?(q==='high'?img.replace(/\.png$/,'_hires.png'):img)
+ :/^https:\/\/images\.scrydex\.com\//.test(img)?(q==='high'?img.replace(/\/small$/,'/large'):img):img;
+const ARTHOST=/^https:\/\/(assets\.tcgdex\.net|images\.pokemontcg\.io|images\.scrydex\.com)\//;
+/* Art for cards TCGdex has no picture for (Trainer Galleries, Shiny Vault, Galarian Gallery, Classic Collections, promos…):
+   card id -> picture checked to exist on pokemontcg.io. Loaded once at start. */
+let ART={},artP=null;
+function artFill(){return artP||(artP=fetch('art-fill.json').then(r=>r.ok?r.json():{}).then(a=>ART=a&&typeof a==='object'?a:{}).catch(()=>{artP=null;return ART}))}
 const okImg=v=>typeof v==='string'&&(/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(v)||/^https:\/\/[^\s"'<>]+$/.test(v));
 const splitId=id=>{const i=id.indexOf(':');return i>0&&LANGS.includes(id.slice(0,i))?[id.slice(0,i),id.slice(i+1)]:['en',id]};
 const $=id=>document.getElementById(id);
@@ -305,10 +313,10 @@ async function list(n){
  if(lists[n])return lists[n];
  await (setsReady||(setsReady=loadSets()));
  // English must load (offline → error); Japanese and Chinese are extras. Cards without a picture yet are kept as text tiles.
- const [raws,nd]=await Promise.all([Promise.all(LANGS.map(l=>l==='en'?getJSON(`${API}/cards?dexId=eq:${n}`):getJSON(`${TCG}/${l}/cards?dexId=eq:${n}`).catch(()=>[]))),noDex().catch(()=>({}))]);
+ const [raws,nd]=await Promise.all([Promise.all(LANGS.map(l=>l==='en'?getJSON(`${API}/cards?dexId=eq:${n}`):getJSON(`${TCG}/${l}/cards?dexId=eq:${n}`).catch(()=>[]))),noDex().catch(()=>({})),artFill()]);
  LANGS.forEach((l,li)=>{const have=new Set((raws[li]||[]).map(c=>c.id));((nd[l]||{})[n]||[]).forEach(c=>{if(!have.has(c.id))raws[li].push(c)})});
  const arr=[];LANGS.forEach((l,li)=>(raws[li]||[]).forEach(c=>{const sid=setOf(c.id);if(isPocket(sid))return;
-  const os=setInfo.name[l+'|'+sid]||sid;arr.push({id:cid(l,c.id),lang:l,li,name:N[n]||c.name,no:c.localId,img:c.image||'',sid,o:setInfo.order[l+'|'+sid]??9999,os,set:setEn(os,cid(l,c.id))})}));
+  const os=setInfo.name[l+'|'+sid]||sid;arr.push({id:cid(l,c.id),lang:l,li,name:N[n]||c.name,no:c.localId,img:c.image||(l==='en'&&ART[c.id])||'',sid,o:setInfo.order[l+'|'+sid]??9999,os,set:setEn(os,cid(l,c.id))})}));
  arr.sort((a,b)=>a.li-b.li||a.o-b.o||(parseInt(a.no)||0)-(parseInt(b.no)||0));
  return lists[n]=arr;
 }
@@ -348,7 +356,7 @@ async function priceOf(id){if(isCustom(id))return null;const [l,raw]=splitId(id)
 const eur=p=>p==null?'':'€'+p.toFixed(2);
 
 /* ---------- rendering ---------- */
-function imgOf(n){const e=col[n];if(e&&e.c)return isCustom(e.c)?((customs[e.c.slice(7)]||{}).img||''):(e.img||'');const d=defs[n];return d&&d.img}
+function imgOf(n){const e=col[n];if(e&&e.c)return isCustom(e.c)?((customs[e.c.slice(7)]||{}).img||''):(e.img||ART[e.c]||'');const d=defs[n];return d&&d.img}
 function cell(n,i){if(!n)return `<div class="c e add" data-i="${i}" title="Add a Pokémon"><span>+</span></div>`;
  const nm=N[n],e=col[n]||{},img=imgOf(n),s=e.s||'';
  const cls='c'+(s?' '+s:' no')+(img?' im':'')+(hits.has(n)?' hit':'');
@@ -569,7 +577,7 @@ function importText(t){let d;try{d=JSON.parse(t)}catch(e){toast('That isn’t a 
   if(typeof v==='string'){if(v==='top'||v==='decent'){entry(n).s=v;k++}}
   else if(v&&typeof v==='object'){const en=entry(n);
    if(v.s==='top'||v.s==='decent')en.s=v.s;
-   if(typeof v.c==='string'&&(!v.img||(typeof v.img==='string'&&/^https:\/\/assets\.tcgdex\.net\//.test(v.img)))){en.c=v.c;en.img=v.img||'';en.set=String(v.set||'');en.no=String(v.no||'');if(LANGS.includes(v.lang)&&v.lang!=='en')en.lang=v.lang;if(typeof v.p==='number')en.p=v.p}
+   if(typeof v.c==='string'&&(!v.img||(typeof v.img==='string'&&ARTHOST.test(v.img)))){en.c=v.c;en.img=v.img||'';en.set=String(v.set||'');en.no=String(v.no||'');if(LANGS.includes(v.lang)&&v.lang!=='en')en.lang=v.lang;if(typeof v.p==='number')en.p=v.p}
    tidy(n);k++}}
  ls.set('pb-col',col);refresh();toast(`Imported ${k} card${k==1?'':'s'}`)}
 $('imf').onclick=()=>$('imfi').click();
@@ -584,7 +592,7 @@ $('rp').onclick=async()=>{const ids=Object.keys(col).filter(n=>col[n].c);if(!ids
 $('cc').onclick=async()=>{try{await caches.delete('pb-img-v1');toast('Image cache cleared')}catch(e){toast('Nothing to clear')}};
 
 /* ---------- start ---------- */
-note('Saved on this device');show();stats();if(!binders.length)openNew(true);
+note('Saved on this device');show();stats();artFill().then(()=>refresh());if(!binders.length)openNew(true);
 /* bridge for sync.js: read the state, or replace it with the cloud copy without re-uploading it */
 window.pbApp={note,toast,state:()=>({col,binders}),customs:()=>customs,
  loadCustoms(m){customs=m&&typeof m==='object'?m:{};try{localStorage.setItem('pb-custom',JSON.stringify(customs))}catch(e){}refresh();if(!$('sh').hidden)picker()},
