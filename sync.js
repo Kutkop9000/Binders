@@ -40,7 +40,35 @@ async function start() {
   app.syncReady();
   A.getRedirectResult(auth).catch(e => app.toast('Sign-in failed: ' + (e.code || e.message)));
 
-  let ref = null, ready = false, unsub = null, pushT = null;
+  let ref = null, ready = false, unsub = null, unsubC = null, pushT = null;
+  // Cards you added yourself (with photos) live in their own documents: users/{uid}/custom/{id}
+  const cdoc = id => F.doc(ref, 'custom', id);
+  window.pbSyncCustom = id => {
+    if (!ref || !ready) return;
+    const c = app.customs()[id];
+    (c ? F.setDoc(cdoc(id), c) : F.deleteDoc(cdoc(id))).catch(e => console.warn('custom card sync', e.code || e));
+  };
+  async function syncCustoms() {
+    try {
+      const snap = await F.getDocs(F.collection(ref, 'custom')), cloud = {};
+      snap.forEach(d => { cloud[d.id] = d.data(); });
+      const local = app.customs();
+      app.loadCustoms(Object.assign({}, local, cloud));
+      Object.keys(local).filter(id => !cloud[id]).forEach(id => window.pbSyncCustom(id));
+      unsubC = F.onSnapshot(F.collection(ref, 'custom'), s => {
+        if (s.metadata.hasPendingWrites) return;
+        const m = Object.assign({}, app.customs()); let changed = false;
+        s.docChanges().forEach(x => {
+          if (x.type === 'removed') { if (m[x.doc.id]) { delete m[x.doc.id]; changed = true; } }
+          else if (JSON.stringify(m[x.doc.id]) !== JSON.stringify(x.doc.data())) { m[x.doc.id] = x.doc.data(); changed = true; }
+        });
+        if (changed) app.loadCustoms(m);
+      }, e => console.warn('custom cards listener', e.code || e));
+    } catch (e) {
+      // Usually: the Firestore rules haven't been updated for custom cards yet. Everything else keeps syncing.
+      console.warn('custom cards not synced', e.code || e);
+    }
+  }
 
   let dirty = false;
   const write = () => {
@@ -60,6 +88,7 @@ async function start() {
 
   A.onAuthStateChanged(auth, async user => {
     if (unsub) { unsub(); unsub = null; }
+    if (unsubC) { unsubC(); unsubC = null; }
     ready = false; ref = null; dirty = false; clearTimeout(pushT);
     if (!user) { ui('Sign in with Google to keep your binders and collection in sync across all your devices.'); app.note('Saved on this device'); return; }
 
@@ -93,5 +122,6 @@ async function start() {
         app.note('Synced to your Google account ✓');
       }
     });
+    syncCustoms();
   });
 }

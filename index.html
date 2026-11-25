@@ -92,6 +92,12 @@ input[type=search],input[type=text],textarea{font-size:1rem;padding:10px 12px;bo
 .lt{font-style:normal;font-weight:700;color:#0d1a2b;background:#9cc3ff;border-radius:4px;padding:0 4px;font-size:.68rem;margin-right:3px}
 .c small.ps{display:block;color:var(--mut);font-size:.72em;margin-top:3px;overflow-wrap:anywhere}
 #plang{margin-bottom:8px}
+.pgrid button.addc .ph{border:1.5px dashed var(--pocket);background:transparent;font-size:1.6rem;color:var(--mut)}
+.pgrid button.addc .ph small{font-size:.75rem;color:var(--mut)}
+.lt.cu{background:#e9c46a;color:#2b2105}
+.addpic{display:flex;justify-content:center;margin:8px 0}.addpic img{max-height:220px;max-width:100%;border-radius:8px}
+#adnone{width:140px;aspect-ratio:63/88;border:1.5px dashed var(--pocket);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:.85rem}#adnone[hidden]{display:none}
+select{font-size:1rem;padding:10px;border:1.5px solid var(--line);border-radius:8px;background:var(--card);color:var(--tx);width:100%;margin-top:8px}
 .pgrid .msg{grid-column:1/-1;color:var(--mut);font-size:.85rem;padding:8px 0}
 .row{display:flex;gap:8px;margin-top:12px}
 .btn{flex:1;padding:11px;border-radius:10px;border:1px solid var(--line);background:#2c2f37;cursor:pointer;font-weight:600}
@@ -153,6 +159,18 @@ a{color:#9cc3ff}
  <div class="row"><button class="btn" id="psx">Cancel</button></div>
 </div></div>
 
+<div class="sheet set" id="ad" hidden><div class="sb">
+ <h3 id="adh">Add a card that isn’t listed</h3>
+ <p id="adp"></p>
+ <div class="addpic"><img id="adimg" alt="" hidden><div id="adnone">No picture</div></div>
+ <div class="row" style="margin-top:0"><button class="btn" id="adcam">📷 Take or choose a photo</button><input type="file" id="adfile" accept="image/*" hidden></div>
+ <input type="text" id="adurl" placeholder="…or paste an image link (https://…)" autocomplete="off" style="margin-top:8px">
+ <input type="text" id="adset" placeholder="Set name, e.g. 宝石包 Vol.2" maxlength="60" autocomplete="off" style="margin-top:14px">
+ <input type="text" id="adno" placeholder="Card number, e.g. 012/080" maxlength="20" autocomplete="off" style="margin-top:8px">
+ <select id="adlang"><option value="zh-cn">Chinese (Simplified) 简中</option><option value="zh-tw">Chinese (Traditional) 繁中</option><option value="ja">Japanese</option><option value="ko">Korean</option><option value="en">English</option><option value="other">Other</option></select>
+ <div class="row" style="margin-top:16px"><button class="btn warn" id="addel" hidden>Delete</button><button class="btn" id="adx">Cancel</button><button class="btn pri" id="ads">Save card</button></div>
+</div></div>
+
 <div class="sheet set" id="bs" hidden><div class="sb">
  <h3>Binder settings</h3>
  <input type="text" id="bsn" maxlength="30" placeholder="Binder name" autocomplete="off">
@@ -210,6 +228,11 @@ const GENS=[[1,151],[152,251],[252,386],[387,493],[494,649],[650,721],[722,809],
 const TCG='https://api.tcgdex.net/v2',API=TCG+'/en';
 const LANGS=['en','ja','zh-tw','zh-cn'],LTAG={en:'EN',ja:'JP','zh-tw':'繁中','zh-cn':'简中'};
 const cid=(l,id)=>l==='en'?id:`${l}:${id}`;                     // stored card id (English ids unchanged)
+const isCustom=id=>typeof id==='string'&&id.startsWith('custom:');
+Object.assign(LTAG,{ko:'KR',other:'Other'});
+// TCGdex pictures come in sizes; your own photos and links are used as they are.
+const pic=(img,q)=>/^https:\/\/assets\.tcgdex\.net\//.test(img)?`${img}/${q}.webp`:img;
+const okImg=v=>typeof v==='string'&&(/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(v)||/^https:\/\/[^\s"'<>]+$/.test(v));
 const splitId=id=>{const i=id.indexOf(':');return i>0&&LANGS.includes(id.slice(0,i))?[id.slice(0,i),id.slice(i+1)]:['en',id]};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -232,7 +255,8 @@ function reflow(b,ns){const os=b.size;let seq=b.slots.slice();
 const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}if((k==='pb-col'||k==='pb-binders')&&window.pbSync)window.pbSync()}};
 
 /* ---------- state ---------- */
-let col=ls.get('pb-col',{});            // n -> {s:'top'|'decent', c:cardId, img, set, no, p}
+let col=ls.get('pb-col',{});
+let customs=ls.get('pb-custom',{});      // id -> {n, set, no, lang, img}: cards you added yourself            // n -> {s:'top'|'decent', c:cardId, img, set, no, p}
 let opt=Object.assign({ord:'old'},ls.get('pb-opt',{}));
 let defs=ls.get('pb-defs-'+opt.ord,{}); // n -> {c,img}
 // Users from before custom binders keep their three original binders.
@@ -292,7 +316,7 @@ function ensureDefaults(sp){
   catch(e){note('Offline — card images will load when you’re back online')}
   finally{pending.delete(n)}});
 }
-async function priceOf(id){const [l,raw]=splitId(id);if(l!=='en')return null; // Cardmarket prices only exist for English prints
+async function priceOf(id){if(isCustom(id))return null;const [l,raw]=splitId(id);if(l!=='en')return null; // Cardmarket prices only exist for English prints
  const d=await getJSON(`${TCG}/${l}/cards/${encodeURIComponent(raw)}`);
  const cm=d.pricing&&d.pricing.cardmarket;if(!cm)return null;
  const v=d.variants||{};const holoOnly=v.holo&&!v.normal;
@@ -302,12 +326,12 @@ async function priceOf(id){const [l,raw]=splitId(id);if(l!=='en')return null; //
 const eur=p=>p==null?'':'€'+p.toFixed(2);
 
 /* ---------- rendering ---------- */
-function imgOf(n){const e=col[n];if(e&&e.c)return e.img||'';const d=defs[n];return d&&d.img}
+function imgOf(n){const e=col[n];if(e&&e.c)return isCustom(e.c)?((customs[e.c.slice(7)]||{}).img||''):(e.img||'');const d=defs[n];return d&&d.img}
 function cell(n,i){if(!n)return `<div class="c e add" data-i="${i}" title="Add a Pokémon"><span>+</span></div>`;
  const nm=N[n],e=col[n]||{},img=imgOf(n),s=e.s||'';
  const cls='c'+(s?' '+s:' no')+(img?' im':'')+(hits.has(n)?' hit':'');
  const badge=s==='top'?'<i>★</i>':s==='decent'?'<i>↻</i>':'';
- const inner=img?`<img src="${esc(img)}/low.webp" alt="${esc(nm)}" loading="lazy" decoding="async">`:`<b>#${pad(n)}</b><span>${esc(nm)}</span>${e.c?`<small class="ps">${e.lang&&e.lang!=='en'?LTAG[e.lang]+' · ':''}${esc(e.set||'')} ${esc(e.no||'')}</small>`:''}`;
+ const inner=img?`<img src="${esc(pic(img,'low'))}" alt="${esc(nm)}" loading="lazy" decoding="async">`:`<b>#${pad(n)}</b><span>${esc(nm)}</span>${e.c?`<small class="ps">${e.lang&&e.lang!=='en'?LTAG[e.lang]+' · ':''}${esc(e.set||'')} ${esc(e.no||'')}</small>`:''}`;
  return `<div class="${cls}" data-n="${n}" data-i="${i}" data-l="#${pad(n)} ${esc(nm)}">${inner}${badge}</div>`}
 function page(i){const p=P[i];if(!p)return i<0?'<div class="cover">Inside cover</div>':'';
  const sz=SZ(),[cols]=SIZES[sz],c=p.it.map((n,k)=>cell(n,i*sz+k)).join('');
@@ -384,32 +408,68 @@ function entry(n){return col[n]||(col[n]={})}
 function tidy(n){const e=col[n];if(e&&!e.s&&!e.c)delete col[n]}
 function sheetHead(){const n=sel,e=col[n]||{},img=imgOf(n);
  $('shn').textContent=`#${pad(n)} ${N[n]}`;
- const im=$('shimg');if(img){im.src=img+'/high.webp';im.hidden=false}else im.hidden=true;
- $('shm').innerHTML=e.c?`${e.lang&&e.lang!=='en'?`<i class="lt">${LTAG[e.lang]}</i>`:''}${esc(e.set||'')} · #${esc(e.no||'')}${e.img?'':' · no picture available'}${e.p!=null?`<br>Cardmarket trend: <b>${eur(e.p)}</b>`:''}`:(defs[n]&&defs[n].img?'Showing default art — pick your print below':'');
+ const im=$('shimg');if(img){im.src=pic(img,'high');im.hidden=false}else im.hidden=true;
+ $('shm').innerHTML=e.c?`${isCustom(e.c)?'<i class="lt cu">Custom</i>':''}${e.lang&&e.lang!=='en'?`<i class="lt">${LTAG[e.lang]||''}</i>`:''}${esc(e.set||'')} · #${esc(e.no||'')}${img?'':' · no picture'}${isCustom(e.c)?' <button class="lnk" data-edit="1">Edit</button>':''}${e.p!=null?`<br>Cardmarket trend: <b>${eur(e.p)}</b>`:''}`:(defs[n]&&defs[n].img?'Showing default art — pick your print below':'');
  $('sh').querySelectorAll('.opts button').forEach(b=>b.classList.toggle('on',(b.dataset.s||'')===(e.s||'')))}
-async function picker(){const n=sel,box=$('pk');box.innerHTML='<div class="msg">Loading prints…</div>';
- try{const arr=await list(n);if(sel!==n)return;
+const customList=n=>Object.entries(customs).filter(([,c])=>c.n===n).map(([id,c])=>({id:'custom:'+id,lang:c.lang,custom:1,name:N[n],no:c.no,img:c.img,set:c.set,sid:''}));
+const addTile='<button data-add="1" class="addc"><div class="ph">＋<small>Card not listed</small></div><span>Add your own card</span></button>';
+const tile=(c,e)=>`<button data-id="${esc(c.id)}" class="${c.id===e.c?'on':''}">${c.img?`<img src="${esc(pic(c.img,'low'))}" alt="" loading="lazy" decoding="async">`:`<div class="ph">${esc(c.name)}<small>No picture yet</small></div>`}<span>${c.custom?'<i class="lt cu">Custom</i>':''}${c.lang!=='en'&&LTAG[c.lang]?`<i class="lt">${LTAG[c.lang]}</i>`:''}${esc(c.set)} · ${esc(c.no)}</span></button>`;
+async function picker(){const n=sel,box=$('pk');box.innerHTML=addTile+customList(n).map(c=>tile(c,col[n]||{})).join('')+'<div class="msg">Loading prints…</div>';
+ try{const arr=[...customList(n),...await list(n)];if(sel!==n)return;
   const f=$('pf').value.trim().toLowerCase(),e=col[n]||{};
   const lg=opt.lang||'';$('plang').querySelectorAll('button').forEach(b=>{const k=b.dataset.l,c=k?arr.filter(x=>x.lang===k).length:arr.length;
    b.classList.toggle('on',k===lg);b.textContent=(k?{en:'English',ja:'Japanese','zh-tw':'繁中','zh-cn':'简中'}[k]:'All')+` ${c}`});
   let a=arr;if(opt.ord==='new')a=LANGS.flatMap(l=>arr.filter(c=>c.lang===l).reverse());
   if(lg)a=a.filter(c=>c.lang===lg);if(f)a=a.filter(c=>(c.set+' '+c.name+' '+c.sid).toLowerCase().includes(f));
-  box.innerHTML=a.length?a.map(c=>`<button data-id="${esc(c.id)}" class="${c.id===e.c?'on':''}">${c.img?`<img src="${esc(c.img)}/low.webp" alt="" loading="lazy" decoding="async">`:`<div class="ph">${esc(c.name)}<small>No picture yet</small></div>`}<span>${c.lang!=='en'?`<i class="lt">${LTAG[c.lang]}</i>`:''}${esc(c.set)} · ${esc(c.no)}</span></button>`).join(''):`<div class="msg">${f||lg?'No prints match that filter':'No prints found'}</div>`}
- catch(err){box.innerHTML='<div class="msg">Couldn’t load prints — check your connection.</div>'}}
+  box.innerHTML=addTile+(a.length?a.map(c=>tile(c,e)).join(''):`<div class="msg">${f||lg?'No prints match that filter':'No prints found'}</div>`)}
+ catch(err){if(sel===n)box.innerHTML=addTile+customList(n).map(c=>tile(c,col[n]||{})).join('')+'<div class="msg">Couldn’t load prints — check your connection.</div>'}}
 $('book').addEventListener('click',e=>{const a=e.target.closest('.c.add[data-i]');if(a&&!busy){selI=+a.dataset.i;sel=null;return openPick()}
  const c=e.target.closest('.c[data-n]');if(!c||busy)return;sel=+c.dataset.n;selI=+c.dataset.i;$('pf').value='';sheetHead();$('sh').hidden=false;$('sh').querySelector('.sb').scrollTop=0;picker()});
 $('sh').querySelector('.opts').addEventListener('click',e=>{const b=e.target.closest('button[data-s]');if(!b)return;const s=b.dataset.s,en=entry(sel);
  if((en.s||'')!==s){if(s)en.s=s;else delete en.s;tidy(sel);save();refresh();sheetHead()}});
-$('pk').addEventListener('click',async e=>{const b=e.target.closest('button[data-id]');if(!b)return;const n=sel,c=(lists[n]||[]).find(x=>x.id===b.dataset.id);if(!c)return;
- const en=entry(n);Object.assign(en,{c:c.id,img:c.img,set:c.set,no:c.no});if(c.lang!=='en')en.lang=c.lang;else delete en.lang;delete en.p;if(!en.s)en.s='top';save();refresh();sheetHead();
+$('pk').addEventListener('click',async e=>{if(e.target.closest('button[data-add]'))return openAdd(null);
+ const b=e.target.closest('button[data-id]');if(!b)return;const n=sel,c=[...customList(n),...(lists[n]||[])].find(x=>x.id===b.dataset.id);if(!c)return;
+ const en=entry(n);Object.assign(en,{c:c.id,img:c.custom?'':c.img,set:c.set,no:c.no});if(c.lang!=='en')en.lang=c.lang;else delete en.lang;delete en.p;if(!en.s)en.s='top';save();refresh();sheetHead();
  $('pk').querySelectorAll('button.on').forEach(x=>x.classList.remove('on'));b.classList.add('on');
  try{const p=await priceOf(c.id);if(col[n]&&col[n].c===c.id){if(p!=null)col[n].p=p;save();stats();if(sel===n)sheetHead()}}catch(err){}});
+/* ---------- cards that aren't on TCGdex ---------- */
+let adId=null,adImg='';
+function saveCustoms(id){try{localStorage.setItem('pb-custom',JSON.stringify(customs))}catch(e){toast('This device is out of space for photos – signed in, it is still saved in your account')}
+ if(window.pbSyncCustom)window.pbSyncCustom(id)}
+function adPic(v){adImg=v||'';$('adimg').hidden=!adImg;$('adnone').hidden=!!adImg;if(adImg)$('adimg').src=adImg}
+function openAdd(id){const c=id?customs[id]:null;adId=id;
+ $('adh').textContent=id?'Edit your card':'Add a card that isn’t listed';$('adp').textContent=`#${pad(sel)} ${N[sel]}`;
+ $('adset').value=c?c.set:'';$('adno').value=c?c.no:'';$('adlang').value=c?c.lang:(opt.lang&&opt.lang!=='en'?opt.lang:'zh-cn');
+ $('adurl').value=c&&/^https:/.test(c.img)?c.img:'';adPic(c?c.img:'');$('addel').hidden=!id;$('sh').hidden=true;$('ad').hidden=false}
+// Photos are shrunk to a small JPEG (~30 KB) so they fit in your account and on the device.
+async function shrink(file){const url=URL.createObjectURL(file);
+ try{const im=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=url});
+  const sc=Math.min(1,320/im.naturalWidth),c=document.createElement('canvas');c.width=Math.round(im.naturalWidth*sc);c.height=Math.round(im.naturalHeight*sc);
+  c.getContext('2d').drawImage(im,0,0,c.width,c.height);let q=.8,d=c.toDataURL('image/jpeg',q);while(d.length>90000&&q>.35){q-=.1;d=c.toDataURL('image/jpeg',q)}return d}
+ finally{URL.revokeObjectURL(url)}}
+$('adcam').onclick=()=>$('adfile').click();
+$('adfile').onchange=async()=>{const f=$('adfile').files[0];$('adfile').value='';if(!f)return;
+ try{adPic(await shrink(f));$('adurl').value=''}catch(e){toast('Couldn’t read that picture')}};
+$('adurl').addEventListener('change',()=>{const v=$('adurl').value.trim();if(!v)return;if(/^https:\/\//.test(v)&&okImg(v))adPic(v);else toast('Use a link that starts with https://')});
+function backToSheet(){$('ad').hidden=true;sheetHead();$('sh').hidden=false;picker()}
+$('adx').onclick=backToSheet;
+$('ads').onclick=()=>{const set=$('adset').value.trim(),no=$('adno').value.trim(),lang=$('adlang').value;
+ if(!set&&!no&&!adImg){toast('Add a picture, set name or number');return}
+ const id=adId||newId(),n=sel;customs[id]={n,set:set||'Custom card',no,lang,img:adImg};saveCustoms(id);
+ Object.values(col).forEach(en=>{if(en.c==='custom:'+id)Object.assign(en,{set:customs[id].set,no,lang})});
+ const en=entry(n);Object.assign(en,{c:'custom:'+id,img:'',set:customs[id].set,no});if(lang!=='en')en.lang=lang;else delete en.lang;delete en.p;if(!en.s)en.s='top';
+ save();refresh();toast(adId?'Card updated':'Card added');backToSheet()};
+$('addel').onclick=()=>{const id=adId;if(!id||!confirm('Delete this card? Pockets using it go back to default art.'))return;
+ delete customs[id];saveCustoms(id);for(const [n,en] of Object.entries(col))if(en.c==='custom:'+id){delete en.c;delete en.img;delete en.set;delete en.no;delete en.lang;delete en.p;tidy(n)}
+ save();refresh();toast('Card deleted');backToSheet()};
+$('shm').addEventListener('click',e=>{if(e.target.closest('[data-edit]')){const en=col[sel];if(en&&isCustom(en.c))openAdd(en.c.slice(7))}});
+
 $('plang').onclick=e=>{const b=e.target.closest('button[data-l]');if(!b)return;opt.lang=b.dataset.l;ls.set('pb-opt',opt);picker()};
 $('pclr').onclick=()=>{const en=col[sel];if(en){delete en.c;delete en.img;delete en.set;delete en.no;delete en.p;delete en.lang;tidy(sel);save();refresh();sheetHead();picker()}};
 let pfT;$('pf').addEventListener('input',()=>{clearTimeout(pfT);pfT=setTimeout(picker,200)});
 $('shimg').onclick=()=>{$('zmi').src=$('shimg').src;$('zm').hidden=false};
 $('zm').onclick=()=>$('zm').hidden=true;
-function closeAll(){$('bs').hidden=true;$('sh').hidden=true;$('setg').hidden=true;$('zm').hidden=true;$('ps').hidden=true;if(binders.length)$('nb').hidden=true}
+function closeAll(){$('ad').hidden=true;$('bs').hidden=true;$('sh').hidden=true;$('setg').hidden=true;$('zm').hidden=true;$('ps').hidden=true;if(binders.length)$('nb').hidden=true}
 
 /* ---------- replace / add a Pokémon in a pocket ---------- */
 function setSlot(i,n){const b=binders[bi];if(!b||i==null)return;b.slots[i]=n||0;b.slots=padSlots(b.slots,b.size);saveBinders();layout();refresh()}
@@ -471,16 +531,17 @@ $('bsx').onclick=closeAll;
 $('bsd').onclick=()=>{const b=binders[bi];if(!b||!confirm(`Delete the binder “${b.name}”? Your owned cards stay saved.`))return;
  binders.splice(bi,1);delete mem[b.id];saveBinders();closeAll();if(binders.length)setBinder(Math.max(0,bi-1),null,true);else{bi=0;layout();refresh();openNew(true)}};
 $('shd').onclick=closeAll;
-['sh','setg','ps','nb','bs'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target===$(id))closeAll()}));
+['sh','setg','ps','nb','bs','ad'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target===$(id))closeAll()}));
 
 /* ---------- settings ---------- */
 function segs(){$('ord').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.o===opt.ord))}
 $('gear').onclick=()=>{segs();$('setg').hidden=false};$('setd').onclick=closeAll;
 $('ord').onclick=e=>{const b=e.target.closest('button[data-o]');if(!b||b.dataset.o===opt.ord)return;opt.ord=b.dataset.o;ls.set('pb-opt',opt);defs=ls.get('pb-defs-'+opt.ord,{});segs();refresh()};
-function backup(){return JSON.stringify({app:'pokedex-binders',v:2,exported:new Date().toISOString(),col,binders},null,1)}
+function backup(){return JSON.stringify({app:'pokedex-binders',v:2,exported:new Date().toISOString(),col,binders,customs},null,1)}
 $('exf').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([backup()],{type:'application/json'}));a.download=`pokedex-binders-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();toast('Backup file saved')};
 $('exc').onclick=async()=>{try{await navigator.clipboard.writeText(backup());toast('Backup copied')}catch(e){$('imt').value=backup();$('imt').select();toast('Copy the text in the box')}};
 function importText(t){let d;try{d=JSON.parse(t)}catch(e){toast('That isn’t a valid backup');return}
+ if(d.customs&&typeof d.customs==='object'){let k=0;for(const [id,c] of Object.entries(d.customs))if(/^[\w-]{1,40}$/.test(id)&&c&&N[c.n]&&(!c.img||okImg(c.img))&&!customs[id]){customs[id]={n:+c.n,set:String(c.set||'').slice(0,60),no:String(c.no||'').slice(0,20),lang:LTAG[c.lang]?c.lang:'other',img:c.img||''};saveCustoms(id);k++}}
  const nb=cleanBinders(d.binders);if(nb.length){binders=binders.concat(nb.filter(b=>!binders.some(x=>x.id===b.id)));saveBinders();setBinder(bi,null,true)}
  const src=d.col||d.cards;if(!src||typeof src!=='object'){toast(nb.length?'Imported binders':'No collection found in that backup');return}
  let k=0;for(const [n,v] of Object.entries(src)){if(!N[n])continue;
@@ -504,7 +565,8 @@ $('cc').onclick=async()=>{try{await caches.delete('pb-img-v1');toast('Image cach
 /* ---------- start ---------- */
 note('Saved on this device');show();stats();if(!binders.length)openNew(true);
 /* bridge for sync.js: read the state, or replace it with the cloud copy without re-uploading it */
-window.pbApp={note,toast,state:()=>({col,binders}),
+window.pbApp={note,toast,state:()=>({col,binders}),customs:()=>customs,
+ loadCustoms(m){customs=m&&typeof m==='object'?m:{};try{localStorage.setItem('pb-custom',JSON.stringify(customs))}catch(e){}refresh();if(!$('sh').hidden)picker()},
  load(st){if(st.col&&typeof st.col==='object')col=st.col;if(Array.isArray(st.binders))binders=cleanBinders(st.binders);
  try{localStorage.setItem('pb-col',JSON.stringify(col));localStorage.setItem('pb-binders',JSON.stringify(binders))}catch(e){}
  const id=(binders[bi]||{}).id;bi=Math.max(0,binders.findIndex(b=>b.id===(id||ls.get('pb-curid',null))));layout();spread=target=Math.min(spread,S-1);
