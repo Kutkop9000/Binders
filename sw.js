@@ -1,6 +1,6 @@
 // Pokédex Binders service worker: offline app shell + cached card images and card lists.
-const SHELL = 'pb-shell-v5', IMG = 'pb-img-v1', API = 'pb-api-v1';
-const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './sync.js', './firebase-config.js'];
+const SHELL = 'pb-shell-v7', IMG = 'pb-img-v1', API = 'pb-api-v1';
+const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './sync.js', './firebase-config.js', './set-names.js'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(SHELL).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
@@ -34,6 +34,8 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.hostname === 'assets.tcgdex.net') return e.respondWith(cacheFirst(req, IMG));
+  // Firebase SDK (versioned URLs): keep a copy so sign-in still loads offline.
+  if (url.hostname === 'www.gstatic.com' && url.pathname.startsWith('/firebasejs/')) return e.respondWith(cacheFirst(req, SHELL));
   if (url.hostname === 'api.tcgdex.net') {
     // Single card (prices) → fresh when online; lists and sets → instant from cache, refreshed in background.
     const single = /\/cards\/[^/?]+$/.test(url.pathname);
