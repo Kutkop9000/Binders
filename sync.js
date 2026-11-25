@@ -9,6 +9,7 @@ const gate = (msg, canSignIn) => {
   $('gate').hidden = false;
   $('gmsg').textContent = msg;
   $('gin').disabled = !canSignIn;
+  $('gin').textContent = 'Sign in with Google';
 };
 
 if (!firebaseConfig.apiKey) {
@@ -48,6 +49,7 @@ async function start() {
     app.loadCustoms({});
     app.load({ col: {}, binders: [] });
   };
+  gate('Checking your sign-in…', true);
   A.getRedirectResult(auth).catch(e => app.toast('Sign-in failed: ' + (e.code || e.message)));
 
   let ref = null, ready = false, unsub = null, unsubC = null, pushT = null, dirty = false;
