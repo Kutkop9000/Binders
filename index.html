@@ -7,7 +7,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-192.png"><link rel="icon" href="icon-192.png">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{--bg:#111215;--card:#1b1d22;--page:#1e2026;--spine:#15161a;--cell:#262930;--line:#3a3e47;--tx:#e9e9ec;--mut:#8b9099;--dim:#5f646d;--top:#3fbf72;--topbg:#163222;--dec:#f0a03a;--decbg:#3a2a12}
+:root{--bg:#111215;--card:#1b1d22;--page:#1e2026;--spine:#15161a;--cell:#262930;--line:#3a3e47;--tx:#e9e9ec;--mut:#8b9099;--dim:#868b95;--pocket:#6b707b;--top:#3fbf72;--topbg:#163222;--dec:#f0a03a;--decbg:#3a2a12}
 body{font-family:system-ui,-apple-system,sans-serif;margin:0;padding:calc(12px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left));background:var(--bg);color:var(--tx)}
 button{font:inherit;color:inherit}
 .top{display:flex;align-items:center;gap:8px}
@@ -15,45 +15,53 @@ h1{font-size:1.25rem;margin:0;flex:1}p.s{margin:2px 0 10px;color:var(--mut);font
 .icon{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--card);font-size:1.1rem;cursor:pointer}
 .tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;background:var(--card);padding:4px;border-radius:12px;margin-bottom:10px}
 .tabs button{flex:1;min-width:76px;border:0;background:transparent;color:var(--mut);padding:8px 4px;border-radius:9px;font-size:.9rem;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px}
-.tabs button small{font-size:.68rem;font-weight:500;opacity:.8}
+.tabs button small{font-size:.75rem;font-weight:500;opacity:.8}
 .tabs button.on{background:#33363e;color:var(--tx)}
 .search{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
 input[type=search],input[type=text],textarea{font-size:1rem;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;width:100%;background:var(--card);color:var(--tx)}
 ::placeholder{color:var(--dim)}
 #r{color:var(--mut);font-size:.85rem;min-height:1.2em}
-.stats{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:.8rem;margin:-4px 0 10px}
+.stats{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:.85rem;margin:-4px 0 10px}
 .pill{padding:2px 8px;border-radius:10px;background:var(--card);border:1px solid var(--line)}
 .pill.t{border-color:var(--top);color:#7fcf9c}.pill.d{border-color:var(--dec);color:#f2b866}
-#sv{color:var(--dim);font-size:.72rem;margin-left:auto}
+#sv{color:var(--dim);font-size:.75rem;margin-left:auto}
 .book{position:relative;display:flex;perspective:2200px;max-width:900px;margin:0 auto;filter:drop-shadow(0 8px 18px #000a)}
 .book.sw{animation:sw .35s ease}@keyframes sw{from{opacity:0;transform:translateY(8px)}}
 .book::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:linear-gradient(#0000,#000a,#0000);z-index:3;pointer-events:none}
 .pg,.face{background:var(--page);padding:8px 7px 10px}
 .pg{width:50%}
+.book.one::after{display:none}.book.one .pg.l{width:100%;border-radius:10px}.book.one .pg.r{display:none}
 .pg.l,.face.back,.leaf.b .face.front{border-radius:10px 2px 2px 10px;background:linear-gradient(90deg,var(--page) 86%,var(--spine))}
 .pg.r,.face.front,.leaf.b .face.back{border-radius:2px 10px 10px 2px;background:linear-gradient(270deg,var(--page) 86%,var(--spine))}
 .leaf{position:absolute;top:0;height:100%;width:50%;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;z-index:4;visibility:hidden;will-change:transform;pointer-events:none}
 .leaf.f{left:50%;transform-origin:left center}.leaf.b{left:0;transform-origin:right center}
 .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .face.back{transform:rotateY(180deg)}
-.h{font-weight:700;font-size:.8rem;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:4px}
-.h small{font-weight:600;font-size:.62rem;color:#fff;padding:1px 6px;border-radius:9px;white-space:nowrap}
-.g1 small{background:#c94444}.g2 small{background:#b8921c}.g3 small{background:#2a8f60}.g4 small{background:#3b6fb6}.g5 small{background:#5d626b}.g6 small{background:#8a4fb8}.g7 small{background:#c2622d}.g8 small{background:#2f8f9a}.g9 small{background:#a8325e}
-.g{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
-.c{position:relative;aspect-ratio:63/88;border:1.5px solid var(--line);border-radius:5px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:2px;font-size:clamp(.5rem,1.9vw,.85rem);overflow:hidden;background:var(--cell)}
-.c b{color:var(--dim);font-size:.8em;font-weight:600}.c span{font-weight:600;overflow-wrap:anywhere;line-height:1.1}
-.c.e{border-style:dashed;border-color:#2c2f36;background:transparent}
+.h{font-weight:700;font-size:.85rem;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:4px}
+.h small{font-weight:600;font-size:.75rem;color:var(--tx);background:#2c2f37;border:1px solid var(--line);padding:1px 8px 1px 6px;border-radius:9px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.h small::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--gc,var(--mut))}
+.g1{--gc:#e05a5a}.g2{--gc:#d6ab2e}.g3{--gc:#3cb37a}.g4{--gc:#5b8fd9}.g5{--gc:#a3a8b2}.g6{--gc:#a974d6}.g7{--gc:#e07b42}.g8{--gc:#3fb3c0}.g9{--gc:#d4507f}
+.g{display:grid;grid-template-columns:repeat(var(--cols,3),1fr);gap:4px}
+.cover{height:100%;min-height:200px;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:.8rem;border:1.5px dashed #2c2f36;border-radius:6px}
+.lnk{background:none;border:0;color:#9cc3ff;padding:0 0 0 10px;cursor:pointer;font-size:inherit}
+.btn.warn{color:#ff9b93;border-color:#5a2c2c}
+.seg button small{display:block;font-size:.72rem;opacity:.8}
+.c{position:relative;aspect-ratio:63/88;border:1.5px solid var(--line);border-radius:5px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:2px;font-size:calc(clamp(.7rem,2.6vw,.9rem)*var(--k,1));overflow:hidden;background:var(--cell)}
+.c b{color:var(--mut);font-size:.8em;font-weight:600}.c span{font-weight:600;overflow-wrap:anywhere;line-height:1.1}
+.c.e{border-style:dashed;border-color:var(--pocket);background:transparent}
 .c[data-n],.c.add{cursor:pointer}
-.c.add span{color:#3a3e47;font-size:1.6em;font-weight:400}.c.add:hover span{color:var(--mut)}
+.c.add span{color:var(--dim);font-size:1.6em;font-weight:400}.c.add:hover span{color:var(--tx)}.c.add:hover{border-color:var(--mut)}
 .c[data-n].no span{color:var(--dim)}
 .c.im{padding:0;border-width:1px}
 .c img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:3px}
 .c.no img{filter:grayscale(1) brightness(.45)}
-.c.no.im::after{content:attr(data-l);position:absolute;left:0;right:0;bottom:0;padding:2px;font-size:.75em;font-weight:600;background:#000a;color:#ccc}
+.c.no.im::after{content:attr(data-l);position:absolute;left:0;right:0;bottom:0;padding:2px 3px;font-size:max(.8em,.7rem);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;background:#000a;color:#ccc}
 .c.top{border-color:var(--top)!important;border-width:2px;background:var(--topbg)}
 .c.decent{border-color:var(--dec)!important;border-width:2px;background:var(--decbg)}
-.c i{position:absolute;top:2px;right:2px;font-style:normal;font-size:.8em;z-index:2;width:1.5em;height:1.5em;line-height:1.5em;border-radius:50%;background:#000c;text-align:center}
-.c.top i{color:var(--top)}.c.decent i{color:var(--dec)}
+.c i{position:absolute;top:3px;right:3px;font-style:normal;font-weight:700;font-size:max(.95em,.75rem);z-index:3;width:1.7em;height:1.7em;line-height:1.7em;border-radius:50%;text-align:center;box-shadow:0 1px 3px #000a}
+.c.top::before,.c.decent::before{content:'';position:absolute;left:0;right:0;bottom:0;height:4px;z-index:3}
+.c.top::before{background:var(--top)}.c.decent::before{background:var(--dec)}
+.c.top i{background:var(--top);color:#0b2015}.c.decent i{background:var(--dec);color:#2a1a05}
 .c.hit{outline:3px solid #ffd84d;outline-offset:-1px;animation:pulse 1.2s ease-in-out 2;z-index:2}
 .c.hit:not(.im){background:#ffd84d!important}.c.hit:not(.im) span,.c.hit:not(.im) b{color:#1a1a1a!important}
 .c.hit.no img{filter:none}
@@ -62,7 +70,7 @@ input[type=search],input[type=text],textarea{font-size:1rem;padding:10px 12px;bo
 .nav button{font-size:1.3rem;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);cursor:pointer}
 .nav button:disabled{opacity:.3}
 #pi{font-size:.9rem;color:var(--mut);min-width:110px;text-align:center}
-.hint{font-size:.78rem;color:var(--dim);text-align:center;margin-top:8px}
+.hint{font-size:.8rem;color:var(--dim);text-align:center;margin-top:8px}
 .sheet{position:fixed;inset:0;background:#000a;display:flex;align-items:flex-end;justify-content:center;z-index:20}
 .sheet[hidden]{display:none}
 .sb{background:var(--card);width:100%;max-width:560px;max-height:88vh;overflow:auto;border-radius:16px 16px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
@@ -76,7 +84,7 @@ input[type=search],input[type=text],textarea{font-size:1rem;padding:10px 12px;bo
 .pkh{display:flex;align-items:center;gap:8px;margin:16px 0 8px;font-weight:700;font-size:.9rem}
 .pkh input{flex:1;font-size:.85rem;padding:7px 10px}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
-.pgrid button{border:2px solid transparent;border-radius:7px;background:var(--cell);padding:3px;cursor:pointer;display:flex;flex-direction:column;gap:3px;font-size:.66rem;color:var(--mut);text-align:left}
+.pgrid button{border:2px solid transparent;border-radius:7px;background:var(--cell);padding:3px;cursor:pointer;display:flex;flex-direction:column;gap:3px;font-size:.75rem;color:var(--mut);text-align:left;line-height:1.25}
 .pgrid button img{width:100%;aspect-ratio:63/88;object-fit:cover;border-radius:4px;background:#2c2f36}
 .pgrid button.on{border-color:#ffd84d;color:var(--tx)}
 .pgrid .msg{grid-column:1/-1;color:var(--mut);font-size:.85rem;padding:8px 0}
@@ -98,6 +106,9 @@ details.wl summary{font-weight:700;cursor:pointer}
 .chips.d button{border-color:var(--dec);background:var(--decbg)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#e9e9ec;color:#111;padding:9px 14px;border-radius:20px;font-size:.85rem;z-index:40;box-shadow:0 4px 14px #0008}
 .toast[hidden]{display:none}
+.tabs.fr{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 48px),#0000);mask-image:linear-gradient(90deg,#000 calc(100% - 48px),#0000)}
+.tabs.fl{-webkit-mask-image:linear-gradient(90deg,#0000,#000 48px);mask-image:linear-gradient(90deg,#0000,#000 48px)}
+.tabs.fl.fr{-webkit-mask-image:linear-gradient(90deg,#0000,#000 48px,#000 calc(100% - 48px),#0000);mask-image:linear-gradient(90deg,#0000,#000 48px,#000 calc(100% - 48px),#0000)}
 .tabs button.new{flex:0 0 auto;min-width:56px;color:var(--mut)}
 .chips.gens button.on{background:#e9e9ec;color:#111;border-color:#e9e9ec}
 .chk{display:flex;gap:8px;align-items:center;font-size:.85rem;margin-top:12px;color:var(--tx)}
@@ -110,7 +121,7 @@ a{color:#9cc3ff}
 .empty{text-align:center;color:var(--mut);padding:60px 20px}
 </style></head><body>
 <div class="top"><h1>Pokédex Binders</h1><button class="icon" id="gear" aria-label="Settings">⚙︎</button></div>
-<p class="s" id="sub"></p>
+<p class="s"><span id="sub"></span><button class="lnk" id="bset" hidden>⚙︎ Binder settings</button></p>
 <div class="tabs" id="tabs"></div>
 <div class="search"><input id="q" type="search" placeholder="Search name or #number, then press Enter" enterkeyhint="search" autocomplete="off"><div id="r"></div></div>
 <div class="stats" id="st"></div>
@@ -136,11 +147,25 @@ a{color:#9cc3ff}
  <div class="row"><button class="btn" id="psx">Cancel</button></div>
 </div></div>
 
+<div class="sheet set" id="bs" hidden><div class="sb">
+ <h3>Binder settings</h3>
+ <input type="text" id="bsn" maxlength="30" placeholder="Binder name" autocomplete="off">
+ <h3>Pockets per page</h3>
+ <div class="seg" id="bsz"><button data-z="4">4<small>2×2</small></button><button data-z="9">9<small>3×3</small></button><button data-z="16">16<small>4×4</small></button><button data-z="20">20<small>5×4</small></button></div>
+ <h3>First page</h3>
+ <div class="seg" id="bsr"><button data-r="0">Left side</button><button data-r="1">Right side</button></div>
+ <p>Most real binders start on the right-hand page, opposite the inside cover.</p>
+ <h3>Pages</h3>
+ <div class="row" style="margin-top:0;align-items:center"><button class="btn" id="bsm">− 2 pages</button><span id="bsc" style="flex:1;text-align:center;font-size:.9rem"></span><button class="btn" id="bsp">＋ 2 pages</button></div>
+ <div class="row" style="margin-top:22px"><button class="btn warn" id="bsd">Delete binder</button><button class="btn pri" id="bsx">Done</button></div>
+</div></div>
+
 <div class="sheet set" id="nb" hidden><div class="sb">
  <h3 id="nbh">New binder</h3>
  <p id="nbw" hidden>Welcome! Create your first binder to get started. You can add more binders later with the ＋ tab.</p>
  <input type="text" id="nbn" placeholder="Binder name (optional)" maxlength="30" autocomplete="off">
- <div class="seg" id="nbt" style="margin-top:12px"><button data-t="dex" class="on">Pokédex binder</button><button data-t="free">Start from scratch</button></div>
+ <div class="seg" id="nbz" style="margin-top:12px"><button data-z="4">4 pockets</button><button data-z="9" class="on">9 pockets</button><button data-z="16">16 pockets</button><button data-z="20">20 pockets</button></div>
+ <div class="seg" id="nbt" style="margin-top:8px"><button data-t="dex" class="on">Pokédex binder</button><button data-t="free">Start from scratch</button></div>
  <div id="nbdex"><p>Pick the generations to include. Pokémon are placed in National Pokédex order, 9 per page.</p>
   <div class="chips gens" id="nbg"></div>
   <label class="chk"><input type="checkbox" id="nbp" checked> Start each generation on a new page</label></div>
@@ -151,8 +176,6 @@ a{color:#9cc3ff}
 </div></div>
 
 <div class="sheet set" id="setg" hidden><div class="sb">
- <h3>This binder</h3>
- <div class="row" style="margin-top:0"><button class="btn" id="bren">Rename</button><button class="btn" id="bpg">＋2 pages</button><button class="btn" id="bdel">Delete</button></div>
  <h3>Default art for pockets without a chosen print</h3>
  <div class="seg" id="ord"><button data-o="old">Oldest print</button><button data-o="new">Newest print</button></div>
  <h3>Cloud sync</h3>
@@ -185,10 +208,18 @@ const pad=n=>String(n).padStart(3,'0');
 const N={};NAMES.forEach((nm,i)=>N[i+1]=nm);
 const genOf=n=>GENS.findIndex(([a,b])=>n>=a&&n<=b)+1;
 /* binder layouts: [{id,name,slots:[dex number or 0 for an empty pocket]}], 9 pockets per page, even page count */
-function dexSlots(gens,newPage){const s=[];[...gens].sort((a,b)=>a-b).forEach(g=>{if(newPage)while(s.length%9)s.push(0);for(let n=GENS[g-1][0];n<=GENS[g-1][1];n++)s.push(n)});return s}
-function padSlots(s){const t=s.map(n=>N[n]?+n:0),m=Math.max(18,Math.ceil(t.length/18)*18);while(t.length<m)t.push(0);return t}
+const SIZES={4:[2,2],9:[3,3],16:[4,4],20:[5,4]}; // pockets per page -> [columns, rows]
+function dexSlots(gens,newPage,size=9){const s=[];[...gens].sort((a,b)=>a-b).forEach(g=>{if(newPage)while(s.length%size)s.push(0);for(let n=GENS[g-1][0];n<=GENS[g-1][1];n++)s.push(n)});return s}
+function padSlots(s,size=9){const t=s.map(n=>N[n]?+n:0),m=Math.max(2*size,Math.ceil(t.length/(2*size))*2*size);while(t.length<m)t.push(0);return t}
 const newId=()=>'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-function cleanBinders(a){return Array.isArray(a)?a.filter(b=>b&&typeof b.id==='string'&&Array.isArray(b.slots)).map(b=>({id:b.id,name:String(b.name||'Binder').slice(0,30),slots:padSlots(b.slots)})):[]}
+function cleanBinders(a){return Array.isArray(a)?a.filter(b=>b&&typeof b.id==='string'&&Array.isArray(b.slots)).map(b=>{const size=SIZES[b.size]?+b.size:9;return{id:b.id,name:String(b.name||'Binder').slice(0,30),size,right:!!b.right,gb:!!b.gb,slots:padSlots(b.slots,size)}}):[]}
+// Change pockets per page, keeping the Pokémon order. Binders where each generation starts a new page keep that.
+function reflow(b,ns){const os=b.size;let seq=b.slots.slice();
+ if(b.gb){const out=[];for(let i=0;i<seq.length;i+=os){const pg=seq.slice(i,i+os);let e=pg.length;while(e&&!pg[e-1])e--;
+   const last=pg[e-1],nx=seq[i+os];out.push(...(e<pg.length&&last&&nx&&genOf(nx)!==genOf(last)?pg.slice(0,e):pg))}
+  seq=[];out.forEach(n=>{const prev=seq[seq.length-1];if(n&&prev&&genOf(prev)!==genOf(n))while(seq.length%ns)seq.push(0);seq.push(n)});
+  while(seq.length&&!seq[seq.length-1])seq.pop()}
+ b.size=ns;b.slots=padSlots(seq,ns)}
 const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}if((k==='pb-col'||k==='pb-binders')&&window.pbSync)window.pbSync()}};
 
 /* ---------- state ---------- */
@@ -196,15 +227,20 @@ let col=ls.get('pb-col',{});            // n -> {s:'top'|'decent', c:cardId, img
 let opt=Object.assign({ord:'old'},ls.get('pb-opt',{}));
 let defs=ls.get('pb-defs-'+opt.ord,{}); // n -> {c,img}
 // Users from before custom binders keep their three original binders.
-const LEGACY=()=>[{id:'gen1',name:'Gen 1',slots:padSlots(dexSlots([1],1))},{id:'gen23',name:'Gen 2–3',slots:padSlots(dexSlots([2,3],1))},{id:'gen45',name:'Gen 4–5',slots:padSlots(dexSlots([4,5],0))}];
+const LEGACY=()=>[{id:'gen1',name:'Gen 1',size:9,right:true,gb:true,slots:padSlots(dexSlots([1],1))},{id:'gen23',name:'Gen 2–3',size:9,right:false,gb:true,slots:padSlots(dexSlots([2,3],1))},{id:'gen45',name:'Gen 4–5',size:9,right:false,gb:false,slots:padSlots(dexSlots([4,5],0))}];
 let binders=cleanBinders(ls.get('pb-binders',null));
 if(localStorage.getItem('pb-binders')==null&&(localStorage.getItem('pb-col')!=null||localStorage.getItem('pb-cur')!=null)){binders=LEGACY();ls.set('pb-binders',binders)}
-const mem=ls.get('pb-mem2',null)||(()=>{const o={},a=ls.get('pb-mem',[]);LEGACY().forEach((b,i)=>o[b.id]=a[i]||0);return o})();
+const mem=ls.get('pb-mem2',null)||(()=>{const o={},a=ls.get('pb-mem',[]);LEGACY().forEach((b,i)=>o[b.id]=(a[i]||0)*2);return o})(); // binder id -> first visible page
 const curId=ls.get('pb-curid',null)??(LEGACY()[ls.get('pb-cur',0)]||{}).id;
 let bi=Math.max(0,binders.findIndex(b=>b.id===curId)),P=[],S=1;
-function layout(){P=[];const b=binders[bi];if(b)for(let i=0;i<b.slots.length;i+=9){const it=b.slots.slice(i,i+9),f=it.find(n=>n);P.push({n:i/9+1,g:f?genOf(f):0,it})}S=Math.max(1,P.length/2)}
+const MQ=matchMedia('(max-width:599px)');let PER=MQ.matches?1:2,lastPg=0; // pages shown at once; page last looked at
+const SZ=()=>binders[bi]?binders[bi].size:9;
+const OFF=()=>PER===2&&binders[bi]&&binders[bi].right?1:0; // first page on the right: a blank inside cover on the left
+const vp=(v,k)=>v*PER+k-OFF();                            // page index on view v, side k
+const pv=pg=>Math.floor((pg+OFF())/PER);                  // view that shows page pg
+function layout(){P=[];const b=binders[bi];if(b)for(let i=0;i<b.slots.length;i+=b.size){const it=b.slots.slice(i,i+b.size),f=it.find(n=>n);P.push({n:i/b.size+1,g:f?genOf(f):0,it})}S=Math.max(1,Math.ceil((P.length+OFF())/PER))}
 layout();
-let spread=Math.min(binders[bi]?mem[binders[bi].id]||0:0,S-1),target=spread,busy=false,hits=new Set(),cur=null,sel=null,selI=null;
+let spread=Math.min(binders[bi]?pv(mem[binders[bi].id]||0):0,S-1),target=spread,busy=false,hits=new Set(),cur=null,sel=null,selI=null;
 function saveBinders(){ls.set('pb-binders',binders)}
 let saveT;
 function save(){clearTimeout(saveT);saveT=setTimeout(()=>{ls.set('pb-col',col);note('Saved on this device ✓')},300)}
@@ -239,7 +275,7 @@ function pickDefault(arr){if(!arr.length)return null;
 const pending=new Set();let rrT;
 function rerenderSoon(){clearTimeout(rrT);rrT=setTimeout(()=>{if(!busy)show()},120)}
 function ensureDefaults(sp){
- const ns=[];for(const s of [sp,sp+1,sp-1])for(const pi of [s*2,s*2+1]){const p=P[pi];if(p)p.it.forEach(n=>{if(n)ns.push(n)})}
+ const ns=[];for(const s of [sp,sp+1,sp-1])for(let k=0;k<PER;k++){const p=P[vp(s,k)];if(p)p.it.forEach(n=>{if(n)ns.push(n)})}
  ns.filter(n=>!(col[n]&&col[n].img)&&!defs[n]&&!pending.has(n)).forEach(async n=>{
   pending.add(n);
   try{const d=pickDefault(await list(n));defs[n]=d?{c:d.id,img:d.img}:{none:1};ls.set('pb-defs-'+opt.ord,defs);rerenderSoon()}
@@ -263,17 +299,19 @@ function cell(n,i){if(!n)return `<div class="c e add" data-i="${i}" title="Add a
  const badge=s==='top'?'<i>★</i>':s==='decent'?'<i>↻</i>':'';
  const inner=img?`<img src="${esc(img)}/low.webp" alt="${esc(nm)}" loading="lazy" decoding="async">`:`<b>#${pad(n)}</b><span>${esc(nm)}</span>`;
  return `<div class="${cls}" data-n="${n}" data-i="${i}" data-l="#${pad(n)} ${esc(nm)}">${inner}${badge}</div>`}
-function page(i){const p=P[i];if(!p)return'';
- let c=p.it.map((n,k)=>cell(n,i*9+k)).join('');
- return `<div class="g${p.g}"><div class="h">Page ${p.n}${p.g?`<small>Gen ${p.g}</small>`:''}</div><div class="g">${c}</div></div>`}
+function page(i){const p=P[i];if(!p)return i<0?'<div class="cover">Inside cover</div>':'';
+ const sz=SZ(),[cols]=SIZES[sz],c=p.it.map((n,k)=>cell(n,i*sz+k)).join('');
+ return `<div class="g${p.g}" style="--cols:${cols};--k:${cols>3?(cols>4?.75:.85):1}"><div class="h">Page ${p.n}${p.g?`<small>Gen ${p.g}</small>`:''}</div><div class="g">${c}</div></div>`}
 function show(){if(!binders.length){$('L').innerHTML=$('R').innerHTML='';$('pi').textContent='';return}
- $('L').innerHTML=page(spread*2);$('R').innerHTML=page(spread*2+1);
- $('pi').textContent=`Pages ${spread*2+1}–${spread*2+2} of ${P.length}`;$('pv').disabled=spread==0;$('nx').disabled=spread==S-1;ensureDefaults(spread)}
+ $('book').classList.toggle('one',PER===1);$('L').innerHTML=page(vp(spread,0));$('R').innerHTML=PER===1?'':page(vp(spread,1));
+ const vis=[...Array(PER).keys()].map(k=>vp(spread,k)).filter(i=>P[i]);if(PER===1||!vis.includes(lastPg))lastPg=vis[0]??0;
+ $('pi').textContent=vis.length>1?`Pages ${vis[0]+1}–${vis[1]+1} of ${P.length}`:`Page ${(vis[0]??0)+1} of ${P.length}`;$('pv').disabled=spread==0;$('nx').disabled=spread==S-1;ensureDefaults(spread)}
 function nums(b=bi){return binders[b]?[...new Set(binders[b].slots.filter(Boolean))]:[]}
+function tabFade(){const t=$('tabs'),m=t.scrollWidth-t.clientWidth;t.classList.toggle('fl',t.scrollLeft>2);t.classList.toggle('fr',m>2&&t.scrollLeft<m-2)}
 function tabs(){$('tabs').innerHTML=binders.map((b,i)=>{const ns=nums(i),h=ns.filter(n=>col[n]&&col[n].s).length;
  return `<button class="${i===bi?'on':''}" data-b="${i}">${esc(b.name)}<small>${h}/${ns.length}</small></button>`}).join('')+'<button class="new" data-new="1" aria-label="New binder">＋<small>New</small></button>';
  const ns=nums(),sorted=[...ns].sort((a,b)=>a-b),run=ns.length>1&&sorted[sorted.length-1]-sorted[0]===ns.length-1;
- $('sub').textContent=binders.length?`9-pocket · ${run?`#${sorted[0]}–${sorted[sorted.length-1]} · `:''}${ns.length} Pokémon · ${P.length} pages`:''}
+ $('bset').hidden=!binders.length;$('sub').textContent=binders.length?`${SZ()}-pocket · ${run?`#${sorted[0]}–${sorted[sorted.length-1]} · `:''}${ns.length} Pokémon · ${P.length} pages`:'';tabFade()}
 function stats(){if(!binders.length){tabs();$('st').innerHTML='';return}const bn=nums(),v=bn.map(n=>col[n]).filter(e=>e&&e.s),t=v.filter(e=>e.s==='top').length,d=v.length-t;
  const val=v.reduce((a,e)=>a+(e.p||0),0);
  tabs();$('st').innerHTML=`<span class="pill"><b>${v.length}</b>/${bn.length} owned</span><span class="pill t" title="Top">★ ${t}</span><span class="pill d" title="Upgrade needed">↻ ${d}</span><span class="pill">${bn.length-v.length} missing</span>${val?`<span class="pill">≈ ${eur(val)}</span>`:''}<span id="sv"></span>`;
@@ -284,25 +322,29 @@ function wl(){const ns=nums(),dec=ns.filter(n=>col[n]&&col[n].s==='decent'),mis=
 function refresh(){if(!busy)show();stats()}
 
 /* ---------- page flipping ---------- */
-function flip(dir,ms){return new Promise(res=>{const F=$('F'),nx=spread+dir;
+function flip(dir,ms){if(PER===1)return new Promise(res=>{spread+=dir;show(); // phone: quick slide instead of a page turn
+  const a=$('L').animate([{transform:`translateX(${dir*40}px)`,opacity:.2},{transform:'none',opacity:1}],{duration:Math.min(ms,240),easing:'ease-out'});a.onfinish=a.oncancel=res});
+ return new Promise(res=>{const F=$('F'),nx=spread+dir;
  F.className='leaf '+(dir>0?'f':'b');F.style.transition='none';F.style.transform='rotateY(0deg)';F.style.visibility='visible';
- if(dir>0){$('FF').innerHTML=page(spread*2+1);$('FB').innerHTML=page(nx*2);$('R').innerHTML=page(nx*2+1)}
- else{$('FF').innerHTML=page(spread*2);$('FB').innerHTML=page(nx*2+1);$('L').innerHTML=page(nx*2)}
- F.offsetWidth;let done=false;const end=()=>{if(done)return;done=true;spread=nx;F.style.visibility='hidden';show();res()};
+ if(dir>0){$('FF').innerHTML=page(vp(spread,1));$('FB').innerHTML=page(vp(nx,0));$('R').innerHTML=page(vp(nx,1))}
+ else{$('FF').innerHTML=page(vp(spread,0));$('FB').innerHTML=page(vp(nx,1));$('L').innerHTML=page(vp(nx,0))}
+ F.offsetWidth;let done=false;const end=()=>{if(done)return;done=true;spread=nx;F.style.visibility='hidden';$('FF').style.visibility=$('FB').style.visibility='';show();res()};
  $('FF').style.visibility='visible';$('FB').style.visibility='hidden';
  requestAnimationFrame(()=>requestAnimationFrame(()=>{setTimeout(()=>{$('FF').style.visibility='hidden';$('FB').style.visibility='visible'},ms/2);
   F.style.transition=`transform ${ms}ms cubic-bezier(.45,.05,.35,1)`;F.style.transform=`rotateY(${dir>0?-180:180}deg)`;
   F.addEventListener('transitionend',end,{once:true});setTimeout(end,ms+120)}))})}
 async function run(){if(busy)return;busy=true;
  while(spread!==target){const left=Math.abs(target-spread);await flip(target>spread?1:-1,left>4?160:left>1?300:650)}
- busy=false;if(binders[bi])mem[binders[bi].id]=spread;ls.set('pb-mem2',mem)}
+ busy=false;if(binders[bi])mem[binders[bi].id]=Math.max(0,vp(spread,0));ls.set('pb-mem2',mem)}
 function go(s){target=Math.max(0,Math.min(S-1,s));const b=$('book').getBoundingClientRect();
  if(b.top<0||b.bottom>innerHeight){try{scrollTo({top:b.top+scrollY-8,behavior:'smooth'})}catch(e){}}run()}
 const idle=()=>new Promise(r=>{const w=()=>busy?setTimeout(w,50):r();w()});
 async function setBinder(i,sp,force){if(i===bi&&sp==null&&!force)return;target=spread;await idle();
- if(binders[bi])mem[binders[bi].id]=spread;bi=Math.max(0,Math.min(i,binders.length-1));layout();spread=target=Math.min(sp??(binders[bi]?mem[binders[bi].id]:0)??0,S-1);
+ if(binders[bi])mem[binders[bi].id]=Math.max(0,vp(spread,0));bi=Math.max(0,Math.min(i,binders.length-1));layout();spread=target=Math.min(pv(sp??(binders[bi]?mem[binders[bi].id]||0:0)),S-1);
  const bk=$('book');bk.classList.remove('sw');bk.offsetWidth;bk.classList.add('sw');
- if(binders[bi])ls.set('pb-curid',binders[bi].id);ls.set('pb-mem2',mem);show();stats()}
+ if(binders[bi])ls.set('pb-curid',binders[bi].id);ls.set('pb-mem2',mem);show();stats();
+ const on=$('tabs').querySelector('button.on');if(on)try{on.scrollIntoView({block:'nearest',inline:'nearest'})}catch(e){}}
+$('tabs').addEventListener('scroll',tabFade,{passive:true});addEventListener('resize',tabFade);
 $('tabs').addEventListener('click',e=>{if(e.target.closest('button[data-new]'))return openNew(false);const b=e.target.closest('button[data-b]');if(b)setBinder(+b.dataset.b)});
 $('pv').onclick=()=>go(target-1);$('nx').onclick=()=>go(target+1);
 let tx=null;$('book').addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
@@ -314,13 +356,14 @@ function search(){
  const v=$('q').value.trim().toLowerCase().replace(/^#/,''),r=$('r');hits=new Set();
  if(!v){r.textContent='';if(!busy)show();return}
  const num=/^\d+$/.test(v),found=[];
- [bi,...binders.keys()].filter((x,i,a)=>a.indexOf(x)===i&&binders[x]).forEach(b=>binders[b].slots.forEach((n,j)=>{if(n&&(num?n===+v:N[n].toLowerCase().includes(v))){hits.add(n);found.push({b,pi:Math.floor(j/9),k:j%9})}}));
+ [bi,...binders.keys()].filter((x,i,a)=>a.indexOf(x)===i&&binders[x]).forEach(b=>{const z=binders[b].size;binders[b].slots.forEach((n,j)=>{if(n&&(num?n===+v:N[n].toLowerCase().includes(v))){hits.add(n);found.push({b,pi:Math.floor(j/z),k:j%z,cols:SIZES[z][0]})}})});
  if(!busy)show();
  if(!found.length){r.textContent='No match';return}
  const f=found[0],pn=f.pi+1,other=f.b!==bi;
  const d=other?` · in your ${binders[f.b].name} binder`:(cur==null||cur.b!==f.b)?'':(pn===cur.pn?' · same page as before':` · ${Math.abs(pn-cur.pn)} page${Math.abs(pn-cur.pn)>1?'s':''} ${pn>cur.pn?'forward':'back'} from page ${cur.pn}`);
- r.textContent=(found.length>1?found.length+' matches · first: ':'')+`Page ${pn}, row ${Math.floor(f.k/3)+1}, slot ${f.k%3+1}`+d;
- cur={b:f.b,pn};if(other)setBinder(f.b,Math.floor(f.pi/2));else setTimeout(()=>go(Math.floor(f.pi/2)),350)}
+ r.textContent=(found.length>1?found.length+' matches · first: ':'')+`Page ${pn}, row ${Math.floor(f.k/f.cols)+1}, slot ${f.k%f.cols+1}`+d;
+ cur={b:f.b,pn};lastPg=f.pi;if(other)setBinder(f.b,f.pi);else setTimeout(()=>go(pv(f.pi)),350)}
+MQ.addEventListener('change',async()=>{target=spread;await idle();const vis=[vp(spread,0),vp(spread,1)];const pg=PER===2&&vis.includes(lastPg)?lastPg:Math.max(0,vp(spread,0));PER=MQ.matches?1:2;layout();spread=target=Math.min(pv(pg),S-1);show()});
 $('q').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('q').blur();search()}});
 $('q').addEventListener('input',()=>{if(!$('q').value){hits=new Set();$('r').textContent='';if(!busy)show()}});
 $('wl').addEventListener('toggle',()=>{if($('wl').open)wl()});
@@ -352,12 +395,12 @@ $('pclr').onclick=()=>{const en=col[sel];if(en){delete en.c;delete en.img;delete
 let pfT;$('pf').addEventListener('input',()=>{clearTimeout(pfT);pfT=setTimeout(picker,200)});
 $('shimg').onclick=()=>{$('zmi').src=$('shimg').src;$('zm').hidden=false};
 $('zm').onclick=()=>$('zm').hidden=true;
-function closeAll(){$('sh').hidden=true;$('setg').hidden=true;$('zm').hidden=true;$('ps').hidden=true;if(binders.length)$('nb').hidden=true}
+function closeAll(){$('bs').hidden=true;$('sh').hidden=true;$('setg').hidden=true;$('zm').hidden=true;$('ps').hidden=true;if(binders.length)$('nb').hidden=true}
 
 /* ---------- replace / add a Pokémon in a pocket ---------- */
-function setSlot(i,n){const b=binders[bi];if(!b||i==null)return;b.slots[i]=n||0;b.slots=padSlots(b.slots);saveBinders();layout();refresh()}
+function setSlot(i,n){const b=binders[bi];if(!b||i==null)return;b.slots[i]=n||0;b.slots=padSlots(b.slots,b.size);saveBinders();layout();refresh()}
 function openPick(){const cur=selI!=null&&binders[bi]?binders[bi].slots[selI]:0;
- $('psh').textContent=cur?`Replace #${pad(cur)} ${N[cur]} with…`:`Add a Pokémon to page ${Math.floor(selI/9)+1}, slot ${selI%9+1}`;
+ $('psh').textContent=cur?`Replace #${pad(cur)} ${N[cur]} with…`:`Add a Pokémon to page ${Math.floor(selI/SZ())+1}, pocket ${selI%SZ()+1}`;
  $('psq').value='';$('sh').hidden=true;$('ps').hidden=false;plist();setTimeout(()=>$('psq').focus(),50)}
 function plist(){const v=$('psq').value.trim().toLowerCase().replace(/^#/,''),cur=binders[bi]?binders[bi].slots[selI]:0;
  const inB=new Set(nums());let a=[];
@@ -373,32 +416,48 @@ $('srep').onclick=()=>openPick();
 $('srem').onclick=()=>{const n=sel;setSlot(selI,0);closeAll();toast(`Removed ${N[n]} from this pocket`)};
 
 /* ---------- new binder ---------- */
-let nbType='dex';const nbGens=new Set([1]);
-function nbUI(){$('nbt').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.t===nbType));
+let nbType='dex',nbSize=9;const nbGens=new Set([1]);
+function nbUI(){$('nbz').querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset.z===nbSize));$('nbt').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.t===nbType));
  $('nbdex').hidden=nbType!=='dex';$('nbfree').hidden=nbType!=='free';
  $('nbg').innerHTML=GENS.map(([a,b],i)=>`<button data-g="${i+1}" class="${nbGens.has(i+1)?'on':''}">Gen ${i+1} <small>#${a}–${b}</small></button>`).join('')}
-function openNew(welcome){closeAll();nbType='dex';nbGens.clear();nbGens.add(1);$('nbn').value='';
+function openNew(welcome){closeAll();nbType='dex';nbSize=9;nbGens.clear();nbGens.add(1);$('nbn').value='';
  $('nbh').textContent=welcome?'Create your first binder':'New binder';$('nbw').hidden=!welcome;$('nbx').hidden=!!welcome;
  $('nbs').hidden=!(welcome&&window.pbSignIn);nbUI();$('nb').hidden=false}
 function genName(gs){const a=[...gs].sort((x,y)=>x-y);if(a.length===9)return'National Dex';
  return a.every((g,i)=>!i||g===a[i-1]+1)&&a.length>1?`Gen ${a[0]}–${a[a.length-1]}`:'Gen '+a.join(', ')}
+$('nbz').onclick=e=>{const b=e.target.closest('button[data-z]');if(b){nbSize=+b.dataset.z;nbUI()}};
 $('nbt').onclick=e=>{const b=e.target.closest('button[data-t]');if(b){nbType=b.dataset.t;nbUI()}};
 $('nbg').onclick=e=>{const b=e.target.closest('button[data-g]');if(!b)return;const g=+b.dataset.g;nbGens.has(g)?nbGens.delete(g):nbGens.add(g);nbUI()};
 $('nbx').onclick=()=>{$('nb').hidden=true};
 $('nbsi').onclick=e=>{e.preventDefault();window.pbSignIn&&window.pbSignIn()};
 $('nbc').onclick=()=>{let b;
  if(nbType==='dex'){if(!nbGens.size){toast('Pick at least one generation');return}
- b={id:newId(),name:$('nbn').value.trim()||genName(nbGens),slots:padSlots(dexSlots([...nbGens],$('nbp').checked))}}
- else{const pg=Math.max(2,Math.min(300,Math.ceil((+$('nbpg').value||20)/2)*2));b={id:newId(),name:$('nbn').value.trim()||'My binder',slots:padSlots(new Array(pg*9).fill(0))}}
+ const gb=$('nbp').checked;b={id:newId(),name:$('nbn').value.trim()||genName(nbGens),size:nbSize,right:false,gb,slots:padSlots(dexSlots([...nbGens],gb,nbSize),nbSize)}}
+ else{const pg=Math.max(2,Math.min(300,Math.ceil((+$('nbpg').value||20)/2)*2));b={id:newId(),name:$('nbn').value.trim()||'My binder',size:nbSize,right:false,gb:false,slots:padSlots(new Array(pg*nbSize).fill(0),nbSize)}}
  binders.push(b);saveBinders();$('nb').hidden=true;setBinder(binders.length-1,0,true);toast(`Created “${b.name}”`)};
 
 /* ---------- binder settings ---------- */
-$('bren').onclick=()=>{const b=binders[bi];if(!b)return;const v=prompt('Binder name',b.name);if(v&&v.trim()){b.name=v.trim().slice(0,30);saveBinders();stats()}};
-$('bpg').onclick=()=>{const b=binders[bi];if(!b)return;b.slots=padSlots(b.slots.concat(new Array(18).fill(0)));saveBinders();layout();refresh();toast(`Now ${P.length} pages`)};
-$('bdel').onclick=()=>{const b=binders[bi];if(!b||!confirm(`Delete the binder “${b.name}”? Your owned cards stay saved.`))return;
+function bsUI(){const b=binders[bi];if(!b)return;
+ $('bsz').querySelectorAll('button').forEach(x=>x.classList.toggle('on',+x.dataset.z===b.size));
+ $('bsr').querySelectorAll('button').forEach(x=>x.classList.toggle('on',+x.dataset.r===+b.right));
+ $('bsc').textContent=`${P.length} pages · ${b.slots.length} pockets`}
+function bsChanged(keepPage){const pg=Math.max(0,vp(spread,0));saveBinders();layout();spread=target=Math.min(pv(keepPage??pg),S-1);refresh();bsUI()}
+$('bset').onclick=()=>{const b=binders[bi];if(!b)return;closeAll();$('bsn').value=b.name;bsUI();$('bs').hidden=false};
+$('bsn').addEventListener('change',()=>{const b=binders[bi],v=$('bsn').value.trim();if(b&&v){b.name=v.slice(0,30);saveBinders();stats()}});
+$('bsz').onclick=e=>{const x=e.target.closest('button[data-z]'),b=binders[bi];if(!x||!b||+x.dataset.z===b.size)return;
+ const first=b.slots[Math.max(0,vp(spread,0))*b.size];reflow(b,+x.dataset.z);const at=first?b.slots.indexOf(first):-1;
+ bsChanged(at<0?0:Math.floor(at/b.size));toast(`${b.size} pockets per page · ${P.length} pages`)};
+$('bsr').onclick=e=>{const x=e.target.closest('button[data-r]'),b=binders[bi];if(!x||!b)return;b.right=x.dataset.r==='1';bsChanged()};
+$('bsp').onclick=()=>{const b=binders[bi];if(!b)return;b.slots=padSlots(b.slots.concat(new Array(2*b.size).fill(0)),b.size);bsChanged()};
+$('bsm').onclick=()=>{const b=binders[bi];if(!b)return;const n=2*b.size;
+ if(b.slots.length<=n){toast('A binder needs at least 2 pages');return}
+ if(b.slots.slice(-n).some(Boolean)){toast('The last 2 pages aren’t empty');return}
+ b.slots=b.slots.slice(0,-n);bsChanged()};
+$('bsx').onclick=closeAll;
+$('bsd').onclick=()=>{const b=binders[bi];if(!b||!confirm(`Delete the binder “${b.name}”? Your owned cards stay saved.`))return;
  binders.splice(bi,1);delete mem[b.id];saveBinders();closeAll();if(binders.length)setBinder(Math.max(0,bi-1),null,true);else{bi=0;layout();refresh();openNew(true)}};
 $('shd').onclick=closeAll;
-['sh','setg','ps','nb'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target===$(id))closeAll()}));
+['sh','setg','ps','nb','bs'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target===$(id))closeAll()}));
 
 /* ---------- settings ---------- */
 function segs(){$('ord').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.o===opt.ord))}
