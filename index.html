@@ -153,6 +153,13 @@ a{color:var(--acc)}
 .gate{position:fixed;inset:0;z-index:45;background:radial-gradient(120% 80% at 50% 0%,#1d2028,var(--bg) 60%);display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}.gate[hidden]{display:none}
 .gate .gb{max-width:340px;width:100%;display:flex;flex-direction:column;align-items:center;gap:10px}.gate img{width:88px;height:88px;border-radius:22px;box-shadow:0 10px 30px #000a}.gate h2{margin:6px 0 0;letter-spacing:-.015em}.gate p{color:var(--mut);margin:0 0 10px;line-height:1.45}.gate .btn{width:100%;flex:none;min-height:48px}
 .btn:disabled{opacity:.45;cursor:default}
+/* pick/replace sheets: header and buttons stay put, only the card list scrolls */
+#sh .sb,#ps .sb{display:flex;flex-direction:column;overflow:hidden;height:88vh;height:88dvh}
+#sh .sb>*,#ps .sb>*{flex:none}
+#sh #pk,#ps #psl{flex:1 1 auto;min-height:120px;overflow-y:auto;overscroll-behavior:contain;align-content:start;margin:0 -16px;padding:4px 16px 12px;scrollbar-width:thin;scrollbar-color:var(--line2) transparent}
+#ps #psl{margin-top:10px}
+#pk+.row,#psl+.row{margin-top:0;padding-top:12px;border-top:1px solid var(--line)}
+@media (min-width:640px){#sh .sb,#ps .sb{height:min(86vh,820px)}#sh #pk,#ps #psl{margin:0 -20px;padding:4px 20px 12px}#ps #psl{margin-top:10px}}
 @media (hover:hover){
  .icon:hover,.nav button:not(:disabled):hover,.btn:not(:disabled):not(.pri):hover,.chips button:hover,.plist button:hover,.opts button:hover{border-color:var(--line2);background-color:var(--on)}
  .opts [data-s=decent]:hover{background:#4a3517}.opts [data-s=top]:hover{background:#1c3f2b}
@@ -485,7 +492,7 @@ async function picker(){const n=sel,box=$('pk');box.innerHTML=addTile+customList
   box.innerHTML=addTile+(a.length?a.map(c=>tile(c,e)).join(''):`<div class="msg">${f||lg?'No prints match that filter':'No prints found'}</div>`)}
  catch(err){if(sel===n)box.innerHTML=addTile+customList(n).map(c=>tile(c,col[n]||{})).join('')+'<div class="msg">Couldn’t load prints — check your connection.</div>'}}
 $('book').addEventListener('click',e=>{const a=e.target.closest('.c.add[data-i]');if(a&&!busy){selI=+a.dataset.i;sel=null;return openPick()}
- const c=e.target.closest('.c[data-n]');if(!c||busy)return;sel=+c.dataset.n;selI=+c.dataset.i;$('pf').value='';sheetHead();$('sh').hidden=false;$('sh').querySelector('.sb').scrollTop=0;picker()});
+ const c=e.target.closest('.c[data-n]');if(!c||busy)return;sel=+c.dataset.n;selI=+c.dataset.i;$('pf').value='';sheetHead();$('sh').hidden=false;$('pk').scrollTop=0;picker()});
 $('sh').querySelector('.opts').addEventListener('click',e=>{const b=e.target.closest('button[data-s]');if(!b)return;const s=b.dataset.s,en=entry(sel);
  if((en.s||'')!==s){if(s)en.s=s;else delete en.s;tidy(sel);save();refresh();sheetHead()}});
 $('pk').addEventListener('click',async e=>{if(e.target.closest('button[data-add]'))return openAdd(null);
@@ -536,7 +543,7 @@ function closeAll(){$('ad').hidden=true;$('bs').hidden=true;$('sh').hidden=true;
 function setSlot(i,n){const b=binders[bi];if(!b||i==null)return;b.slots[i]=n||0;b.slots=padSlots(b.slots,b.size);saveBinders();layout();refresh()}
 function openPick(){const cur=selI!=null&&binders[bi]?binders[bi].slots[selI]:0;
  $('psh').textContent=cur?`Replace #${pad(cur)} ${N[cur]} with…`:`Add a Pokémon to page ${Math.floor(selI/SZ())+1}, pocket ${selI%SZ()+1}`;
- $('psq').value='';$('sh').hidden=true;$('ps').hidden=false;plist();setTimeout(()=>$('psq').focus(),50)}
+ $('psq').value='';$('sh').hidden=true;$('ps').hidden=false;$('psl').scrollTop=0;plist();setTimeout(()=>$('psq').focus(),50)}
 function plist(){const v=$('psq').value.trim().toLowerCase().replace(/^#/,''),cur=binders[bi]?binders[bi].slots[selI]:0;
  const inB=new Set(nums());let a=[];
  if(!v){const near=cur||binders[bi].slots.slice(0,selI).reverse().find(Boolean)||0;for(let n=Math.max(1,near-5);n<=Math.min(NAMES.length,near+40);n++)a.push(n)}
