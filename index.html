@@ -120,6 +120,9 @@ details.wl summary{font-weight:700;cursor:pointer}
 <div class="sheet set" id="setg" hidden><div class="sb">
  <h3>Default art for pockets without a chosen print</h3>
  <div class="seg" id="ord"><button data-o="old">Oldest print</button><button data-o="new">Newest print</button></div>
+ <h3>Cloud sync</h3>
+ <p id="acct">Sign in with Google to keep your collection in sync across all your devices.</p>
+ <div class="row"><button class="btn pri" id="gin">Sign in with Google</button><button class="btn" id="gout" hidden>Sign out</button></div>
  <h3>Backup</h3>
  <p>Your collection is stored on this device. Export a backup now and then, and use Import to move it to another device.</p>
  <div class="row"><button class="btn" id="exf">Export file</button><button class="btn" id="exc">Copy backup</button></div>
@@ -144,7 +147,7 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pad=n=>String(n).padStart(3,'0');
 const N={};B.forEach(b=>b.P.forEach(p=>p.it.forEach(([n,nm])=>N[n]=nm)));
-const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}if(k==='pb-col'&&window.pbSync)window.pbSync(v)}};
 
 /* ---------- state ---------- */
 let col=ls.get('pb-col',{});            // n -> {s:'top'|'decent', c:cardId, img, set, no, p}
@@ -328,6 +331,11 @@ $('cc').onclick=async()=>{try{await caches.delete('pb-img-v1');toast('Image cach
 
 /* ---------- start ---------- */
 note('Saved on this device');show();stats();
+/* bridge for sync.js: read the collection, or replace it with the cloud copy without re-uploading it */
+window.pbApp={col:()=>col,note,toast,
+ load(c){col=c&&typeof c==='object'?c:{};try{localStorage.setItem('pb-col',JSON.stringify(col))}catch(e){}refresh()}};
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
-</script></body></html>
+</script>
+<script type="module" src="sync.js"></script>
+</body></html>
