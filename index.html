@@ -304,13 +304,27 @@ let setsReady=null;
 async function list(n){
  if(lists[n])return lists[n];
  await (setsReady||(setsReady=loadSets()));
- // English must load (offline → error); Japanese and Chinese are extras. Asian cards often have no picture yet: keep them as text tiles.
- const raws=await Promise.all(LANGS.map(l=>l==='en'?getJSON(`${API}/cards?dexId=eq:${n}`):getJSON(`${TCG}/${l}/cards?dexId=eq:${n}`).catch(()=>[])));
- const arr=[];LANGS.forEach((l,li)=>(raws[li]||[]).forEach(c=>{const sid=setOf(c.id);if(isPocket(sid)||(l==='en'&&!c.image))return;
+ // English must load (offline → error); Japanese and Chinese are extras. Cards without a picture yet are kept as text tiles.
+ const [raws,nd]=await Promise.all([Promise.all(LANGS.map(l=>l==='en'?getJSON(`${API}/cards?dexId=eq:${n}`):getJSON(`${TCG}/${l}/cards?dexId=eq:${n}`).catch(()=>[]))),noDex().catch(()=>({}))]);
+ LANGS.forEach((l,li)=>{const have=new Set((raws[li]||[]).map(c=>c.id));((nd[l]||{})[n]||[]).forEach(c=>{if(!have.has(c.id))raws[li].push(c)})});
+ const arr=[];LANGS.forEach((l,li)=>(raws[li]||[]).forEach(c=>{const sid=setOf(c.id);if(isPocket(sid))return;
   const os=setInfo.name[l+'|'+sid]||sid;arr.push({id:cid(l,c.id),lang:l,li,name:N[n]||c.name,no:c.localId,img:c.image||'',sid,o:setInfo.order[l+'|'+sid]??9999,os,set:setEn(os,cid(l,c.id))})}));
  arr.sort((a,b)=>a.li-b.li||a.o-b.o||(parseInt(a.no)||0)-(parseInt(b.no)||0));
  return lists[n]=arr;
 }
+/* Some cards on TCGdex have no Pokédex number yet (the newest sets, and many Japanese and Chinese cards).
+   Find those by name instead: the longest Pokémon name inside the card name wins ("Mega Golisopod ex" → Golisopod,
+   "メガヤンマex" → Yanmega, not Yanma). Loaded once, the first time prints are shown. */
+let noDexP=null;
+function noDex(){return noDexP||(noDexP=(async()=>{
+ const [intl,...lsts]=await Promise.all([getJSON('names-intl.json'),...LANGS.map(l=>getJSON(`${TCG}/${l}/cards?category=Pokemon&dexId=null:`).catch(()=>[]))]);
+ const names={en:[],ja:[],'zh-tw':[],'zh-cn':[]};
+ NAMES.forEach((nm,i)=>{const n=i+1,[ja,hant,hans]=intl[i]||[];names.en.push([nm,n]);if(ja)names.ja.push([ja,n]);
+  if(hant){names['zh-tw'].push([hant,n]);names['zh-cn'].push([hant,n])}if(hans&&hans!==hant){names['zh-tw'].push([hans,n]);names['zh-cn'].push([hans,n])}});
+ const out={};LANGS.forEach((l,k)=>{const list=names[l].sort((a,b)=>b[0].length-a[0].length),idx={};
+  const hit=l==='en'?(cn,nm)=>{const i=cn.indexOf(nm);return i>=0&&!/[A-Za-z]/.test(cn[i-1]||'')&&!/[a-z]/.test(cn[i+nm.length]||'')}:(cn,nm)=>cn.includes(nm);
+  (Array.isArray(lsts[k])?lsts[k]:[]).forEach(c=>{const m=list.find(([nm])=>hit(c.name||'',nm));if(m)(idx[m[1]]||(idx[m[1]]=[])).push(c)});out[l]=idx});
+ return out})().catch(e=>{noDexP=null;throw e}))}
 function pickDefault(all){const arr=all.filter(c=>c.lang==='en'&&c.img);if(!arr.length)return all.find(c=>c.img)||null;
  if(opt.ord==='new'){for(let i=arr.length-1;i>=0;i--)if(arr[i].o<9999)return arr[i];return arr[arr.length-1]}
  return arr[0]}
