@@ -1,20 +1,26 @@
-// Cloud sync: Google sign-in (Firebase Auth) + one Firestore document per user holding the collection.
+// Google sign-in (required) via Firebase Auth + one Firestore document per user holding the collection.
 import { firebaseConfig } from './firebase-config.js';
 
 const V = '10.14.1', CDN = `https://www.gstatic.com/firebasejs/${V}`;
 const $ = id => document.getElementById(id);
 const app = window.pbApp;
-const ui = (text, signedIn) => {
-  $('acct').textContent = text;
-  $('gin').hidden = !!signedIn;
-  $('gout').hidden = !signedIn;
+// The app stays behind the sign-in screen until a Google account is signed in.
+const gate = (msg, canSignIn) => {
+  $('gate').hidden = false;
+  $('gmsg').textContent = msg;
+  $('gin').disabled = !canSignIn;
+  $('gin').textContent = 'Sign in with Google';
 };
 
 if (!firebaseConfig.apiKey) {
-  ui('Cloud sync is not set up yet (add your Firebase config to firebase-config.js).');
-  $('gin').disabled = true;
+  gate('Sign-in is not set up yet (add your Firebase config to firebase-config.js).', false);
 } else {
-  start().catch(e => { console.error(e); ui('Cloud sync is unavailable right now (offline?).'); });
+  start().catch(e => {
+    console.error(e);
+    gate('Can’t reach Google sign-in right now. Check your connection and try again.', true);
+    $('gin').textContent = 'Try again';
+    $('gin').onclick = () => location.reload();
+  });
 }
 
 async function start() {
@@ -35,12 +41,18 @@ async function start() {
       if (e.code !== 'auth/popup-closed-by-user') app.toast('Sign-in failed: ' + (e.code || e.message));
     }
   };
-  $('gout').onclick = () => A.signOut(auth);
-  window.pbSignIn = () => $('gin').click();
-  app.syncReady();
+  // Sign out: upload anything still waiting, then clear this device so the next account starts clean.
+  $('gout').onclick = async () => {
+    if (!confirm('Sign out? Your binders stay saved in your Google account.')) return;
+    if (dirty) await write();
+    await A.signOut(auth);
+    app.loadCustoms({});
+    app.load({ col: {}, binders: [] });
+  };
+  gate('Checking your sign-in…', true);
   A.getRedirectResult(auth).catch(e => app.toast('Sign-in failed: ' + (e.code || e.message)));
 
-  let ref = null, ready = false, unsub = null, unsubC = null, pushT = null;
+  let ref = null, ready = false, unsub = null, unsubC = null, pushT = null, dirty = false;
   // Cards you added yourself (with photos) live in their own documents: users/{uid}/custom/{id}
   const cdoc = id => F.doc(ref, 'custom', id);
   window.pbSyncCustom = id => {
@@ -70,7 +82,6 @@ async function start() {
     }
   }
 
-  let dirty = false;
   const write = () => {
     clearTimeout(pushT); dirty = false;
     const { col, binders } = app.state();
@@ -90,9 +101,11 @@ async function start() {
     if (unsub) { unsub(); unsub = null; }
     if (unsubC) { unsubC(); unsubC = null; }
     ready = false; ref = null; dirty = false; clearTimeout(pushT);
-    if (!user) { ui('Sign in with Google to keep your binders and collection in sync across all your devices.'); app.note('Saved on this device'); return; }
+    if (!user) { gate('Sign in with Google to use your binders. Your collection syncs across all your devices.', true); return; }
 
-    ui(`Signed in as ${user.email || user.displayName}. Your binders and collection sync automatically.`, true);
+    $('gate').hidden = true;
+    $('acct').textContent = `Signed in as ${user.email || user.displayName}. Your binders and collection sync automatically.`;
+    $('gout').hidden = false;
     ref = F.doc(db, 'users', user.uid);
 
     // First sync on this device: merge local + cloud so nothing is lost.
