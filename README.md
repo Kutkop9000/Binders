@@ -1,4 +1,5 @@
 # Binders
+
 ## Cloud sync (Google sign-in)
 
 The collection syncs across devices through Firebase. One-time setup:
