@@ -36,48 +36,62 @@ async function start() {
     }
   };
   $('gout').onclick = () => A.signOut(auth);
+  window.pbSignIn = () => $('gin').click();
+  app.syncReady();
   A.getRedirectResult(auth).catch(e => app.toast('Sign-in failed: ' + (e.code || e.message)));
 
   let ref = null, ready = false, unsub = null, pushT = null;
 
-  const push = col => {
+  let dirty = false;
+  const write = () => {
+    clearTimeout(pushT); dirty = false;
+    const { col, binders } = app.state();
+    return F.setDoc(ref, { col: JSON.stringify(col), binders: JSON.stringify(binders), updated: F.serverTimestamp() })
+      .then(() => app.note('Synced to your Google account ✓'))
+      .catch(() => app.note('Saved on this device – will sync when online'));
+  };
+  // Local change: upload shortly after (batches quick taps). Until then, incoming cloud updates don't overwrite it.
+  const push = () => {
     if (!ref || !ready) return;
-    clearTimeout(pushT);
-    app.note('Syncing…');
-    pushT = setTimeout(() => {
-      F.setDoc(ref, { col: JSON.stringify(col), updated: F.serverTimestamp() })
-        .then(() => app.note('Synced to your Google account ✓'))
-        .catch(() => app.note('Saved on this device – will sync when online'));
-    }, 600);
+    dirty = true; clearTimeout(pushT); app.note('Syncing…');
+    pushT = setTimeout(write, 600);
   };
   window.pbSync = push;
 
   A.onAuthStateChanged(auth, async user => {
     if (unsub) { unsub(); unsub = null; }
-    ready = false; ref = null;
-    if (!user) { ui('Sign in with Google to keep your collection in sync across all your devices.'); app.note('Saved on this device'); return; }
+    ready = false; ref = null; dirty = false; clearTimeout(pushT);
+    if (!user) { ui('Sign in with Google to keep your binders and collection in sync across all your devices.'); app.note('Saved on this device'); return; }
 
-    ui(`Signed in as ${user.email || user.displayName}. Your collection syncs automatically.`, true);
+    ui(`Signed in as ${user.email || user.displayName}. Your binders and collection sync automatically.`, true);
     ref = F.doc(db, 'users', user.uid);
 
-    // First sync on this device: merge local + cloud so nothing is lost (cloud wins for the same Pokémon).
+    // First sync on this device: merge local + cloud so nothing is lost.
+    // Cards: cloud wins for the same Pokémon. Binders: the account's layouts, plus any local binders it doesn't have yet.
     try {
-      const snap = await F.getDoc(ref);
-      const cloud = snap.exists() ? JSON.parse(snap.data().col || '{}') : {};
-      const merged = Object.assign({}, app.col(), cloud);
-      app.load(merged);
+      const snap = await F.getDoc(ref), d = snap.exists() ? snap.data() : {};
+      const cloudCol = JSON.parse(d.col || '{}'), cloudBinders = JSON.parse(d.binders || '[]');
+      const local = app.state();
+      const col = Object.assign({}, local.col, cloudCol);
+      const binders = cloudBinders.concat(local.binders.filter(b => !cloudBinders.some(c => c.id === b.id)));
+      app.load({ col, binders });
       ready = true;
-      if (JSON.stringify(merged) !== JSON.stringify(cloud)) push(merged);
+      const now = app.state();
+      if (JSON.stringify(now.col) !== (d.col || '{}') || JSON.stringify(now.binders) !== (d.binders || '[]')) write(); // applied to the local cache at once, so the listener below sees it as a pending write
       else app.note('Synced to your Google account ✓');
     } catch (e) {
       console.error(e); app.note('Saved on this device – cloud sync failed'); return;
     }
 
-    // Live updates from your other devices.
+    // Live updates from your other devices (started after the merge is uploaded, so it can't be overwritten by the old copy).
     unsub = F.onSnapshot(ref, snap => {
-      if (!snap.exists() || snap.metadata.hasPendingWrites) return;
-      const raw = snap.data().col || '{}';
-      if (raw !== JSON.stringify(app.col())) { app.load(JSON.parse(raw)); app.note('Synced to your Google account ✓'); }
+      if (!snap.exists() || snap.metadata.hasPendingWrites || dirty) return;
+      const d = snap.data(), st = app.state();
+      const c = d.col ?? JSON.stringify(st.col), b = d.binders ?? JSON.stringify(st.binders);
+      if (c !== JSON.stringify(st.col) || b !== JSON.stringify(st.binders)) {
+        app.load({ col: JSON.parse(c), binders: JSON.parse(b) });
+        app.note('Synced to your Google account ✓');
+      }
     });
   });
 }

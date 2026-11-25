@@ -13,8 +13,8 @@ button{font:inherit;color:inherit}
 .top{display:flex;align-items:center;gap:8px}
 h1{font-size:1.25rem;margin:0;flex:1}p.s{margin:2px 0 10px;color:var(--mut);font-size:.85rem}
 .icon{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--card);font-size:1.1rem;cursor:pointer}
-.tabs{display:flex;gap:4px;background:var(--card);padding:4px;border-radius:12px;margin-bottom:10px}
-.tabs button{flex:1;border:0;background:transparent;color:var(--mut);padding:8px 4px;border-radius:9px;font-size:.9rem;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;background:var(--card);padding:4px;border-radius:12px;margin-bottom:10px}
+.tabs button{flex:1;min-width:76px;border:0;background:transparent;color:var(--mut);padding:8px 4px;border-radius:9px;font-size:.9rem;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px}
 .tabs button small{font-size:.68rem;font-weight:500;opacity:.8}
 .tabs button.on{background:#33363e;color:var(--tx)}
 .search{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
@@ -38,12 +38,13 @@ input[type=search],input[type=text],textarea{font-size:1rem;padding:10px 12px;bo
 .face.back{transform:rotateY(180deg)}
 .h{font-weight:700;font-size:.8rem;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:4px}
 .h small{font-weight:600;font-size:.62rem;color:#fff;padding:1px 6px;border-radius:9px;white-space:nowrap}
-.g1 small{background:#c94444}.g2 small{background:#b8921c}.g3 small{background:#2a8f60}.g4 small{background:#3b6fb6}.g5 small{background:#5d626b}
+.g1 small{background:#c94444}.g2 small{background:#b8921c}.g3 small{background:#2a8f60}.g4 small{background:#3b6fb6}.g5 small{background:#5d626b}.g6 small{background:#8a4fb8}.g7 small{background:#c2622d}.g8 small{background:#2f8f9a}.g9 small{background:#a8325e}
 .g{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
 .c{position:relative;aspect-ratio:63/88;border:1.5px solid var(--line);border-radius:5px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:2px;font-size:clamp(.5rem,1.9vw,.85rem);overflow:hidden;background:var(--cell)}
 .c b{color:var(--dim);font-size:.8em;font-weight:600}.c span{font-weight:600;overflow-wrap:anywhere;line-height:1.1}
 .c.e{border-style:dashed;border-color:#2c2f36;background:transparent}
-.c[data-n]{cursor:pointer}
+.c[data-n],.c.add{cursor:pointer}
+.c.add span{color:#3a3e47;font-size:1.6em;font-weight:400}.c.add:hover span{color:var(--mut)}
 .c[data-n].no span{color:var(--dim)}
 .c.im{padding:0;border-width:1px}
 .c img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:3px}
@@ -97,6 +98,16 @@ details.wl summary{font-weight:700;cursor:pointer}
 .chips.d button{border-color:var(--dec);background:var(--decbg)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#e9e9ec;color:#111;padding:9px 14px;border-radius:20px;font-size:.85rem;z-index:40;box-shadow:0 4px 14px #0008}
 .toast[hidden]{display:none}
+.tabs button.new{flex:0 0 auto;min-width:56px;color:var(--mut)}
+.chips.gens button.on{background:#e9e9ec;color:#111;border-color:#e9e9ec}
+.chk{display:flex;gap:8px;align-items:center;font-size:.85rem;margin-top:12px;color:var(--tx)}
+.plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-top:10px}
+.plist button{text-align:left;padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:var(--cell);cursor:pointer;font-size:.85rem}
+.plist button b{color:var(--mut);font-weight:600;margin-right:4px}.plist button.on{border-color:#ffd84d}
+.plist .msg{grid-column:1/-1;color:var(--mut);font-size:.85rem}
+input[type=number]{font-size:1rem;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--card);color:var(--tx);width:90px}
+a{color:#9cc3ff}
+.empty{text-align:center;color:var(--mut);padding:60px 20px}
 </style></head><body>
 <div class="top"><h1>Pokédex Binders</h1><button class="icon" id="gear" aria-label="Settings">⚙︎</button></div>
 <p class="s" id="sub"></p>
@@ -106,25 +117,49 @@ details.wl summary{font-weight:700;cursor:pointer}
 <div class="book" id="book"><div class="pg l" id="L"></div><div class="pg r" id="R"></div>
 <div class="leaf" id="F"><div class="face front" id="FF"></div><div class="face back" id="FB"></div></div></div>
 <div class="nav"><button id="pv" aria-label="Previous">‹</button><span id="pi"></span><button id="nx" aria-label="Next">›</button></div>
-<div class="hint">Tap a pocket to mark it (↻ Decent · ★ Top) and choose which print you own</div>
+<div class="hint">Tap a pocket to mark it (★ Top · ↻ Upgrade needed), choose your print, or replace the Pokémon</div>
 <details class="wl" id="wl"><summary>Want list (this binder)</summary><div id="wlc"></div></details>
 
 <div class="sheet" id="sh" hidden><div class="sb">
  <div class="shh"><img id="shimg" alt="" hidden><div><div id="shn"></div><div id="shm"></div></div></div>
- <div class="opts"><button data-s="">Don't have</button><button data-s="decent">↻ Decent</button><button data-s="top">★ Top</button></div>
+ <div class="opts"><button data-s="">Don't have</button><button data-s="decent">↻ Upgrade needed</button><button data-s="top">★ Top</button></div>
  <div class="pkh">Your print <input id="pf" type="text" placeholder="Filter: set or name"></div>
  <div class="pgrid" id="pk"></div>
+ <div class="row"><button class="btn" id="srep">⇄ Replace Pokémon</button><button class="btn" id="srem">Empty pocket</button></div>
  <div class="row"><button class="btn" id="pclr">Use default art</button><button class="btn pri" id="shd">Done</button></div>
 </div></div>
 
+<div class="sheet" id="ps" hidden><div class="sb">
+ <div class="pkh" style="margin-top:0"><span id="psh">Replace with</span></div>
+ <input type="search" id="psq" placeholder="Search name or #number" autocomplete="off" enterkeyhint="search">
+ <div class="plist" id="psl"></div>
+ <div class="row"><button class="btn" id="psx">Cancel</button></div>
+</div></div>
+
+<div class="sheet set" id="nb" hidden><div class="sb">
+ <h3 id="nbh">New binder</h3>
+ <p id="nbw" hidden>Welcome! Create your first binder to get started. You can add more binders later with the ＋ tab.</p>
+ <input type="text" id="nbn" placeholder="Binder name (optional)" maxlength="30" autocomplete="off">
+ <div class="seg" id="nbt" style="margin-top:12px"><button data-t="dex" class="on">Pokédex binder</button><button data-t="free">Start from scratch</button></div>
+ <div id="nbdex"><p>Pick the generations to include. Pokémon are placed in National Pokédex order, 9 per page.</p>
+  <div class="chips gens" id="nbg"></div>
+  <label class="chk"><input type="checkbox" id="nbp" checked> Start each generation on a new page</label></div>
+ <div id="nbfree" hidden><p>An empty binder. Tap any pocket to put a Pokémon in it.</p>
+  <label class="chk">Pages <input type="number" id="nbpg" min="2" max="300" step="2" value="20"></label></div>
+ <div class="row"><button class="btn" id="nbx">Cancel</button><button class="btn pri" id="nbc">Create binder</button></div>
+ <p id="nbs" hidden style="margin-top:14px;text-align:center"><a href="#" id="nbsi">Already have binders? Sign in with Google</a></p>
+</div></div>
+
 <div class="sheet set" id="setg" hidden><div class="sb">
+ <h3>This binder</h3>
+ <div class="row" style="margin-top:0"><button class="btn" id="bren">Rename</button><button class="btn" id="bpg">＋2 pages</button><button class="btn" id="bdel">Delete</button></div>
  <h3>Default art for pockets without a chosen print</h3>
  <div class="seg" id="ord"><button data-o="old">Oldest print</button><button data-o="new">Newest print</button></div>
  <h3>Cloud sync</h3>
- <p id="acct">Sign in with Google to keep your collection in sync across all your devices.</p>
+ <p id="acct">Sign in with Google to keep your binders and collection in sync across all your devices.</p>
  <div class="row"><button class="btn pri" id="gin">Sign in with Google</button><button class="btn" id="gout" hidden>Sign out</button></div>
  <h3>Backup</h3>
- <p>Your collection is stored on this device. Export a backup now and then, and use Import to move it to another device.</p>
+ <p>Your binders and collection are stored on this device (and in your Google account when signed in). A backup file includes both.</p>
  <div class="row"><button class="btn" id="exf">Export file</button><button class="btn" id="exc">Copy backup</button></div>
  <div class="row"><button class="btn" id="imf">Import file</button><input type="file" id="imfi" accept=".json,application/json,text/plain" hidden></div>
  <textarea id="imt" rows="3" placeholder="…or paste a backup here (also works with the old Claude version)" style="margin-top:8px"></textarea>
@@ -141,21 +176,36 @@ details.wl summary{font-weight:700;cursor:pointer}
 <div class="toast" id="toast" hidden></div>
 
 <script>
-const B=[{"name": "Gen 1", "P": [{"n": 1, "g": 1, "it": [[1, "Bulbasaur"], [2, "Ivysaur"], [3, "Venusaur"], [4, "Charmander"], [5, "Charmeleon"], [6, "Charizard"], [7, "Squirtle"], [8, "Wartortle"], [9, "Blastoise"]]}, {"n": 2, "g": 1, "it": [[10, "Caterpie"], [11, "Metapod"], [12, "Butterfree"], [13, "Weedle"], [14, "Kakuna"], [15, "Beedrill"], [16, "Pidgey"], [17, "Pidgeotto"], [18, "Pidgeot"]]}, {"n": 3, "g": 1, "it": [[19, "Rattata"], [20, "Raticate"], [21, "Spearow"], [22, "Fearow"], [23, "Ekans"], [24, "Arbok"], [25, "Pikachu"], [26, "Raichu"], [27, "Sandshrew"]]}, {"n": 4, "g": 1, "it": [[28, "Sandslash"], [29, "Nidoran♀"], [30, "Nidorina"], [31, "Nidoqueen"], [32, "Nidoran♂"], [33, "Nidorino"], [34, "Nidoking"], [35, "Clefairy"], [36, "Clefable"]]}, {"n": 5, "g": 1, "it": [[37, "Vulpix"], [38, "Ninetales"], [39, "Jigglypuff"], [40, "Wigglytuff"], [41, "Zubat"], [42, "Golbat"], [43, "Oddish"], [44, "Gloom"], [45, "Vileplume"]]}, {"n": 6, "g": 1, "it": [[46, "Paras"], [47, "Parasect"], [48, "Venonat"], [49, "Venomoth"], [50, "Diglett"], [51, "Dugtrio"], [52, "Meowth"], [53, "Persian"], [54, "Psyduck"]]}, {"n": 7, "g": 1, "it": [[55, "Golduck"], [56, "Mankey"], [57, "Primeape"], [58, "Growlithe"], [59, "Arcanine"], [60, "Poliwag"], [61, "Poliwhirl"], [62, "Poliwrath"], [63, "Abra"]]}, {"n": 8, "g": 1, "it": [[64, "Kadabra"], [65, "Alakazam"], [66, "Machop"], [67, "Machoke"], [68, "Machamp"], [69, "Bellsprout"], [70, "Weepinbell"], [71, "Victreebel"], [72, "Tentacool"]]}, {"n": 9, "g": 1, "it": [[73, "Tentacruel"], [74, "Geodude"], [75, "Graveler"], [76, "Golem"], [77, "Ponyta"], [78, "Rapidash"], [79, "Slowpoke"], [80, "Slowbro"], [81, "Magnemite"]]}, {"n": 10, "g": 1, "it": [[82, "Magneton"], [83, "Farfetch'd"], [84, "Doduo"], [85, "Dodrio"], [86, "Seel"], [87, "Dewgong"], [88, "Grimer"], [89, "Muk"], [90, "Shellder"]]}, {"n": 11, "g": 1, "it": [[91, "Cloyster"], [92, "Gastly"], [93, "Haunter"], [94, "Gengar"], [95, "Onix"], [96, "Drowzee"], [97, "Hypno"], [98, "Krabby"], [99, "Kingler"]]}, {"n": 12, "g": 1, "it": [[100, "Voltorb"], [101, "Electrode"], [102, "Exeggcute"], [103, "Exeggutor"], [104, "Cubone"], [105, "Marowak"], [106, "Hitmonlee"], [107, "Hitmonchan"], [108, "Lickitung"]]}, {"n": 13, "g": 1, "it": [[109, "Koffing"], [110, "Weezing"], [111, "Rhyhorn"], [112, "Rhydon"], [113, "Chansey"], [114, "Tangela"], [115, "Kangaskhan"], [116, "Horsea"], [117, "Seadra"]]}, {"n": 14, "g": 1, "it": [[118, "Goldeen"], [119, "Seaking"], [120, "Staryu"], [121, "Starmie"], [122, "Mr. Mime"], [123, "Scyther"], [124, "Jynx"], [125, "Electabuzz"], [126, "Magmar"]]}, {"n": 15, "g": 1, "it": [[127, "Pinsir"], [128, "Tauros"], [129, "Magikarp"], [130, "Gyarados"], [131, "Lapras"], [132, "Ditto"], [133, "Eevee"], [134, "Vaporeon"], [135, "Jolteon"]]}, {"n": 16, "g": 1, "it": [[136, "Flareon"], [137, "Porygon"], [138, "Omanyte"], [139, "Omastar"], [140, "Kabuto"], [141, "Kabutops"], [142, "Aerodactyl"], [143, "Snorlax"], [144, "Articuno"]]}, {"n": 17, "g": 1, "it": [[145, "Zapdos"], [146, "Moltres"], [147, "Dratini"], [148, "Dragonair"], [149, "Dragonite"], [150, "Mewtwo"], [151, "Mew"]]}, {"n": 18, "g": 0, "it": []}]}, {"name": "Gen 2–3", "P": [{"n": 1, "g": 2, "it": [[152, "Chikorita"], [153, "Bayleef"], [154, "Meganium"], [155, "Cyndaquil"], [156, "Quilava"], [157, "Typhlosion"], [158, "Totodile"], [159, "Croconaw"], [160, "Feraligatr"]]}, {"n": 2, "g": 2, "it": [[161, "Sentret"], [162, "Furret"], [163, "Hoothoot"], [164, "Noctowl"], [165, "Ledyba"], [166, "Ledian"], [167, "Spinarak"], [168, "Ariados"], [169, "Crobat"]]}, {"n": 3, "g": 2, "it": [[170, "Chinchou"], [171, "Lanturn"], [172, "Pichu"], [173, "Cleffa"], [174, "Igglybuff"], [175, "Togepi"], [176, "Togetic"], [177, "Natu"], [178, "Xatu"]]}, {"n": 4, "g": 2, "it": [[179, "Mareep"], [180, "Flaaffy"], [181, "Ampharos"], [182, "Bellossom"], [183, "Marill"], [184, "Azumarill"], [185, "Sudowoodo"], [186, "Politoed"], [187, "Hoppip"]]}, {"n": 5, "g": 2, "it": [[188, "Skiploom"], [189, "Jumpluff"], [190, "Aipom"], [191, "Sunkern"], [192, "Sunflora"], [193, "Yanma"], [194, "Wooper"], [195, "Quagsire"], [196, "Espeon"]]}, {"n": 6, "g": 2, "it": [[197, "Umbreon"], [198, "Murkrow"], [199, "Slowking"], [200, "Misdreavus"], [201, "Unown"], [202, "Wobbuffet"], [203, "Girafarig"], [204, "Pineco"], [205, "Forretress"]]}, {"n": 7, "g": 2, "it": [[206, "Dunsparce"], [207, "Gligar"], [208, "Steelix"], [209, "Snubbull"], [210, "Granbull"], [211, "Qwilfish"], [212, "Scizor"], [213, "Shuckle"], [214, "Heracross"]]}, {"n": 8, "g": 2, "it": [[215, "Sneasel"], [216, "Teddiursa"], [217, "Ursaring"], [218, "Slugma"], [219, "Magcargo"], [220, "Swinub"], [221, "Piloswine"], [222, "Corsola"], [223, "Remoraid"]]}, {"n": 9, "g": 2, "it": [[224, "Octillery"], [225, "Delibird"], [226, "Mantine"], [227, "Skarmory"], [228, "Houndour"], [229, "Houndoom"], [230, "Kingdra"], [231, "Phanpy"], [232, "Donphan"]]}, {"n": 10, "g": 2, "it": [[233, "Porygon2"], [234, "Stantler"], [235, "Smeargle"], [236, "Tyrogue"], [237, "Hitmontop"], [238, "Smoochum"], [239, "Elekid"], [240, "Magby"], [241, "Miltank"]]}, {"n": 11, "g": 2, "it": [[242, "Blissey"], [243, "Raikou"], [244, "Entei"], [245, "Suicune"], [246, "Larvitar"], [247, "Pupitar"], [248, "Tyranitar"], [249, "Lugia"], [250, "Ho-Oh"]]}, {"n": 12, "g": 2, "it": [[251, "Celebi"]]}, {"n": 13, "g": 3, "it": [[252, "Treecko"], [253, "Grovyle"], [254, "Sceptile"], [255, "Torchic"], [256, "Combusken"], [257, "Blaziken"], [258, "Mudkip"], [259, "Marshtomp"], [260, "Swampert"]]}, {"n": 14, "g": 3, "it": [[261, "Poochyena"], [262, "Mightyena"], [263, "Zigzagoon"], [264, "Linoone"], [265, "Wurmple"], [266, "Silcoon"], [267, "Beautifly"], [268, "Cascoon"], [269, "Dustox"]]}, {"n": 15, "g": 3, "it": [[270, "Lotad"], [271, "Lombre"], [272, "Ludicolo"], [273, "Seedot"], [274, "Nuzleaf"], [275, "Shiftry"], [276, "Taillow"], [277, "Swellow"], [278, "Wingull"]]}, {"n": 16, "g": 3, "it": [[279, "Pelipper"], [280, "Ralts"], [281, "Kirlia"], [282, "Gardevoir"], [283, "Surskit"], [284, "Masquerain"], [285, "Shroomish"], [286, "Breloom"], [287, "Slakoth"]]}, {"n": 17, "g": 3, "it": [[288, "Vigoroth"], [289, "Slaking"], [290, "Nincada"], [291, "Ninjask"], [292, "Shedinja"], [293, "Whismur"], [294, "Loudred"], [295, "Exploud"], [296, "Makuhita"]]}, {"n": 18, "g": 3, "it": [[297, "Hariyama"], [298, "Azurill"], [299, "Nosepass"], [300, "Skitty"], [301, "Delcatty"], [302, "Sableye"], [303, "Mawile"], [304, "Aron"], [305, "Lairon"]]}, {"n": 19, "g": 3, "it": [[306, "Aggron"], [307, "Meditite"], [308, "Medicham"], [309, "Electrike"], [310, "Manectric"], [311, "Plusle"], [312, "Minun"], [313, "Volbeat"], [314, "Illumise"]]}, {"n": 20, "g": 3, "it": [[315, "Roselia"], [316, "Gulpin"], [317, "Swalot"], [318, "Carvanha"], [319, "Sharpedo"], [320, "Wailmer"], [321, "Wailord"], [322, "Numel"], [323, "Camerupt"]]}, {"n": 21, "g": 3, "it": [[324, "Torkoal"], [325, "Spoink"], [326, "Grumpig"], [327, "Spinda"], [328, "Trapinch"], [329, "Vibrava"], [330, "Flygon"], [331, "Cacnea"], [332, "Cacturne"]]}, {"n": 22, "g": 3, "it": [[333, "Swablu"], [334, "Altaria"], [335, "Zangoose"], [336, "Seviper"], [337, "Lunatone"], [338, "Solrock"], [339, "Barboach"], [340, "Whiscash"], [341, "Corphish"]]}, {"n": 23, "g": 3, "it": [[342, "Crawdaunt"], [343, "Baltoy"], [344, "Claydol"], [345, "Lileep"], [346, "Cradily"], [347, "Anorith"], [348, "Armaldo"], [349, "Feebas"], [350, "Milotic"]]}, {"n": 24, "g": 3, "it": [[351, "Castform"], [352, "Kecleon"], [353, "Shuppet"], [354, "Banette"], [355, "Duskull"], [356, "Dusclops"], [357, "Tropius"], [358, "Chimecho"], [359, "Absol"]]}, {"n": 25, "g": 3, "it": [[360, "Wynaut"], [361, "Snorunt"], [362, "Glalie"], [363, "Spheal"], [364, "Sealeo"], [365, "Walrein"], [366, "Clamperl"], [367, "Huntail"], [368, "Gorebyss"]]}, {"n": 26, "g": 3, "it": [[369, "Relicanth"], [370, "Luvdisc"], [371, "Bagon"], [372, "Shelgon"], [373, "Salamence"], [374, "Beldum"], [375, "Metang"], [376, "Metagross"], [377, "Regirock"]]}, {"n": 27, "g": 3, "it": [[378, "Regice"], [379, "Registeel"], [380, "Latias"], [381, "Latios"], [382, "Kyogre"], [383, "Groudon"], [384, "Rayquaza"], [385, "Jirachi"], [386, "Deoxys"]]}, {"n": 28, "g": 0, "it": []}]}, {"name": "Gen 4–5", "P": [{"n": 1, "g": 4, "it": [[387, "Turtwig"], [388, "Grotle"], [389, "Torterra"], [390, "Chimchar"], [391, "Monferno"], [392, "Infernape"], [393, "Piplup"], [394, "Prinplup"], [395, "Empoleon"]]}, {"n": 2, "g": 4, "it": [[396, "Starly"], [397, "Staravia"], [398, "Staraptor"], [399, "Bidoof"], [400, "Bibarel"], [401, "Kricketot"], [402, "Kricketune"], [403, "Shinx"], [404, "Luxio"]]}, {"n": 3, "g": 4, "it": [[405, "Luxray"], [406, "Budew"], [407, "Roserade"], [408, "Cranidos"], [409, "Rampardos"], [410, "Shieldon"], [411, "Bastiodon"], [412, "Burmy"], [413, "Wormadam"]]}, {"n": 4, "g": 4, "it": [[414, "Mothim"], [415, "Combee"], [416, "Vespiquen"], [417, "Pachirisu"], [418, "Buizel"], [419, "Floatzel"], [420, "Cherubi"], [421, "Cherrim"], [422, "Shellos"]]}, {"n": 5, "g": 4, "it": [[423, "Gastrodon"], [424, "Ambipom"], [425, "Drifloon"], [426, "Drifblim"], [427, "Buneary"], [428, "Lopunny"], [429, "Mismagius"], [430, "Honchkrow"], [431, "Glameow"]]}, {"n": 6, "g": 4, "it": [[432, "Purugly"], [433, "Chingling"], [434, "Stunky"], [435, "Skuntank"], [436, "Bronzor"], [437, "Bronzong"], [438, "Bonsly"], [439, "Mime Jr."], [440, "Happiny"]]}, {"n": 7, "g": 4, "it": [[441, "Chatot"], [442, "Spiritomb"], [443, "Gible"], [444, "Gabite"], [445, "Garchomp"], [446, "Munchlax"], [447, "Riolu"], [448, "Lucario"], [449, "Hippopotas"]]}, {"n": 8, "g": 4, "it": [[450, "Hippowdon"], [451, "Skorupi"], [452, "Drapion"], [453, "Croagunk"], [454, "Toxicroak"], [455, "Carnivine"], [456, "Finneon"], [457, "Lumineon"], [458, "Mantyke"]]}, {"n": 9, "g": 4, "it": [[459, "Snover"], [460, "Abomasnow"], [461, "Weavile"], [462, "Magnezone"], [463, "Lickilicky"], [464, "Rhyperior"], [465, "Tangrowth"], [466, "Electivire"], [467, "Magmortar"]]}, {"n": 10, "g": 4, "it": [[468, "Togekiss"], [469, "Yanmega"], [470, "Leafeon"], [471, "Glaceon"], [472, "Gliscor"], [473, "Mamoswine"], [474, "Porygon-Z"], [475, "Gallade"], [476, "Probopass"]]}, {"n": 11, "g": 4, "it": [[477, "Dusknoir"], [478, "Froslass"], [479, "Rotom"], [480, "Uxie"], [481, "Mesprit"], [482, "Azelf"], [483, "Dialga"], [484, "Palkia"], [485, "Heatran"]]}, {"n": 12, "g": 4, "it": [[486, "Regigigas"], [487, "Giratina"], [488, "Cresselia"], [489, "Phione"], [490, "Manaphy"], [491, "Darkrai"], [492, "Shaymin"], [493, "Arceus"], [494, "Victini"]]}, {"n": 13, "g": 5, "it": [[495, "Snivy"], [496, "Servine"], [497, "Serperior"], [498, "Tepig"], [499, "Pignite"], [500, "Emboar"], [501, "Oshawott"], [502, "Dewott"], [503, "Samurott"]]}, {"n": 14, "g": 5, "it": [[504, "Patrat"], [505, "Watchog"], [506, "Lillipup"], [507, "Herdier"], [508, "Stoutland"], [509, "Purrloin"], [510, "Liepard"], [511, "Pansage"], [512, "Simisage"]]}, {"n": 15, "g": 5, "it": [[513, "Pansear"], [514, "Simisear"], [515, "Panpour"], [516, "Simipour"], [517, "Munna"], [518, "Musharna"], [519, "Pidove"], [520, "Tranquill"], [521, "Unfezant"]]}, {"n": 16, "g": 5, "it": [[522, "Blitzle"], [523, "Zebstrika"], [524, "Roggenrola"], [525, "Boldore"], [526, "Gigalith"], [527, "Woobat"], [528, "Swoobat"], [529, "Drilbur"], [530, "Excadrill"]]}, {"n": 17, "g": 5, "it": [[531, "Audino"], [532, "Timburr"], [533, "Gurdurr"], [534, "Conkeldurr"], [535, "Tympole"], [536, "Palpitoad"], [537, "Seismitoad"], [538, "Throh"], [539, "Sawk"]]}, {"n": 18, "g": 5, "it": [[540, "Sewaddle"], [541, "Swadloon"], [542, "Leavanny"], [543, "Venipede"], [544, "Whirlipede"], [545, "Scolipede"], [546, "Cottonee"], [547, "Whimsicott"], [548, "Petilil"]]}, {"n": 19, "g": 5, "it": [[549, "Lilligant"], [550, "Basculin"], [551, "Sandile"], [552, "Krokorok"], [553, "Krookodile"], [554, "Darumaka"], [555, "Darmanitan"], [556, "Maractus"], [557, "Dwebble"]]}, {"n": 20, "g": 5, "it": [[558, "Crustle"], [559, "Scraggy"], [560, "Scrafty"], [561, "Sigilyph"], [562, "Yamask"], [563, "Cofagrigus"], [564, "Tirtouga"], [565, "Carracosta"], [566, "Archen"]]}, {"n": 21, "g": 5, "it": [[567, "Archeops"], [568, "Trubbish"], [569, "Garbodor"], [570, "Zorua"], [571, "Zoroark"], [572, "Minccino"], [573, "Cinccino"], [574, "Gothita"], [575, "Gothorita"]]}, {"n": 22, "g": 5, "it": [[576, "Gothitelle"], [577, "Solosis"], [578, "Duosion"], [579, "Reuniclus"], [580, "Ducklett"], [581, "Swanna"], [582, "Vanillite"], [583, "Vanillish"], [584, "Vanilluxe"]]}, {"n": 23, "g": 5, "it": [[585, "Deerling"], [586, "Sawsbuck"], [587, "Emolga"], [588, "Karrablast"], [589, "Escavalier"], [590, "Foongus"], [591, "Amoonguss"], [592, "Frillish"], [593, "Jellicent"]]}, {"n": 24, "g": 5, "it": [[594, "Alomomola"], [595, "Joltik"], [596, "Galvantula"], [597, "Ferroseed"], [598, "Ferrothorn"], [599, "Klink"], [600, "Klang"], [601, "Klinklang"], [602, "Tynamo"]]}, {"n": 25, "g": 5, "it": [[603, "Eelektrik"], [604, "Eelektross"], [605, "Elgyem"], [606, "Beheeyem"], [607, "Litwick"], [608, "Lampent"], [609, "Chandelure"], [610, "Axew"], [611, "Fraxure"]]}, {"n": 26, "g": 5, "it": [[612, "Haxorus"], [613, "Cubchoo"], [614, "Beartic"], [615, "Cryogonal"], [616, "Shelmet"], [617, "Accelgor"], [618, "Stunfisk"], [619, "Mienfoo"], [620, "Mienshao"]]}, {"n": 27, "g": 5, "it": [[621, "Druddigon"], [622, "Golett"], [623, "Golurk"], [624, "Pawniard"], [625, "Bisharp"], [626, "Bouffalant"], [627, "Rufflet"], [628, "Braviary"], [629, "Vullaby"]]}, {"n": 28, "g": 5, "it": [[630, "Mandibuzz"], [631, "Heatmor"], [632, "Durant"], [633, "Deino"], [634, "Zweilous"], [635, "Hydreigon"], [636, "Larvesta"], [637, "Volcarona"], [638, "Cobalion"]]}, {"n": 29, "g": 5, "it": [[639, "Terrakion"], [640, "Virizion"], [641, "Tornadus"], [642, "Thundurus"], [643, "Reshiram"], [644, "Zekrom"], [645, "Landorus"], [646, "Kyurem"], [647, "Keldeo"]]}, {"n": 30, "g": 5, "it": [[648, "Meloetta"], [649, "Genesect"]]}]}];
+const NAMES='Bulbasaur|Ivysaur|Venusaur|Charmander|Charmeleon|Charizard|Squirtle|Wartortle|Blastoise|Caterpie|Metapod|Butterfree|Weedle|Kakuna|Beedrill|Pidgey|Pidgeotto|Pidgeot|Rattata|Raticate|Spearow|Fearow|Ekans|Arbok|Pikachu|Raichu|Sandshrew|Sandslash|Nidoran♀|Nidorina|Nidoqueen|Nidoran♂|Nidorino|Nidoking|Clefairy|Clefable|Vulpix|Ninetales|Jigglypuff|Wigglytuff|Zubat|Golbat|Oddish|Gloom|Vileplume|Paras|Parasect|Venonat|Venomoth|Diglett|Dugtrio|Meowth|Persian|Psyduck|Golduck|Mankey|Primeape|Growlithe|Arcanine|Poliwag|Poliwhirl|Poliwrath|Abra|Kadabra|Alakazam|Machop|Machoke|Machamp|Bellsprout|Weepinbell|Victreebel|Tentacool|Tentacruel|Geodude|Graveler|Golem|Ponyta|Rapidash|Slowpoke|Slowbro|Magnemite|Magneton|Farfetch\'d|Doduo|Dodrio|Seel|Dewgong|Grimer|Muk|Shellder|Cloyster|Gastly|Haunter|Gengar|Onix|Drowzee|Hypno|Krabby|Kingler|Voltorb|Electrode|Exeggcute|Exeggutor|Cubone|Marowak|Hitmonlee|Hitmonchan|Lickitung|Koffing|Weezing|Rhyhorn|Rhydon|Chansey|Tangela|Kangaskhan|Horsea|Seadra|Goldeen|Seaking|Staryu|Starmie|Mr. Mime|Scyther|Jynx|Electabuzz|Magmar|Pinsir|Tauros|Magikarp|Gyarados|Lapras|Ditto|Eevee|Vaporeon|Jolteon|Flareon|Porygon|Omanyte|Omastar|Kabuto|Kabutops|Aerodactyl|Snorlax|Articuno|Zapdos|Moltres|Dratini|Dragonair|Dragonite|Mewtwo|Mew|Chikorita|Bayleef|Meganium|Cyndaquil|Quilava|Typhlosion|Totodile|Croconaw|Feraligatr|Sentret|Furret|Hoothoot|Noctowl|Ledyba|Ledian|Spinarak|Ariados|Crobat|Chinchou|Lanturn|Pichu|Cleffa|Igglybuff|Togepi|Togetic|Natu|Xatu|Mareep|Flaaffy|Ampharos|Bellossom|Marill|Azumarill|Sudowoodo|Politoed|Hoppip|Skiploom|Jumpluff|Aipom|Sunkern|Sunflora|Yanma|Wooper|Quagsire|Espeon|Umbreon|Murkrow|Slowking|Misdreavus|Unown|Wobbuffet|Girafarig|Pineco|Forretress|Dunsparce|Gligar|Steelix|Snubbull|Granbull|Qwilfish|Scizor|Shuckle|Heracross|Sneasel|Teddiursa|Ursaring|Slugma|Magcargo|Swinub|Piloswine|Corsola|Remoraid|Octillery|Delibird|Mantine|Skarmory|Houndour|Houndoom|Kingdra|Phanpy|Donphan|Porygon2|Stantler|Smeargle|Tyrogue|Hitmontop|Smoochum|Elekid|Magby|Miltank|Blissey|Raikou|Entei|Suicune|Larvitar|Pupitar|Tyranitar|Lugia|Ho-Oh|Celebi|Treecko|Grovyle|Sceptile|Torchic|Combusken|Blaziken|Mudkip|Marshtomp|Swampert|Poochyena|Mightyena|Zigzagoon|Linoone|Wurmple|Silcoon|Beautifly|Cascoon|Dustox|Lotad|Lombre|Ludicolo|Seedot|Nuzleaf|Shiftry|Taillow|Swellow|Wingull|Pelipper|Ralts|Kirlia|Gardevoir|Surskit|Masquerain|Shroomish|Breloom|Slakoth|Vigoroth|Slaking|Nincada|Ninjask|Shedinja|Whismur|Loudred|Exploud|Makuhita|Hariyama|Azurill|Nosepass|Skitty|Delcatty|Sableye|Mawile|Aron|Lairon|Aggron|Meditite|Medicham|Electrike|Manectric|Plusle|Minun|Volbeat|Illumise|Roselia|Gulpin|Swalot|Carvanha|Sharpedo|Wailmer|Wailord|Numel|Camerupt|Torkoal|Spoink|Grumpig|Spinda|Trapinch|Vibrava|Flygon|Cacnea|Cacturne|Swablu|Altaria|Zangoose|Seviper|Lunatone|Solrock|Barboach|Whiscash|Corphish|Crawdaunt|Baltoy|Claydol|Lileep|Cradily|Anorith|Armaldo|Feebas|Milotic|Castform|Kecleon|Shuppet|Banette|Duskull|Dusclops|Tropius|Chimecho|Absol|Wynaut|Snorunt|Glalie|Spheal|Sealeo|Walrein|Clamperl|Huntail|Gorebyss|Relicanth|Luvdisc|Bagon|Shelgon|Salamence|Beldum|Metang|Metagross|Regirock|Regice|Registeel|Latias|Latios|Kyogre|Groudon|Rayquaza|Jirachi|Deoxys|Turtwig|Grotle|Torterra|Chimchar|Monferno|Infernape|Piplup|Prinplup|Empoleon|Starly|Staravia|Staraptor|Bidoof|Bibarel|Kricketot|Kricketune|Shinx|Luxio|Luxray|Budew|Roserade|Cranidos|Rampardos|Shieldon|Bastiodon|Burmy|Wormadam|Mothim|Combee|Vespiquen|Pachirisu|Buizel|Floatzel|Cherubi|Cherrim|Shellos|Gastrodon|Ambipom|Drifloon|Drifblim|Buneary|Lopunny|Mismagius|Honchkrow|Glameow|Purugly|Chingling|Stunky|Skuntank|Bronzor|Bronzong|Bonsly|Mime Jr.|Happiny|Chatot|Spiritomb|Gible|Gabite|Garchomp|Munchlax|Riolu|Lucario|Hippopotas|Hippowdon|Skorupi|Drapion|Croagunk|Toxicroak|Carnivine|Finneon|Lumineon|Mantyke|Snover|Abomasnow|Weavile|Magnezone|Lickilicky|Rhyperior|Tangrowth|Electivire|Magmortar|Togekiss|Yanmega|Leafeon|Glaceon|Gliscor|Mamoswine|Porygon-Z|Gallade|Probopass|Dusknoir|Froslass|Rotom|Uxie|Mesprit|Azelf|Dialga|Palkia|Heatran|Regigigas|Giratina|Cresselia|Phione|Manaphy|Darkrai|Shaymin|Arceus|Victini|Snivy|Servine|Serperior|Tepig|Pignite|Emboar|Oshawott|Dewott|Samurott|Patrat|Watchog|Lillipup|Herdier|Stoutland|Purrloin|Liepard|Pansage|Simisage|Pansear|Simisear|Panpour|Simipour|Munna|Musharna|Pidove|Tranquill|Unfezant|Blitzle|Zebstrika|Roggenrola|Boldore|Gigalith|Woobat|Swoobat|Drilbur|Excadrill|Audino|Timburr|Gurdurr|Conkeldurr|Tympole|Palpitoad|Seismitoad|Throh|Sawk|Sewaddle|Swadloon|Leavanny|Venipede|Whirlipede|Scolipede|Cottonee|Whimsicott|Petilil|Lilligant|Basculin|Sandile|Krokorok|Krookodile|Darumaka|Darmanitan|Maractus|Dwebble|Crustle|Scraggy|Scrafty|Sigilyph|Yamask|Cofagrigus|Tirtouga|Carracosta|Archen|Archeops|Trubbish|Garbodor|Zorua|Zoroark|Minccino|Cinccino|Gothita|Gothorita|Gothitelle|Solosis|Duosion|Reuniclus|Ducklett|Swanna|Vanillite|Vanillish|Vanilluxe|Deerling|Sawsbuck|Emolga|Karrablast|Escavalier|Foongus|Amoonguss|Frillish|Jellicent|Alomomola|Joltik|Galvantula|Ferroseed|Ferrothorn|Klink|Klang|Klinklang|Tynamo|Eelektrik|Eelektross|Elgyem|Beheeyem|Litwick|Lampent|Chandelure|Axew|Fraxure|Haxorus|Cubchoo|Beartic|Cryogonal|Shelmet|Accelgor|Stunfisk|Mienfoo|Mienshao|Druddigon|Golett|Golurk|Pawniard|Bisharp|Bouffalant|Rufflet|Braviary|Vullaby|Mandibuzz|Heatmor|Durant|Deino|Zweilous|Hydreigon|Larvesta|Volcarona|Cobalion|Terrakion|Virizion|Tornadus|Thundurus|Reshiram|Zekrom|Landorus|Kyurem|Keldeo|Meloetta|Genesect|Chespin|Quilladin|Chesnaught|Fennekin|Braixen|Delphox|Froakie|Frogadier|Greninja|Bunnelby|Diggersby|Fletchling|Fletchinder|Talonflame|Scatterbug|Spewpa|Vivillon|Litleo|Pyroar|Flabébé|Floette|Florges|Skiddo|Gogoat|Pancham|Pangoro|Furfrou|Espurr|Meowstic|Honedge|Doublade|Aegislash|Spritzee|Aromatisse|Swirlix|Slurpuff|Inkay|Malamar|Binacle|Barbaracle|Skrelp|Dragalge|Clauncher|Clawitzer|Helioptile|Heliolisk|Tyrunt|Tyrantrum|Amaura|Aurorus|Sylveon|Hawlucha|Dedenne|Carbink|Goomy|Sliggoo|Goodra|Klefki|Phantump|Trevenant|Pumpkaboo|Gourgeist|Bergmite|Avalugg|Noibat|Noivern|Xerneas|Yveltal|Zygarde|Diancie|Hoopa|Volcanion|Rowlet|Dartrix|Decidueye|Litten|Torracat|Incineroar|Popplio|Brionne|Primarina|Pikipek|Trumbeak|Toucannon|Yungoos|Gumshoos|Grubbin|Charjabug|Vikavolt|Crabrawler|Crabominable|Oricorio|Cutiefly|Ribombee|Rockruff|Lycanroc|Wishiwashi|Mareanie|Toxapex|Mudbray|Mudsdale|Dewpider|Araquanid|Fomantis|Lurantis|Morelull|Shiinotic|Salandit|Salazzle|Stufful|Bewear|Bounsweet|Steenee|Tsareena|Comfey|Oranguru|Passimian|Wimpod|Golisopod|Sandygast|Palossand|Pyukumuku|Type: Null|Silvally|Minior|Komala|Turtonator|Togedemaru|Mimikyu|Bruxish|Drampa|Dhelmise|Jangmo-o|Hakamo-o|Kommo-o|Tapu Koko|Tapu Lele|Tapu Bulu|Tapu Fini|Cosmog|Cosmoem|Solgaleo|Lunala|Nihilego|Buzzwole|Pheromosa|Xurkitree|Celesteela|Kartana|Guzzlord|Necrozma|Magearna|Marshadow|Poipole|Naganadel|Stakataka|Blacephalon|Zeraora|Meltan|Melmetal|Grookey|Thwackey|Rillaboom|Scorbunny|Raboot|Cinderace|Sobble|Drizzile|Inteleon|Skwovet|Greedent|Rookidee|Corvisquire|Corviknight|Blipbug|Dottler|Orbeetle|Nickit|Thievul|Gossifleur|Eldegoss|Wooloo|Dubwool|Chewtle|Drednaw|Yamper|Boltund|Rolycoly|Carkol|Coalossal|Applin|Flapple|Appletun|Silicobra|Sandaconda|Cramorant|Arrokuda|Barraskewda|Toxel|Toxtricity|Sizzlipede|Centiskorch|Clobbopus|Grapploct|Sinistea|Polteageist|Hatenna|Hattrem|Hatterene|Impidimp|Morgrem|Grimmsnarl|Obstagoon|Perrserker|Cursola|Sirfetch’d|Mr. Rime|Runerigus|Milcery|Alcremie|Falinks|Pincurchin|Snom|Frosmoth|Stonjourner|Eiscue|Indeedee|Morpeko|Cufant|Copperajah|Dracozolt|Arctozolt|Dracovish|Arctovish|Duraludon|Dreepy|Drakloak|Dragapult|Zacian|Zamazenta|Eternatus|Kubfu|Urshifu|Zarude|Regieleki|Regidrago|Glastrier|Spectrier|Calyrex|Wyrdeer|Kleavor|Ursaluna|Basculegion|Sneasler|Overqwil|Enamorus|Sprigatito|Floragato|Meowscarada|Fuecoco|Crocalor|Skeledirge|Quaxly|Quaxwell|Quaquaval|Lechonk|Oinkologne|Tarountula|Spidops|Nymble|Lokix|Pawmi|Pawmo|Pawmot|Tandemaus|Maushold|Fidough|Dachsbun|Smoliv|Dolliv|Arboliva|Squawkabilly|Nacli|Naclstack|Garganacl|Charcadet|Armarouge|Ceruledge|Tadbulb|Bellibolt|Wattrel|Kilowattrel|Maschiff|Mabosstiff|Shroodle|Grafaiai|Bramblin|Brambleghast|Toedscool|Toedscruel|Klawf|Capsakid|Scovillain|Rellor|Rabsca|Flittle|Espathra|Tinkatink|Tinkatuff|Tinkaton|Wiglett|Wugtrio|Bombirdier|Finizen|Palafin|Varoom|Revavroom|Cyclizar|Orthworm|Glimmet|Glimmora|Greavard|Houndstone|Flamigo|Cetoddle|Cetitan|Veluza|Dondozo|Tatsugiri|Annihilape|Clodsire|Farigiraf|Dudunsparce|Kingambit|Great Tusk|Scream Tail|Brute Bonnet|Flutter Mane|Slither Wing|Sandy Shocks|Iron Treads|Iron Bundle|Iron Hands|Iron Jugulis|Iron Moth|Iron Thorns|Frigibax|Arctibax|Baxcalibur|Gimmighoul|Gholdengo|Wo-Chien|Chien-Pao|Ting-Lu|Chi-Yu|Roaring Moon|Iron Valiant|Koraidon|Miraidon|Walking Wake|Iron Leaves|Dipplin|Poltchageist|Sinistcha|Okidogi|Munkidori|Fezandipiti|Ogerpon|Archaludon|Hydrapple|Gouging Fire|Raging Bolt|Iron Boulder|Iron Crown|Terapagos|Pecharunt'.split('|');
+const GENS=[[1,151],[152,251],[252,386],[387,493],[494,649],[650,721],[722,809],[810,905],[906,1025]];
 const API='https://api.tcgdex.net/v2/en';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pad=n=>String(n).padStart(3,'0');
-const N={};B.forEach(b=>b.P.forEach(p=>p.it.forEach(([n,nm])=>N[n]=nm)));
-const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}if(k==='pb-col'&&window.pbSync)window.pbSync(v)}};
+const N={};NAMES.forEach((nm,i)=>N[i+1]=nm);
+const genOf=n=>GENS.findIndex(([a,b])=>n>=a&&n<=b)+1;
+/* binder layouts: [{id,name,slots:[dex number or 0 for an empty pocket]}], 9 pockets per page, even page count */
+function dexSlots(gens,newPage){const s=[];[...gens].sort((a,b)=>a-b).forEach(g=>{if(newPage)while(s.length%9)s.push(0);for(let n=GENS[g-1][0];n<=GENS[g-1][1];n++)s.push(n)});return s}
+function padSlots(s){const t=s.map(n=>N[n]?+n:0),m=Math.max(18,Math.ceil(t.length/18)*18);while(t.length<m)t.push(0);return t}
+const newId=()=>'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+function cleanBinders(a){return Array.isArray(a)?a.filter(b=>b&&typeof b.id==='string'&&Array.isArray(b.slots)).map(b=>({id:b.id,name:String(b.name||'Binder').slice(0,30),slots:padSlots(b.slots)})):[]}
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}if((k==='pb-col'||k==='pb-binders')&&window.pbSync)window.pbSync()}};
 
 /* ---------- state ---------- */
 let col=ls.get('pb-col',{});            // n -> {s:'top'|'decent', c:cardId, img, set, no, p}
 let opt=Object.assign({ord:'old'},ls.get('pb-opt',{}));
 let defs=ls.get('pb-defs-'+opt.ord,{}); // n -> {c,img}
-let bi=Math.min(ls.get('pb-cur',0),B.length-1),P=B[bi].P,S=P.length/2;
-const mem=ls.get('pb-mem',B.map(()=>0));
-let spread=Math.min(mem[bi]||0,S-1),target=spread,busy=false,hits=new Set(),cur=null,sel=null;
+// Users from before custom binders keep their three original binders.
+const LEGACY=()=>[{id:'gen1',name:'Gen 1',slots:padSlots(dexSlots([1],1))},{id:'gen23',name:'Gen 2–3',slots:padSlots(dexSlots([2,3],1))},{id:'gen45',name:'Gen 4–5',slots:padSlots(dexSlots([4,5],0))}];
+let binders=cleanBinders(ls.get('pb-binders',null));
+if(localStorage.getItem('pb-binders')==null&&(localStorage.getItem('pb-col')!=null||localStorage.getItem('pb-cur')!=null)){binders=LEGACY();ls.set('pb-binders',binders)}
+const mem=ls.get('pb-mem2',null)||(()=>{const o={},a=ls.get('pb-mem',[]);LEGACY().forEach((b,i)=>o[b.id]=a[i]||0);return o})();
+const curId=ls.get('pb-curid',null)??(LEGACY()[ls.get('pb-cur',0)]||{}).id;
+let bi=Math.max(0,binders.findIndex(b=>b.id===curId)),P=[],S=1;
+function layout(){P=[];const b=binders[bi];if(b)for(let i=0;i<b.slots.length;i+=9){const it=b.slots.slice(i,i+9),f=it.find(n=>n);P.push({n:i/9+1,g:f?genOf(f):0,it})}S=Math.max(1,P.length/2)}
+layout();
+let spread=Math.min(binders[bi]?mem[binders[bi].id]||0:0,S-1),target=spread,busy=false,hits=new Set(),cur=null,sel=null,selI=null;
+function saveBinders(){ls.set('pb-binders',binders)}
 let saveT;
 function save(){clearTimeout(saveT);saveT=setTimeout(()=>{ls.set('pb-col',col);note('Saved on this device ✓')},300)}
 function toast(t){const e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(e._t);e._t=setTimeout(()=>e.hidden=true,2600)}
@@ -189,7 +239,7 @@ function pickDefault(arr){if(!arr.length)return null;
 const pending=new Set();let rrT;
 function rerenderSoon(){clearTimeout(rrT);rrT=setTimeout(()=>{if(!busy)show()},120)}
 function ensureDefaults(sp){
- const ns=[];for(const s of [sp,sp+1,sp-1])for(const pi of [s*2,s*2+1]){const p=P[pi];if(p)p.it.forEach(([n])=>ns.push(n))}
+ const ns=[];for(const s of [sp,sp+1,sp-1])for(const pi of [s*2,s*2+1]){const p=P[pi];if(p)p.it.forEach(n=>{if(n)ns.push(n)})}
  ns.filter(n=>!(col[n]&&col[n].img)&&!defs[n]&&!pending.has(n)).forEach(async n=>{
   pending.add(n);
   try{const d=pickDefault(await list(n));defs[n]=d?{c:d.id,img:d.img}:{none:1};ls.set('pb-defs-'+opt.ord,defs);rerenderSoon()}
@@ -207,27 +257,30 @@ const eur=p=>p==null?'':'€'+p.toFixed(2);
 
 /* ---------- rendering ---------- */
 function imgOf(n){const e=col[n];if(e&&e.img)return e.img;const d=defs[n];return d&&d.img}
-function cell(n,nm){const e=col[n]||{},img=imgOf(n),s=e.s||'';
+function cell(n,i){if(!n)return `<div class="c e add" data-i="${i}" title="Add a Pokémon"><span>+</span></div>`;
+ const nm=N[n],e=col[n]||{},img=imgOf(n),s=e.s||'';
  const cls='c'+(s?' '+s:' no')+(img?' im':'')+(hits.has(n)?' hit':'');
  const badge=s==='top'?'<i>★</i>':s==='decent'?'<i>↻</i>':'';
  const inner=img?`<img src="${esc(img)}/low.webp" alt="${esc(nm)}" loading="lazy" decoding="async">`:`<b>#${pad(n)}</b><span>${esc(nm)}</span>`;
- return `<div class="${cls}" data-n="${n}" data-l="#${pad(n)} ${esc(nm)}">${inner}${badge}</div>`}
+ return `<div class="${cls}" data-n="${n}" data-i="${i}" data-l="#${pad(n)} ${esc(nm)}">${inner}${badge}</div>`}
 function page(i){const p=P[i];if(!p)return'';
- let c=p.it.map(([n,nm])=>cell(n,nm)).join('')+'<div class="c e"></div>'.repeat(9-p.it.length);
+ let c=p.it.map((n,k)=>cell(n,i*9+k)).join('');
  return `<div class="g${p.g}"><div class="h">Page ${p.n}${p.g?`<small>Gen ${p.g}</small>`:''}</div><div class="g">${c}</div></div>`}
-function show(){$('L').innerHTML=page(spread*2);$('R').innerHTML=page(spread*2+1);
+function show(){if(!binders.length){$('L').innerHTML=$('R').innerHTML='';$('pi').textContent='';return}
+ $('L').innerHTML=page(spread*2);$('R').innerHTML=page(spread*2+1);
  $('pi').textContent=`Pages ${spread*2+1}–${spread*2+2} of ${P.length}`;$('pv').disabled=spread==0;$('nx').disabled=spread==S-1;ensureDefaults(spread)}
-function nums(b=bi){return B[b].P.flatMap(p=>p.it.map(x=>x[0]))}
-function tabs(){$('tabs').innerHTML=B.map((b,i)=>{const ns=nums(i),h=ns.filter(n=>col[n]&&col[n].s).length;
- return `<button class="${i===bi?'on':''}" data-b="${i}">${b.name}<small>${h}/${ns.length}</small></button>`}).join('');
- const ns=nums();$('sub').textContent=`9-pocket · #${ns[0]}–${ns[ns.length-1]} · ${ns.length} Pokémon · ${P.length} pages`}
-function stats(){const bn=nums(),v=bn.map(n=>col[n]).filter(e=>e&&e.s),t=v.filter(e=>e.s==='top').length,d=v.length-t;
+function nums(b=bi){return binders[b]?[...new Set(binders[b].slots.filter(Boolean))]:[]}
+function tabs(){$('tabs').innerHTML=binders.map((b,i)=>{const ns=nums(i),h=ns.filter(n=>col[n]&&col[n].s).length;
+ return `<button class="${i===bi?'on':''}" data-b="${i}">${esc(b.name)}<small>${h}/${ns.length}</small></button>`}).join('')+'<button class="new" data-new="1" aria-label="New binder">＋<small>New</small></button>';
+ const ns=nums(),sorted=[...ns].sort((a,b)=>a-b),run=ns.length>1&&sorted[sorted.length-1]-sorted[0]===ns.length-1;
+ $('sub').textContent=binders.length?`9-pocket · ${run?`#${sorted[0]}–${sorted[sorted.length-1]} · `:''}${ns.length} Pokémon · ${P.length} pages`:''}
+function stats(){if(!binders.length){tabs();$('st').innerHTML='';return}const bn=nums(),v=bn.map(n=>col[n]).filter(e=>e&&e.s),t=v.filter(e=>e.s==='top').length,d=v.length-t;
  const val=v.reduce((a,e)=>a+(e.p||0),0);
- tabs();$('st').innerHTML=`<span class="pill"><b>${v.length}</b>/${bn.length} owned</span><span class="pill t">★ ${t}</span><span class="pill d">↻ ${d}</span><span class="pill">${bn.length-v.length} missing</span>${val?`<span class="pill">≈ ${eur(val)}</span>`:''}<span id="sv"></span>`;
+ tabs();$('st').innerHTML=`<span class="pill"><b>${v.length}</b>/${bn.length} owned</span><span class="pill t" title="Top">★ ${t}</span><span class="pill d" title="Upgrade needed">↻ ${d}</span><span class="pill">${bn.length-v.length} missing</span>${val?`<span class="pill">≈ ${eur(val)}</span>`:''}<span id="sv"></span>`;
  $('sv').textContent=nt0;if($('wl').open)wl()}
 function wl(){const ns=nums(),dec=ns.filter(n=>col[n]&&col[n].s==='decent'),mis=ns.filter(n=>!(col[n]&&col[n].s));
  const ch=a=>a.map(n=>`<button data-n="${n}">#${pad(n)} ${esc(N[n])}</button>`).join('')||'<span style="color:var(--dim);font-size:.8rem">None</span>';
- $('wlc').innerHTML=`<h3>↻ Upgrade these (${dec.length})</h3><div class="chips d">${ch(dec)}</div><h3>Missing (${mis.length})</h3><div class="chips">${ch(mis)}</div>`}
+ $('wlc').innerHTML=`<h3>↻ Upgrade needed (${dec.length})</h3><div class="chips d">${ch(dec)}</div><h3>Missing (${mis.length})</h3><div class="chips">${ch(mis)}</div>`}
 function refresh(){if(!busy)show();stats()}
 
 /* ---------- page flipping ---------- */
@@ -242,15 +295,15 @@ function flip(dir,ms){return new Promise(res=>{const F=$('F'),nx=spread+dir;
   F.addEventListener('transitionend',end,{once:true});setTimeout(end,ms+120)}))})}
 async function run(){if(busy)return;busy=true;
  while(spread!==target){const left=Math.abs(target-spread);await flip(target>spread?1:-1,left>4?160:left>1?300:650)}
- busy=false;mem[bi]=spread;ls.set('pb-mem',mem)}
+ busy=false;if(binders[bi])mem[binders[bi].id]=spread;ls.set('pb-mem2',mem)}
 function go(s){target=Math.max(0,Math.min(S-1,s));const b=$('book').getBoundingClientRect();
  if(b.top<0||b.bottom>innerHeight){try{scrollTo({top:b.top+scrollY-8,behavior:'smooth'})}catch(e){}}run()}
 const idle=()=>new Promise(r=>{const w=()=>busy?setTimeout(w,50):r();w()});
-async function setBinder(i,sp){if(i===bi&&sp==null)return;target=spread;await idle();
- mem[bi]=spread;bi=i;P=B[i].P;S=P.length/2;spread=target=Math.min(sp??mem[i]??0,S-1);
+async function setBinder(i,sp,force){if(i===bi&&sp==null&&!force)return;target=spread;await idle();
+ if(binders[bi])mem[binders[bi].id]=spread;bi=Math.max(0,Math.min(i,binders.length-1));layout();spread=target=Math.min(sp??(binders[bi]?mem[binders[bi].id]:0)??0,S-1);
  const bk=$('book');bk.classList.remove('sw');bk.offsetWidth;bk.classList.add('sw');
- ls.set('pb-cur',i);ls.set('pb-mem',mem);show();stats()}
-$('tabs').addEventListener('click',e=>{const b=e.target.closest('button[data-b]');if(b)setBinder(+b.dataset.b)});
+ if(binders[bi])ls.set('pb-curid',binders[bi].id);ls.set('pb-mem2',mem);show();stats()}
+$('tabs').addEventListener('click',e=>{if(e.target.closest('button[data-new]'))return openNew(false);const b=e.target.closest('button[data-b]');if(b)setBinder(+b.dataset.b)});
 $('pv').onclick=()=>go(target-1);$('nx').onclick=()=>go(target+1);
 let tx=null;$('book').addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
 $('book').addEventListener('touchend',e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>40)go(target+(dx<0?1:-1));tx=null});
@@ -261,11 +314,11 @@ function search(){
  const v=$('q').value.trim().toLowerCase().replace(/^#/,''),r=$('r');hits=new Set();
  if(!v){r.textContent='';if(!busy)show();return}
  const num=/^\d+$/.test(v),found=[];
- [bi,...B.keys()].filter((x,i,a)=>a.indexOf(x)===i).forEach(b=>B[b].P.forEach((p,pi)=>p.it.forEach(([n,nm],k)=>{if(num?n===+v:nm.toLowerCase().includes(v)){hits.add(n);found.push({b,pi,k})}})));
+ [bi,...binders.keys()].filter((x,i,a)=>a.indexOf(x)===i&&binders[x]).forEach(b=>binders[b].slots.forEach((n,j)=>{if(n&&(num?n===+v:N[n].toLowerCase().includes(v))){hits.add(n);found.push({b,pi:Math.floor(j/9),k:j%9})}}));
  if(!busy)show();
  if(!found.length){r.textContent='No match';return}
  const f=found[0],pn=f.pi+1,other=f.b!==bi;
- const d=other?` · in your ${B[f.b].name} binder`:(cur==null||cur.b!==f.b)?'':(pn===cur.pn?' · same page as before':` · ${Math.abs(pn-cur.pn)} page${Math.abs(pn-cur.pn)>1?'s':''} ${pn>cur.pn?'forward':'back'} from page ${cur.pn}`);
+ const d=other?` · in your ${binders[f.b].name} binder`:(cur==null||cur.b!==f.b)?'':(pn===cur.pn?' · same page as before':` · ${Math.abs(pn-cur.pn)} page${Math.abs(pn-cur.pn)>1?'s':''} ${pn>cur.pn?'forward':'back'} from page ${cur.pn}`);
  r.textContent=(found.length>1?found.length+' matches · first: ':'')+`Page ${pn}, row ${Math.floor(f.k/3)+1}, slot ${f.k%3+1}`+d;
  cur={b:f.b,pn};if(other)setBinder(f.b,Math.floor(f.pi/2));else setTimeout(()=>go(Math.floor(f.pi/2)),350)}
 $('q').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('q').blur();search()}});
@@ -287,30 +340,76 @@ async function picker(){const n=sel,box=$('pk');box.innerHTML='<div class="msg">
   let a=opt.ord==='new'?[...arr].reverse():arr;if(f)a=a.filter(c=>(c.set+' '+c.name).toLowerCase().includes(f));
   box.innerHTML=a.length?a.map(c=>`<button data-id="${esc(c.id)}" class="${c.id===e.c?'on':''}"><img src="${esc(c.img)}/low.webp" alt="" loading="lazy" decoding="async"><span>${esc(c.set)} · ${esc(c.no)}</span></button>`).join(''):`<div class="msg">${f?'No prints match that filter':'No prints found'}</div>`}
  catch(err){box.innerHTML='<div class="msg">Couldn’t load prints — check your connection.</div>'}}
-$('book').addEventListener('click',e=>{const c=e.target.closest('.c[data-n]');if(!c||busy)return;sel=+c.dataset.n;$('pf').value='';sheetHead();$('sh').hidden=false;$('sh').querySelector('.sb').scrollTop=0;picker()});
+$('book').addEventListener('click',e=>{const a=e.target.closest('.c.add[data-i]');if(a&&!busy){selI=+a.dataset.i;sel=null;return openPick()}
+ const c=e.target.closest('.c[data-n]');if(!c||busy)return;sel=+c.dataset.n;selI=+c.dataset.i;$('pf').value='';sheetHead();$('sh').hidden=false;$('sh').querySelector('.sb').scrollTop=0;picker()});
 $('sh').querySelector('.opts').addEventListener('click',e=>{const b=e.target.closest('button[data-s]');if(!b)return;const s=b.dataset.s,en=entry(sel);
  if((en.s||'')!==s){if(s)en.s=s;else delete en.s;tidy(sel);save();refresh();sheetHead()}});
 $('pk').addEventListener('click',async e=>{const b=e.target.closest('button[data-id]');if(!b)return;const n=sel,c=(lists[n]||[]).find(x=>x.id===b.dataset.id);if(!c)return;
- const en=entry(n);Object.assign(en,{c:c.id,img:c.img,set:c.set,no:c.no});delete en.p;save();refresh();sheetHead();
+ const en=entry(n);Object.assign(en,{c:c.id,img:c.img,set:c.set,no:c.no});delete en.p;if(!en.s)en.s='top';save();refresh();sheetHead();
  $('pk').querySelectorAll('button.on').forEach(x=>x.classList.remove('on'));b.classList.add('on');
  try{const p=await priceOf(c.id);if(col[n]&&col[n].c===c.id){if(p!=null)col[n].p=p;save();stats();if(sel===n)sheetHead()}}catch(err){}});
 $('pclr').onclick=()=>{const en=col[sel];if(en){delete en.c;delete en.img;delete en.set;delete en.no;delete en.p;tidy(sel);save();refresh();sheetHead();picker()}};
 let pfT;$('pf').addEventListener('input',()=>{clearTimeout(pfT);pfT=setTimeout(picker,200)});
 $('shimg').onclick=()=>{$('zmi').src=$('shimg').src;$('zm').hidden=false};
 $('zm').onclick=()=>$('zm').hidden=true;
-function closeAll(){$('sh').hidden=true;$('setg').hidden=true;$('zm').hidden=true}
+function closeAll(){$('sh').hidden=true;$('setg').hidden=true;$('zm').hidden=true;$('ps').hidden=true;if(binders.length)$('nb').hidden=true}
+
+/* ---------- replace / add a Pokémon in a pocket ---------- */
+function setSlot(i,n){const b=binders[bi];if(!b||i==null)return;b.slots[i]=n||0;b.slots=padSlots(b.slots);saveBinders();layout();refresh()}
+function openPick(){const cur=selI!=null&&binders[bi]?binders[bi].slots[selI]:0;
+ $('psh').textContent=cur?`Replace #${pad(cur)} ${N[cur]} with…`:`Add a Pokémon to page ${Math.floor(selI/9)+1}, slot ${selI%9+1}`;
+ $('psq').value='';$('sh').hidden=true;$('ps').hidden=false;plist();setTimeout(()=>$('psq').focus(),50)}
+function plist(){const v=$('psq').value.trim().toLowerCase().replace(/^#/,''),cur=binders[bi]?binders[bi].slots[selI]:0;
+ const inB=new Set(nums());let a=[];
+ if(!v){const near=cur||binders[bi].slots.slice(0,selI).reverse().find(Boolean)||0;for(let n=Math.max(1,near-5);n<=Math.min(NAMES.length,near+40);n++)a.push(n)}
+ else if(/^\d+$/.test(v)){const x=+v;if(N[x])a.push(x);for(let n=1;n<=NAMES.length&&a.length<60;n++)if(n!==x&&String(n).startsWith(v))a.push(n)}
+ else for(let n=1;n<=NAMES.length&&a.length<80;n++)if(N[n].toLowerCase().includes(v))a.push(n);
+ $('psl').innerHTML=a.length?a.map(n=>`<button data-p="${n}" class="${n===cur?'on':''}"><b>#${pad(n)}</b>${esc(N[n])}${inB.has(n)&&n!==cur?' <small style="color:var(--dim)">· in binder</small>':''}</button>`).join(''):'<div class="msg">No Pokémon match</div>'}
+let psT;$('psq').addEventListener('input',()=>{clearTimeout(psT);psT=setTimeout(plist,120)});
+$('psl').addEventListener('click',e=>{const b=e.target.closest('button[data-p]');if(!b)return;const n=+b.dataset.p;
+ setSlot(selI,n);$('ps').hidden=true;toast(`Placed #${pad(n)} ${N[n]}`)});
+$('psx').onclick=()=>{$('ps').hidden=true};
+$('srep').onclick=()=>openPick();
+$('srem').onclick=()=>{const n=sel;setSlot(selI,0);closeAll();toast(`Removed ${N[n]} from this pocket`)};
+
+/* ---------- new binder ---------- */
+let nbType='dex';const nbGens=new Set([1]);
+function nbUI(){$('nbt').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.t===nbType));
+ $('nbdex').hidden=nbType!=='dex';$('nbfree').hidden=nbType!=='free';
+ $('nbg').innerHTML=GENS.map(([a,b],i)=>`<button data-g="${i+1}" class="${nbGens.has(i+1)?'on':''}">Gen ${i+1} <small>#${a}–${b}</small></button>`).join('')}
+function openNew(welcome){closeAll();nbType='dex';nbGens.clear();nbGens.add(1);$('nbn').value='';
+ $('nbh').textContent=welcome?'Create your first binder':'New binder';$('nbw').hidden=!welcome;$('nbx').hidden=!!welcome;
+ $('nbs').hidden=!(welcome&&window.pbSignIn);nbUI();$('nb').hidden=false}
+function genName(gs){const a=[...gs].sort((x,y)=>x-y);if(a.length===9)return'National Dex';
+ return a.every((g,i)=>!i||g===a[i-1]+1)&&a.length>1?`Gen ${a[0]}–${a[a.length-1]}`:'Gen '+a.join(', ')}
+$('nbt').onclick=e=>{const b=e.target.closest('button[data-t]');if(b){nbType=b.dataset.t;nbUI()}};
+$('nbg').onclick=e=>{const b=e.target.closest('button[data-g]');if(!b)return;const g=+b.dataset.g;nbGens.has(g)?nbGens.delete(g):nbGens.add(g);nbUI()};
+$('nbx').onclick=()=>{$('nb').hidden=true};
+$('nbsi').onclick=e=>{e.preventDefault();window.pbSignIn&&window.pbSignIn()};
+$('nbc').onclick=()=>{let b;
+ if(nbType==='dex'){if(!nbGens.size){toast('Pick at least one generation');return}
+ b={id:newId(),name:$('nbn').value.trim()||genName(nbGens),slots:padSlots(dexSlots([...nbGens],$('nbp').checked))}}
+ else{const pg=Math.max(2,Math.min(300,Math.ceil((+$('nbpg').value||20)/2)*2));b={id:newId(),name:$('nbn').value.trim()||'My binder',slots:padSlots(new Array(pg*9).fill(0))}}
+ binders.push(b);saveBinders();$('nb').hidden=true;setBinder(binders.length-1,0,true);toast(`Created “${b.name}”`)};
+
+/* ---------- binder settings ---------- */
+$('bren').onclick=()=>{const b=binders[bi];if(!b)return;const v=prompt('Binder name',b.name);if(v&&v.trim()){b.name=v.trim().slice(0,30);saveBinders();stats()}};
+$('bpg').onclick=()=>{const b=binders[bi];if(!b)return;b.slots=padSlots(b.slots.concat(new Array(18).fill(0)));saveBinders();layout();refresh();toast(`Now ${P.length} pages`)};
+$('bdel').onclick=()=>{const b=binders[bi];if(!b||!confirm(`Delete the binder “${b.name}”? Your owned cards stay saved.`))return;
+ binders.splice(bi,1);delete mem[b.id];saveBinders();closeAll();if(binders.length)setBinder(Math.max(0,bi-1),null,true);else{bi=0;layout();refresh();openNew(true)}};
 $('shd').onclick=closeAll;
-['sh','setg'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target===$(id))closeAll()}));
+['sh','setg','ps','nb'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target===$(id))closeAll()}));
 
 /* ---------- settings ---------- */
 function segs(){$('ord').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.o===opt.ord))}
 $('gear').onclick=()=>{segs();$('setg').hidden=false};$('setd').onclick=closeAll;
 $('ord').onclick=e=>{const b=e.target.closest('button[data-o]');if(!b||b.dataset.o===opt.ord)return;opt.ord=b.dataset.o;ls.set('pb-opt',opt);defs=ls.get('pb-defs-'+opt.ord,{});segs();refresh()};
-function backup(){return JSON.stringify({app:'pokedex-binders',v:2,exported:new Date().toISOString(),col},null,1)}
+function backup(){return JSON.stringify({app:'pokedex-binders',v:2,exported:new Date().toISOString(),col,binders},null,1)}
 $('exf').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([backup()],{type:'application/json'}));a.download=`pokedex-binders-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();toast('Backup file saved')};
 $('exc').onclick=async()=>{try{await navigator.clipboard.writeText(backup());toast('Backup copied')}catch(e){$('imt').value=backup();$('imt').select();toast('Copy the text in the box')}};
 function importText(t){let d;try{d=JSON.parse(t)}catch(e){toast('That isn’t a valid backup');return}
- const src=d.col||d.cards;if(!src||typeof src!=='object'){toast('No collection found in that backup');return}
+ const nb=cleanBinders(d.binders);if(nb.length){binders=binders.concat(nb.filter(b=>!binders.some(x=>x.id===b.id)));saveBinders();setBinder(bi,null,true)}
+ const src=d.col||d.cards;if(!src||typeof src!=='object'){toast(nb.length?'Imported binders':'No collection found in that backup');return}
  let k=0;for(const [n,v] of Object.entries(src)){if(!N[n])continue;
   if(typeof v==='string'){if(v==='top'||v==='decent'){entry(n).s=v;k++}}
   else if(v&&typeof v==='object'){const en=entry(n);
@@ -330,10 +429,14 @@ $('rp').onclick=async()=>{const ids=Object.keys(col).filter(n=>col[n].c);if(!ids
 $('cc').onclick=async()=>{try{await caches.delete('pb-img-v1');toast('Image cache cleared')}catch(e){toast('Nothing to clear')}};
 
 /* ---------- start ---------- */
-note('Saved on this device');show();stats();
-/* bridge for sync.js: read the collection, or replace it with the cloud copy without re-uploading it */
-window.pbApp={col:()=>col,note,toast,
- load(c){col=c&&typeof c==='object'?c:{};try{localStorage.setItem('pb-col',JSON.stringify(col))}catch(e){}refresh()}};
+note('Saved on this device');show();stats();if(!binders.length)openNew(true);
+/* bridge for sync.js: read the state, or replace it with the cloud copy without re-uploading it */
+window.pbApp={note,toast,state:()=>({col,binders}),
+ load(st){if(st.col&&typeof st.col==='object')col=st.col;if(Array.isArray(st.binders))binders=cleanBinders(st.binders);
+ try{localStorage.setItem('pb-col',JSON.stringify(col));localStorage.setItem('pb-binders',JSON.stringify(binders))}catch(e){}
+ const id=(binders[bi]||{}).id;bi=Math.max(0,binders.findIndex(b=>b.id===(id||ls.get('pb-curid',null))));layout();spread=target=Math.min(spread,S-1);
+ if(binders.length){if(!$('nb').hidden&&$('nbx').hidden)$('nb').hidden=true}else openNew(true);refresh()},
+ syncReady(){if(!$('nb').hidden&&$('nbx').hidden)$('nbs').hidden=false}};
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
 </script>
