@@ -85,7 +85,8 @@ async function start() {
   const write = () => {
     clearTimeout(pushT); dirty = false;
     const { col, binders, wants } = app.state();
-    return F.setDoc(ref, { col: JSON.stringify(col), binders: JSON.stringify(binders), wants: JSON.stringify(wants || {}), updated: F.serverTimestamp() })
+    // merge: only these fields are written, so data that a newer version adds is never wiped by an older one
+    return F.setDoc(ref, { col: JSON.stringify(col), binders: JSON.stringify(binders), wants: JSON.stringify(wants || {}), updated: F.serverTimestamp() }, { merge: true })
       .then(() => app.note('Synced to your Google account ✓'))
       .catch(() => app.note('Saved on this device – will sync when online'));
   };
