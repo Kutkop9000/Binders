@@ -241,6 +241,9 @@ a{color:var(--acc)}
 <div class="sheet set" id="setg" hidden><div class="sb">
  <h3>Default art for pockets without a chosen print</h3>
  <div class="seg" id="ord"><button data-o="old">Oldest print</button><button data-o="new">Newest print</button></div>
+ <h3>Prints without a picture</h3>
+ <div class="seg" id="nopic"><button data-p="hide">Hide</button><button data-p="show">Show as text</button></div>
+ <p>Most of these are Japanese or Chinese versions of art you can already pick.</p>
  <h3>Cloud sync</h3>
  <p id="acct"></p>
  <div class="row"><button class="btn" id="gout" hidden>Sign out</button></div>
@@ -280,11 +283,17 @@ Object.assign(LTAG,{ko:'KR',other:'Other'});
 // Other hosts: pokemontcg.io (small .png, large _hires.png) and scrydex (/small, /large) fill in art TCGdex doesn't have.
 const pic=(img,q)=>/^https:\/\/assets\.tcgdex\.net\//.test(img)?`${img}/${q}.webp`
  :/^https:\/\/images\.pokemontcg\.io\/.+\.png$/.test(img)?(q==='high'?img.replace(/\.png$/,'_hires.png'):img)
- :/^https:\/\/images\.scrydex\.com\//.test(img)?(q==='high'?img.replace(/\/small$/,'/large'):img):img;
-const ARTHOST=/^https:\/\/(assets\.tcgdex\.net|images\.pokemontcg\.io|images\.scrydex\.com)\//;
+ :/^https:\/\/images\.scrydex\.com\//.test(img)?(q==='high'?img.replace(/\/small$/,'/large'):img)
+ :/^https:\/\/limitlesstcg\.nyc3\.cdn\.digitaloceanspaces\.com\/.+_SM\.png$/.test(img)?(q==='high'?img.replace(/_SM\.png$/,'_LG.png'):img):img;
+const ARTHOST=/^https:\/\/(assets\.tcgdex\.net|images\.pokemontcg\.io|images\.scrydex\.com|limitlesstcg\.nyc3\.cdn\.digitaloceanspaces\.com)\//;
 /* Art for cards TCGdex has no picture for (Trainer Galleries, Shiny Vault, Galarian Gallery, Classic Collections, promos…):
    card id -> picture checked to exist on pokemontcg.io. Loaded once at start. */
 let ART={},artP=null;
+const LIM='https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc';
+// art-fill.json is stored compactly (tools/build_art.py): "L" = the Limitless picture for this card id; @t/ @p/ @s/ = common hosts.
+function artOf(key){const v=ART[key];if(!v)return '';
+ if(v==='L'){const m=splitId(key)[1].match(/^(.+)-0*(\d+)$/);return m?`${LIM}/${m[1]}/${m[1]}_${m[2]}_R_JP_SM.png`:''}
+ return v.replace(/^@t\//,'https://assets.tcgdex.net/').replace(/^@p\//,'https://images.pokemontcg.io/').replace(/^@s\//,'https://images.scrydex.com/pokemon/')}
 function artFill(){return artP||(artP=fetch('art-fill.json').then(r=>r.ok?r.json():{}).then(a=>ART=a&&typeof a==='object'?a:{}).catch(()=>{artP=null;return ART}))}
 const okImg=v=>typeof v==='string'&&(/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(v)||/^https:\/\/[^\s"'<>]+$/.test(v));
 const splitId=id=>{const i=id.indexOf(':');return i>0&&LANGS.includes(id.slice(0,i))?[id.slice(0,i),id.slice(i+1)]:['en',id]};
@@ -354,7 +363,7 @@ async function list(n){
  const [raws,nd]=await Promise.all([Promise.all(LANGS.map(l=>l==='en'?getJSON(`${API}/cards?dexId=eq:${n}`):getJSON(`${TCG}/${l}/cards?dexId=eq:${n}`).catch(()=>[]))),noDex().catch(()=>({})),artFill()]);
  LANGS.forEach((l,li)=>{const have=new Set((raws[li]||[]).map(c=>c.id));((nd[l]||{})[n]||[]).forEach(c=>{if(!have.has(c.id))raws[li].push(c)})});
  const arr=[];LANGS.forEach((l,li)=>(raws[li]||[]).forEach(c=>{const sid=setOf(c.id);if(isPocket(sid))return;
-  const os=setInfo.name[l+'|'+sid]||sid;arr.push({id:cid(l,c.id),lang:l,li,name:N[n]||c.name,no:c.localId,img:c.image||(l==='en'&&ART[c.id])||'',sid,o:setInfo.order[l+'|'+sid]??9999,os,set:setEn(os,cid(l,c.id))})}));
+  const os=setInfo.name[l+'|'+sid]||sid;arr.push({id:cid(l,c.id),lang:l,li,name:N[n]||c.name,no:c.localId,img:c.image||artOf(cid(l,c.id)),sid,o:setInfo.order[l+'|'+sid]??9999,os,set:setEn(os,cid(l,c.id))})}));
  arr.sort((a,b)=>a.li-b.li||a.o-b.o||(parseInt(a.no)||0)-(parseInt(b.no)||0));
  return lists[n]=arr;
 }
@@ -394,7 +403,7 @@ async function priceOf(id){if(isCustom(id))return null;const [l,raw]=splitId(id)
 const eur=p=>p==null?'':'€'+p.toFixed(2);
 
 /* ---------- rendering ---------- */
-function imgOf(n){const e=col[n];if(e&&e.c)return isCustom(e.c)?((customs[e.c.slice(7)]||{}).img||''):(e.img||ART[e.c]||'');const d=defs[n];return d&&d.img}
+function imgOf(n){const e=col[n];if(e&&e.c)return isCustom(e.c)?((customs[e.c.slice(7)]||{}).img||''):(e.img||artOf(e.c));const d=defs[n];return d&&d.img}
 function cell(n,i){if(!n)return `<div class="c e add" data-i="${i}" title="Add a Pokémon"><span>+</span></div>`;
  const nm=N[n],e=col[n]||{},img=imgOf(n),s=e.s||'';
  const cls='c'+(s?' '+s:' no')+(img?' im':'')+(hits.has(n)?' hit':'');
@@ -483,19 +492,22 @@ const customList=n=>Object.entries(customs).filter(([,c])=>c.n===n).map(([id,c])
 const addTile='<button data-add="1" class="addc"><div class="ph">＋<small>Card not listed</small></div><span>Add your own card</span></button>';
 const tile=(c,e)=>`<button data-id="${esc(c.id)}" class="${c.id===e.c?'on':''}">${c.img?`<img src="${esc(pic(c.img,'low'))}" alt="" loading="lazy" decoding="async">`:`<div class="ph">${esc(c.name)}<small>No picture yet</small></div>`}<span>${c.custom?'<i class="lt cu">Custom</i>':''}${c.lang!=='en'&&LTAG[c.lang]?`<i class="lt">${LTAG[c.lang]}</i>`:''}${esc(c.set)} · ${esc(c.no)}</span></button>`;
 async function picker(){const n=sel,box=$('pk');box.innerHTML=addTile+customList(n).map(c=>tile(c,col[n]||{})).join('')+'<div class="msg">Loading prints…</div>';
- try{const arr=[...customList(n),...await list(n)];if(sel!==n)return;
+ try{let arr=[...customList(n),...await list(n)];if(sel!==n)return;
   const f=$('pf').value.trim().toLowerCase(),e=col[n]||{};
+  const hid=(opt.nopic||'hide')==='hide'?arr.filter(c=>!c.img&&!c.custom&&c.id!==e.c).length:0;if(hid)arr=arr.filter(c=>c.img||c.custom||c.id===e.c);
   const lg=opt.lang||'';$('plang').querySelectorAll('button').forEach(b=>{const k=b.dataset.l,c=k?arr.filter(x=>x.lang===k).length:arr.length;
    b.classList.toggle('on',k===lg);b.textContent=(k?{en:'English',ja:'Japanese','zh-tw':'Chinese (Trad.)','zh-cn':'Chinese (Simp.)'}[k]:'All')+` ${c}`});
   let a=arr;if(opt.ord==='new')a=LANGS.flatMap(l=>arr.filter(c=>c.lang===l).reverse());
   if(lg)a=a.filter(c=>c.lang===lg);if(f)a=a.filter(c=>(c.set+' '+c.os+' '+c.name+' '+c.sid).toLowerCase().includes(f));
-  box.innerHTML=addTile+(a.length?a.map(c=>tile(c,e)).join(''):`<div class="msg">${f||lg?'No prints match that filter':'No prints found'}</div>`)}
+  box.innerHTML=addTile+(a.length?a.map(c=>tile(c,e)).join(''):`<div class="msg">${f||lg?'No prints match that filter':'No prints found'}</div>`)
+   +(hid?`<div class="msg">${hid} print${hid>1?'s':''} without a picture hidden · <button class="lnk" data-shownopic="1" style="padding:0">Show them</button></div>`:'')}
  catch(err){if(sel===n)box.innerHTML=addTile+customList(n).map(c=>tile(c,col[n]||{})).join('')+'<div class="msg">Couldn’t load prints — check your connection.</div>'}}
 $('book').addEventListener('click',e=>{const a=e.target.closest('.c.add[data-i]');if(a&&!busy){selI=+a.dataset.i;sel=null;return openPick()}
  const c=e.target.closest('.c[data-n]');if(!c||busy)return;sel=+c.dataset.n;selI=+c.dataset.i;$('pf').value='';sheetHead();$('sh').hidden=false;$('pk').scrollTop=0;picker()});
 $('sh').querySelector('.opts').addEventListener('click',e=>{const b=e.target.closest('button[data-s]');if(!b)return;const s=b.dataset.s,en=entry(sel);
  if((en.s||'')!==s){if(s)en.s=s;else delete en.s;tidy(sel);save();refresh();sheetHead()}});
 $('pk').addEventListener('click',async e=>{if(e.target.closest('button[data-add]'))return openAdd(null);
+ if(e.target.closest('[data-shownopic]')){opt.nopic='show';ls.set('pb-opt',opt);return picker()}
  const b=e.target.closest('button[data-id]');if(!b)return;const n=sel,c=[...customList(n),...(lists[n]||[])].find(x=>x.id===b.dataset.id);if(!c)return;
  const en=entry(n);Object.assign(en,{c:c.id,img:c.custom?'':c.img,set:c.set,no:c.no});if(c.lang!=='en')en.lang=c.lang;else delete en.lang;delete en.p;if(!en.s)en.s='top';save();refresh();sheetHead();
  $('pk').querySelectorAll('button.on').forEach(x=>x.classList.remove('on'));b.classList.add('on');
@@ -601,7 +613,9 @@ $('shd').onclick=closeAll;
 ['sh','setg','ps','nb','bs','ad'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target===$(id))closeAll()}));
 
 /* ---------- settings ---------- */
-function segs(){$('ord').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.o===opt.ord))}
+function segs(){$('ord').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.o===opt.ord));
+ $('nopic').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.p===(opt.nopic||'hide')))}
+$('nopic').onclick=e=>{const b=e.target.closest('button[data-p]');if(!b)return;opt.nopic=b.dataset.p;ls.set('pb-opt',opt);segs()};
 $('gear').onclick=()=>{segs();$('setg').hidden=false};$('setd').onclick=closeAll;
 $('ord').onclick=e=>{const b=e.target.closest('button[data-o]');if(!b||b.dataset.o===opt.ord)return;opt.ord=b.dataset.o;ls.set('pb-opt',opt);defs=ls.get('pb-defs-'+opt.ord,{});segs();refresh()};
 function backup(){return JSON.stringify({app:'pokedex-binders',v:2,exported:new Date().toISOString(),col,binders,customs},null,1)}
