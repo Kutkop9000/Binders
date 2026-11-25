@@ -360,7 +360,9 @@ layout();
 let spread=Math.min(binders[bi]?pv(mem[binders[bi].id]||0):0,S-1),target=spread,busy=false,hits=new Set(),cur=null,sel=null,selI=null;
 function saveBinders(){ls.set('pb-binders',binders)}
 let saveT;
-function save(){clearTimeout(saveT);saveT=setTimeout(()=>{ls.set('pb-col',col);note('Saved on this device ✓')},300)}
+function save(){clearTimeout(saveT);saveT=setTimeout(()=>{saveT=null;ls.set('pb-col',col);note('Saved on this device ✓')},300)}
+// Leaving the app: save a change still waiting on the timer, so it isn't lost (sync.js then uploads it).
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&saveT){clearTimeout(saveT);saveT=null;ls.set('pb-col',col)}});
 function toast(t){const e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(e._t);e._t=setTimeout(()=>e.hidden=true,2600)}
 let nt0='';function note(t){nt0=t;const e=$('sv');if(e)e.textContent=t}
 
@@ -429,7 +431,7 @@ function cell(n,i){if(!n)return `<div class="c e add" data-i="${i}" title="Add a
  const nm=N[n],e=col[n]||{},img=imgOf(n),s=e.s||'';
  const cls='c'+(s?' '+s:' no')+(img?' im':'')+(hits.has(n)?' hit':'');
  const badge=s==='top'?'<i>★</i>':s==='decent'?'<i>↻</i>':'';
- const inner=img?`<img src="${esc(pic(img,'low'))}" alt="${esc(nm)}" loading="lazy" decoding="async">`:`<b>#${pad(n)}</b><span>${esc(nm)}</span>${e.c?`<small class="ps">${e.lang&&e.lang!=='en'?LTAG[e.lang]+' · ':''}${esc(setEn(e.set,e.c))} ${esc(e.no||'')}</small>`:''}`;
+ const inner=img?`<img src="${esc(pic(img,'low'))}" alt="${esc(nm)}" loading="lazy" decoding="async">`:`<b>#${pad(n)}</b><span>${esc(nm)}</span>${e.c?`<small class="ps">${e.lang&&e.lang!=='en'&&LTAG[e.lang]?LTAG[e.lang]+' · ':''}${esc(setEn(e.set,e.c))} ${esc(e.no||'')}</small>`:''}`;
  return `<div class="${cls}" data-n="${n}" data-i="${i}" data-l="#${pad(n)} ${esc(nm)}">${inner}${badge}</div>`}
 function page(i){const p=P[i];if(!p)return i<0?'<div class="cover">Inside cover</div>':'';
  const sz=SZ(),[cols]=SIZES[sz],c=p.it.map((n,k)=>cell(n,i*sz+k)).join('');
@@ -739,5 +741,5 @@ setTimeout(()=>{if(!$('gate').hidden&&$('gin').disabled){$('gmsg').textContent='
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
 </script>
-<script type="module" src="sync.js?v=9"></script>
+<script type="module" src="sync.js?v=10"></script>
 </body></html>
