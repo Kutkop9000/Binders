@@ -7,7 +7,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-192.png"><link rel="icon" href="icon-192.png">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{--bg:#111215;--card:#1b1d22;--page:#1e2026;--spine:#15161a;--cell:#262930;--raise:#2c2f37;--on:#353841;--line:#363a43;--line2:#4a4f5a;--tx:#ececef;--mut:#959aa3;--dim:#868b95;--pocket:#6b707b;--acc:#9cc3ff;--hl:#ffd84d;--top:#3fbf72;--topbg:#163222;--dec:#f0a03a;--decbg:#3a2a12;--warn:#ff9b93;--r1:6px;--r2:10px;--r3:14px;--ease:cubic-bezier(.2,.8,.2,1);--ring:0 0 0 2px var(--bg),0 0 0 4px var(--acc)}
+:root{--bg:#111215;--card:#1b1d22;--page:#1e2026;--spine:#15161a;--cell:#262930;--raise:#2c2f37;--on:#353841;--line:#363a43;--line2:#4a4f5a;--tx:#ececef;--mut:#959aa3;--dim:#868b95;--pocket:#6b707b;--acc:#9cc3ff;--hl:#ffd84d;--top:#3fbf72;--topbg:#163222;--want:#e8689a;--dec:#f0a03a;--decbg:#3a2a12;--warn:#ff9b93;--r1:6px;--r2:10px;--r3:14px;--ease:cubic-bezier(.2,.8,.2,1);--ring:0 0 0 2px var(--bg),0 0 0 4px var(--acc)}
 html{-webkit-text-size-adjust:100%}
 body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.4;margin:0;padding:calc(14px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left));background:var(--bg);color:var(--tx);-webkit-font-smoothing:antialiased}
 body>.top,body>.s,body>.tabs,body>.search,body>.stats,body>.hint{max-width:900px;margin-left:auto;margin-right:auto}
@@ -18,6 +18,16 @@ button:not(:disabled):active{transform:scale(.97)}
 :focus-visible{outline:none;box-shadow:var(--ring)}
 .top{display:flex;align-items:center;gap:8px}
 h1{font-size:1.35rem;font-weight:750;letter-spacing:-.015em;margin:0;flex:1}
+.icon.wb{color:var(--want);font-size:1.15rem}
+.pgrid button{position:relative}
+.pgrid button.want{border-color:var(--want)}
+.wh{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:#000b;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.85rem;line-height:1;z-index:2;cursor:pointer}
+.wh.on{background:var(--want);color:#fff}
+.plist button.wanted{border-color:var(--want);background:color-mix(in srgb,var(--want) 14%,var(--cell))}
+.plist button .wc{color:var(--want);font-weight:700;margin-left:4px;font-size:.8rem}
+.plist .grp{grid-column:1/-1;font-size:.8rem;font-weight:700;color:var(--mut);margin:6px 0 0}
+#wres .back{margin:4px 0 10px}
+.wl-own{position:absolute;left:6px;top:6px;background:var(--top);color:#0b2015;font-weight:700;font-size:.7rem;border-radius:8px;padding:1px 6px;z-index:2}
 .ver{font-size:.7rem;font-weight:600;letter-spacing:0;color:var(--mut);border:1px solid var(--line);border-radius:8px;padding:1px 6px;margin-left:4px;vertical-align:middle}
 p.s{margin-top:2px;margin-bottom:12px;color:var(--mut);font-size:.85rem}
 .icon{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--card);font-size:1.1rem;cursor:pointer;display:grid;place-items:center}
@@ -172,7 +182,7 @@ a{color:var(--acc)}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style></head><body>
-<div class="top"><h1>Pokédex Binders <span class="ver" id="ver" title="App version" hidden></span></h1><button class="icon" id="gear" aria-label="Settings">⚙︎</button></div>
+<div class="top"><h1>Pokédex Binders <span class="ver" id="ver" title="App version" hidden></span></h1><button class="icon wb" id="wbtn" aria-label="Wants" title="Wants">♡</button><button class="icon" id="gear" aria-label="Settings">⚙︎</button></div>
 <p class="s"><span id="sub"></span><button class="lnk" id="bset" hidden>⚙︎ Binder settings</button></p>
 <div class="tabs" id="tabs"></div>
 <div class="search"><input id="q" type="search" placeholder="Search name or #number, then press Enter" enterkeyhint="search" autocomplete="off"><div id="r"></div></div>
@@ -181,7 +191,7 @@ a{color:var(--acc)}
 <div class="leaf" id="F"><div class="face front" id="FF"></div><div class="face back" id="FB"></div></div></div>
 <div class="nav"><button id="pv" aria-label="Previous">‹</button><span id="pi"></span><button id="nx" aria-label="Next">›</button></div>
 <div class="hint">Tap a pocket to mark it (★ Top · ↻ Upgrade needed), choose your print, or replace the Pokémon</div>
-<details class="wl" id="wl"><summary>Want list (this binder)</summary><div id="wlc"></div></details>
+<details class="wl" id="wl"><summary>Missing &amp; upgrades (this binder)</summary><div id="wlc"></div></details>
 
 <div class="sheet" id="sh" hidden><div class="sb">
  <div class="shh"><img id="shimg" alt="" hidden><div><div id="shn"></div><div id="shm"></div></div></div>
@@ -191,6 +201,15 @@ a{color:var(--acc)}
  <div class="pgrid" id="pk"></div>
  <div class="row"><button class="btn" id="srep">⇄ Replace Pokémon</button><button class="btn" id="srem">Empty pocket</button></div>
  <div class="row"><button class="btn" id="pclr">Use default art</button><button class="btn pri" id="shd">Done</button></div>
+</div></div>
+
+<div class="sheet set" id="wn" hidden><div class="sb">
+ <h3>♡ Wants</h3>
+ <input type="search" id="wq" placeholder="Find a Pokémon to add cards: name or #number" autocomplete="off" enterkeyhint="search">
+ <div id="wres"></div>
+ <h3 id="wlh">Your want list</h3>
+ <div class="pgrid" id="wlist"></div>
+ <div class="row"><button class="btn pri" id="wx">Done</button></div>
 </div></div>
 
 <div class="sheet" id="ps" hidden><div class="sb">
@@ -316,10 +335,11 @@ function reflow(b,ns){const os=b.size;let seq=b.slots.slice();
   seq=[];out.forEach(n=>{const prev=seq[seq.length-1];if(n&&prev&&genOf(prev)!==genOf(n))while(seq.length%ns)seq.push(0);seq.push(n)});
   while(seq.length&&!seq[seq.length-1])seq.pop()}
  b.size=ns;b.slots=padSlots(seq,ns)}
-const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}if((k==='pb-col'||k==='pb-binders')&&window.pbSync)window.pbSync()}};
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}if((k==='pb-col'||k==='pb-binders'||k==='pb-wants')&&window.pbSync)window.pbSync()}};
 
 /* ---------- state ---------- */
 let col=ls.get('pb-col',{});
+let wants=ls.get('pb-wants',{});          // card id -> {n, set, no, lang, img, at}: specific cards you want, across all binders
 let customs=ls.get('pb-custom',{});      // id -> {n, set, no, lang, img}: cards you added yourself            // n -> {s:'top'|'decent', c:cardId, img, set, no, p}
 let opt=Object.assign({ord:'old'},ls.get('pb-opt',{}));
 let defs=ls.get('pb-defs-'+opt.ord,{}); // n -> {c,img}
@@ -491,7 +511,9 @@ function sheetHead(){const n=sel,e=col[n]||{},img=imgOf(n);
  $('sh').querySelectorAll('.opts button').forEach(b=>b.classList.toggle('on',(b.dataset.s||'')===(e.s||'')))}
 const customList=n=>Object.entries(customs).filter(([,c])=>c.n===n).map(([id,c])=>({id:'custom:'+id,lang:c.lang,custom:1,name:N[n],no:c.no,img:c.img,os:c.set,set:setEn(c.set),sid:''}));
 const addTile='<button data-add="1" class="addc"><div class="ph">＋<small>Card not listed</small></div><span>Add your own card</span></button>';
-const tile=(c,e)=>`<button data-id="${esc(c.id)}" class="${c.id===e.c?'on':''}">${c.img?`<img src="${esc(pic(c.img,'low'))}" alt="" loading="lazy" decoding="async">`:`<div class="ph">${esc(c.name)}<small>No picture yet</small></div>`}<span>${c.custom?'<i class="lt cu">Custom</i>':''}${c.lang!=='en'&&LTAG[c.lang]?`<i class="lt">${LTAG[c.lang]}</i>`:''}${esc(c.set)} · ${esc(c.no)}</span></button>`;
+const wantN=n=>Object.values(wants).filter(w=>w.n===n).length;
+const heart=c=>`<span class="wh${wants[c.id]?' on':''}" data-want="${esc(c.id)}" title="${wants[c.id]?'On your want list':'Add to want list'}">${wants[c.id]?'♥':'♡'}</span>`;
+const tile=(c,e)=>`<button data-id="${esc(c.id)}" class="${c.id===e.c?'on':''}${wants[c.id]?' want':''}">${heart(c)}${c.img?`<img src="${esc(pic(c.img,'low'))}" alt="" loading="lazy" decoding="async">`:`<div class="ph">${esc(c.name)}<small>No picture yet</small></div>`}<span>${c.custom?'<i class="lt cu">Custom</i>':''}${c.lang!=='en'&&LTAG[c.lang]?`<i class="lt">${LTAG[c.lang]}</i>`:''}${esc(c.set)} · ${esc(c.no)}</span></button>`;
 async function picker(){const n=sel,box=$('pk');box.innerHTML=addTile+customList(n).map(c=>tile(c,col[n]||{})).join('')+'<div class="msg">Loading prints…</div>';
  try{let arr=[...customList(n),...await list(n)];if(sel!==n)return;
   const f=$('pf').value.trim().toLowerCase(),e=col[n]||{};
@@ -508,11 +530,48 @@ $('book').addEventListener('click',e=>{const a=e.target.closest('.c.add[data-i]'
 $('sh').querySelector('.opts').addEventListener('click',e=>{const b=e.target.closest('button[data-s]');if(!b)return;const s=b.dataset.s,en=entry(sel);
  if((en.s||'')!==s){if(s)en.s=s;else delete en.s;tidy(sel);save();refresh();sheetHead()}});
 $('pk').addEventListener('click',async e=>{if(e.target.closest('button[data-add]'))return openAdd(null);
+ const wt=e.target.closest('[data-want]');if(wt){e.stopPropagation();toggleWant(sel,wt.dataset.want);return picker()}
  if(e.target.closest('[data-shownopic]')){opt.nopic='show';ls.set('pb-opt',opt);return picker()}
  const b=e.target.closest('button[data-id]');if(!b)return;const n=sel,c=[...customList(n),...(lists[n]||[])].find(x=>x.id===b.dataset.id);if(!c)return;
  const en=entry(n);Object.assign(en,{c:c.id,img:c.custom?'':c.img,set:c.set,no:c.no});if(c.lang!=='en')en.lang=c.lang;else delete en.lang;delete en.p;if(!en.s)en.s='top';save();refresh();sheetHead();
+ if(wants[c.id]){delete wants[c.id];saveWants();b.classList.remove('want');const h=b.querySelector('.wh');if(h){h.classList.remove('on');h.textContent='♡'}toast('You have it now – removed from your want list')}
  $('pk').querySelectorAll('button.on').forEach(x=>x.classList.remove('on'));b.classList.add('on');
  try{const p=await priceOf(c.id);if(col[n]&&col[n].c===c.id){if(p!=null)col[n].p=p;save();stats();if(sel===n)sheetHead()}}catch(err){}});
+/* ---------- want list: specific cards you want, across all binders ---------- */
+function saveWants(){ls.set('pb-wants',wants);wbtn()}
+function wbtn(){const k=Object.keys(wants).length;$('wbtn').textContent=k?'♥':'♡';$('wbtn').title=k?`Wants (${k})`:'Wants'}
+function toggleWant(n,id){if(wants[id]){delete wants[id];saveWants();toast('Removed from your want list');return}
+ const c=[...customList(n),...(lists[n]||[])].find(x=>x.id===id);if(!c)return;
+ wants[id]={n,set:c.set,no:c.no,lang:c.lang||'en',img:c.custom?'':(c.img||''),at:Date.now()};saveWants();toast(`♥ Added to your want list`)}
+let wSel=null,wT;
+function openWants(){closeAll();wSel=null;$('wq').value='';wres();wlist();$('wn').hidden=false}
+function wres(){const box=$('wres'),v=$('wq').value.trim().toLowerCase().replace(/^#/,'');
+ if(wSel){wPrints();return}
+ if(!v){box.innerHTML='';return}
+ const a=[];if(/^\d+$/.test(v)){if(N[+v])a.push(+v);for(let n=1;n<=NAMES.length&&a.length<40;n++)if(n!==+v&&String(n).startsWith(v))a.push(n)}
+ else for(let n=1;n<=NAMES.length&&a.length<40;n++)if(N[n].toLowerCase().includes(v))a.push(n);
+ box.innerHTML='<div class="plist">'+(a.length?a.map(n=>{const w=wantN(n);return `<button data-wp="${n}" class="${w?'wanted':''}"><b>#${pad(n)}</b>${esc(N[n])}${w?`<span class="wc">♥ ${w}</span>`:''}</button>`}).join(''):'<div class="msg">No Pokémon match</div>')+'</div>'}
+async function wPrints(){const n=wSel,box=$('wres');
+ box.innerHTML=`<div class="back"><button class="lnk" data-wback="1" style="padding:0">← All Pokémon</button> · <b>#${pad(n)} ${esc(N[n])}</b> · tap a card to add it</div><div class="pgrid"><div class="msg">Loading cards…</div></div>`;
+ try{let arr=[...customList(n),...await list(n)];if(wSel!==n)return;
+  const own=(col[n]||{}).c;if((opt.nopic||'hide')==='hide')arr=arr.filter(c=>c.img||c.custom||wants[c.id]);
+  box.querySelector('.pgrid').innerHTML=arr.length?arr.map(c=>`<button data-wid="${esc(c.id)}" class="${wants[c.id]?'want':''}">${heart(c)}${c.id===own?'<span class="wl-own">✓ yours</span>':''}${c.img?`<img src="${esc(pic(c.img,'low'))}" alt="" loading="lazy" decoding="async">`:`<div class="ph">${esc(c.name)}<small>No picture yet</small></div>`}<span>${c.lang!=='en'&&LTAG[c.lang]?`<i class="lt">${LTAG[c.lang]}</i>`:''}${esc(c.set)} · ${esc(c.no)}</span></button>`).join(''):'<div class="msg">No cards found</div>'}
+ catch(e){if(wSel===n)box.querySelector('.pgrid').innerHTML='<div class="msg">Couldn’t load cards — check your connection.</div>'}}
+function wlist(){const all=Object.entries(wants).sort((a,b)=>a[1].n-b[1].n||a[1].at-b[1].at);
+ $('wlh').textContent=all.length?`Your want list (${all.length})`:'Your want list';
+ $('wlist').innerHTML=all.length?all.map(([id,w])=>{const img=isCustom(id)?((customs[id.slice(7)]||{}).img||''):(w.img||artOf(id));const own=(col[w.n]||{}).c===id;
+  return `<button data-wl="${esc(id)}" class="want" title="Tap the heart to remove">${heart({id})}${own?'<span class="wl-own">✓ yours</span>':''}${img?`<img src="${esc(pic(img,'low'))}" alt="" loading="lazy" decoding="async">`:`<div class="ph">${esc(N[w.n]||'')}<small>No picture</small></div>`}<span><b>#${pad(w.n)} ${esc(N[w.n]||'')}</b><br>${w.lang&&w.lang!=='en'&&LTAG[w.lang]?`<i class="lt">${LTAG[w.lang]}</i>`:''}${esc(w.set||'')} · ${esc(w.no||'')}</span></button>`}).join('')
+  :'<div class="msg">Nothing yet. Search a Pokémon above, or tap ♡ on a card in the print picker.</div>'}
+$('wbtn').onclick=openWants;
+$('wx').onclick=closeAll;
+$('wq').addEventListener('input',()=>{clearTimeout(wT);wT=setTimeout(()=>{wSel=null;wres()},120)});
+$('wres').addEventListener('click',e=>{const p=e.target.closest('[data-wp]');if(p){wSel=+p.dataset.wp;return wPrints()}
+ if(e.target.closest('[data-wback]')){wSel=null;return wres()}
+ const t=e.target.closest('[data-wid]');if(t){toggleWant(wSel,t.dataset.wid);wPrints();wlist()}});
+$('wlist').addEventListener('click',e=>{const h=e.target.closest('[data-want]');if(h){delete wants[h.dataset.want];saveWants();toast('Removed from your want list');wlist();if(wSel)wPrints();return}
+ const t=e.target.closest('[data-wl]');if(t){const im=t.querySelector('img');if(im){$('zmi').src=im.src.replace(/\/low\.webp$/,'/high.webp');$('zm').hidden=false}}});
+wbtn();
+
 /* ---------- cards that aren't on TCGdex ---------- */
 let adId=null,adImg='';
 function saveCustoms(id){try{localStorage.setItem('pb-custom',JSON.stringify(customs))}catch(e){toast('This device is out of space for photos – signed in, it is still saved in your account')}
@@ -550,7 +609,7 @@ $('pclr').onclick=()=>{const en=col[sel];if(en){delete en.c;delete en.img;delete
 let pfT;$('pf').addEventListener('input',()=>{clearTimeout(pfT);pfT=setTimeout(picker,200)});
 $('shimg').onclick=()=>{$('zmi').src=$('shimg').src;$('zm').hidden=false};
 $('zm').onclick=()=>$('zm').hidden=true;
-function closeAll(){$('ad').hidden=true;$('bs').hidden=true;$('sh').hidden=true;$('setg').hidden=true;$('zm').hidden=true;$('ps').hidden=true;if(binders.length)$('nb').hidden=true}
+function closeAll(){$('wn').hidden=true;$('ad').hidden=true;$('bs').hidden=true;$('sh').hidden=true;$('setg').hidden=true;$('zm').hidden=true;$('ps').hidden=true;if(binders.length)$('nb').hidden=true}
 
 /* ---------- replace / add a Pokémon in a pocket ---------- */
 function setSlot(i,n){const b=binders[bi];if(!b||i==null)return;b.slots[i]=n||0;b.slots=padSlots(b.slots,b.size);saveBinders();layout();refresh()}
@@ -559,10 +618,13 @@ function openPick(){const cur=selI!=null&&binders[bi]?binders[bi].slots[selI]:0;
  $('psq').value='';$('sh').hidden=true;$('ps').hidden=false;$('psl').scrollTop=0;plist();setTimeout(()=>$('psq').focus(),50)}
 function plist(){const v=$('psq').value.trim().toLowerCase().replace(/^#/,''),cur=binders[bi]?binders[bi].slots[selI]:0;
  const inB=new Set(nums());let a=[];
+ const wn=[...new Set(Object.values(wants).map(w=>w.n))].filter(n=>N[n]).sort((x,y)=>x-y);
+ const btn=n=>{const w=wantN(n);return `<button data-p="${n}" class="${n===cur?'on':''}${w?' wanted':''}"><b>#${pad(n)}</b>${esc(N[n])}${w?`<span class="wc">♥ ${w}</span>`:''}${inB.has(n)&&n!==cur?' <small style="color:var(--dim)">· in binder</small>':''}</button>`};
  if(!v){const near=cur||binders[bi].slots.slice(0,selI).reverse().find(Boolean)||0;for(let n=Math.max(1,near-5);n<=Math.min(NAMES.length,near+40);n++)a.push(n)}
  else if(/^\d+$/.test(v)){const x=+v;if(N[x])a.push(x);for(let n=1;n<=NAMES.length&&a.length<60;n++)if(n!==x&&String(n).startsWith(v))a.push(n)}
  else for(let n=1;n<=NAMES.length&&a.length<80;n++)if(N[n].toLowerCase().includes(v))a.push(n);
- $('psl').innerHTML=a.length?a.map(n=>`<button data-p="${n}" class="${n===cur?'on':''}"><b>#${pad(n)}</b>${esc(N[n])}${inB.has(n)&&n!==cur?' <small style="color:var(--dim)">· in binder</small>':''}</button>`).join(''):'<div class="msg">No Pokémon match</div>'}
+ $('psl').innerHTML=(!v&&wn.length?'<div class="grp">♥ On your want list</div>'+wn.map(btn).join('')+'<div class="grp">Nearby</div>':'')
+  +(a.length?a.map(btn).join(''):'<div class="msg">No Pokémon match</div>')}
 let psT;$('psq').addEventListener('input',()=>{clearTimeout(psT);psT=setTimeout(plist,120)});
 $('psl').addEventListener('click',e=>{const b=e.target.closest('button[data-p]');if(!b)return;const n=+b.dataset.p;
  setSlot(selI,n);$('ps').hidden=true;toast(`Placed #${pad(n)} ${N[n]}`)});
@@ -611,7 +673,7 @@ $('bsx').onclick=closeAll;
 $('bsd').onclick=()=>{const b=binders[bi];if(!b||!confirm(`Delete the binder “${b.name}”? Your owned cards stay saved.`))return;
  binders.splice(bi,1);delete mem[b.id];saveBinders();closeAll();if(binders.length)setBinder(Math.max(0,bi-1),null,true);else{bi=0;layout();refresh();openNew(true)}};
 $('shd').onclick=closeAll;
-['sh','setg','ps','nb','bs','ad'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target===$(id))closeAll()}));
+['sh','setg','ps','nb','bs','ad','wn'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target===$(id))closeAll()}));
 
 /* ---------- settings ---------- */
 function segs(){$('ord').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.o===opt.ord));
@@ -619,11 +681,12 @@ function segs(){$('ord').querySelectorAll('button').forEach(b=>b.classList.toggl
 $('nopic').onclick=e=>{const b=e.target.closest('button[data-p]');if(!b)return;opt.nopic=b.dataset.p;ls.set('pb-opt',opt);segs()};
 $('gear').onclick=()=>{segs();$('setg').hidden=false};$('setd').onclick=closeAll;
 $('ord').onclick=e=>{const b=e.target.closest('button[data-o]');if(!b||b.dataset.o===opt.ord)return;opt.ord=b.dataset.o;ls.set('pb-opt',opt);defs=ls.get('pb-defs-'+opt.ord,{});segs();refresh()};
-function backup(){return JSON.stringify({app:'pokedex-binders',v:2,exported:new Date().toISOString(),col,binders,customs},null,1)}
+function backup(){return JSON.stringify({app:'pokedex-binders',v:2,exported:new Date().toISOString(),col,binders,customs,wants},null,1)}
 $('exf').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([backup()],{type:'application/json'}));a.download=`pokedex-binders-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();toast('Backup file saved')};
 $('exc').onclick=async()=>{try{await navigator.clipboard.writeText(backup());toast('Backup copied')}catch(e){$('imt').value=backup();$('imt').select();toast('Copy the text in the box')}};
 function importText(t){let d;try{d=JSON.parse(t)}catch(e){toast('That isn’t a valid backup');return}
  if(d.customs&&typeof d.customs==='object'){let k=0;for(const [id,c] of Object.entries(d.customs))if(/^[\w-]{1,40}$/.test(id)&&c&&N[c.n]&&(!c.img||okImg(c.img))&&!customs[id]){customs[id]={n:+c.n,set:String(c.set||'').slice(0,60),no:String(c.no||'').slice(0,20),lang:LTAG[c.lang]?c.lang:'other',img:c.img||''};saveCustoms(id);k++}}
+ if(d.wants&&typeof d.wants==='object'){for(const [id,w] of Object.entries(d.wants))if(typeof id==='string'&&id.length<80&&w&&N[w.n]&&!wants[id])wants[id]={n:+w.n,set:String(w.set||'').slice(0,60),no:String(w.no||'').slice(0,20),lang:LTAG[w.lang]?w.lang:'en',img:okImg(w.img)?w.img:'',at:+w.at||Date.now()};saveWants()}
  const nb=cleanBinders(d.binders);if(nb.length){binders=binders.concat(nb.filter(b=>!binders.some(x=>x.id===b.id)));saveBinders();setBinder(bi,null,true)}
  const src=d.col||d.cards;if(!src||typeof src!=='object'){toast(nb.length?'Imported binders':'No collection found in that backup');return}
  let k=0;for(const [n,v] of Object.entries(src)){if(!N[n])continue;
@@ -649,16 +712,16 @@ note('Saved on this device');show();stats();
 // Version label: the number in sw.js (pb-shell-vN), the single place it is bumped. Changes when an update arrives.
 fetch('sw.js',{cache:'no-cache'}).then(r=>r.text()).then(t=>{const m=t.match(/pb-shell-v(\d+)/);if(m){$('ver').textContent='v'+m[1];$('ver').hidden=false}}).catch(()=>{});artFill().then(()=>refresh());if(!binders.length)openNew(true);
 /* bridge for sync.js: read the state, or replace it with the cloud copy without re-uploading it */
-window.pbApp={note,toast,state:()=>({col,binders}),customs:()=>customs,
+window.pbApp={note,toast,state:()=>({col,binders,wants}),customs:()=>customs,
  loadCustoms(m){customs=m&&typeof m==='object'?m:{};try{localStorage.setItem('pb-custom',JSON.stringify(customs))}catch(e){}refresh();if(!$('sh').hidden)picker()},
- load(st){if(st.col&&typeof st.col==='object')col=st.col;if(Array.isArray(st.binders))binders=cleanBinders(st.binders);
- try{localStorage.setItem('pb-col',JSON.stringify(col));localStorage.setItem('pb-binders',JSON.stringify(binders))}catch(e){}
+ load(st){if(st.col&&typeof st.col==='object')col=st.col;if(Array.isArray(st.binders))binders=cleanBinders(st.binders);if(st.wants&&typeof st.wants==='object')wants=st.wants;
+ try{localStorage.setItem('pb-col',JSON.stringify(col));localStorage.setItem('pb-binders',JSON.stringify(binders));localStorage.setItem('pb-wants',JSON.stringify(wants))}catch(e){}wbtn();if(!$('wn').hidden){wres();wlist()}
  const id=(binders[bi]||{}).id;bi=Math.max(0,binders.findIndex(b=>b.id===(id||ls.get('pb-curid',null))));layout();spread=target=Math.min(spread,S-1);
  if(binders.length){if(!$('nb').hidden&&$('nbx').hidden)$('nb').hidden=true}else openNew(true);refresh()}};
 
 /* ---------- phone back button: closes the open menu instead of leaving the app ---------- */
 // One history entry stands for "a menu is open". Back pops it and steps back one level; closing a menu with its own buttons removes it again.
-const OVS=['zm','ad','ps','bs','nb','setg','sh'];  // topmost first
+const OVS=['zm','ad','ps','bs','nb','setg','wn','sh'];  // topmost first
 const ovOpen=()=>OVS.some(id=>!$(id).hidden&&!(id==='nb'&&$('nbx').hidden));  // the first-binder welcome can't be closed
 let ovHist=false,ovSkip=false;
 function ovSync(){const o=ovOpen();
@@ -676,5 +739,5 @@ setTimeout(()=>{if(!$('gate').hidden&&$('gin').disabled){$('gmsg').textContent='
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
 </script>
-<script type="module" src="sync.js?v=8"></script>
+<script type="module" src="sync.js?v=9"></script>
 </body></html>
