@@ -1,0 +1,333 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pokédex Binders</title>
+<meta name="color-scheme" content="dark"><meta name="theme-color" content="#111215">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Binders">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-192.png"><link rel="icon" href="icon-192.png">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#111215;--card:#1b1d22;--page:#1e2026;--spine:#15161a;--cell:#262930;--line:#3a3e47;--tx:#e9e9ec;--mut:#8b9099;--dim:#5f646d;--top:#3fbf72;--topbg:#163222;--dec:#f0a03a;--decbg:#3a2a12}
+body{font-family:system-ui,-apple-system,sans-serif;margin:0;padding:calc(12px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left));background:var(--bg);color:var(--tx)}
+button{font:inherit;color:inherit}
+.top{display:flex;align-items:center;gap:8px}
+h1{font-size:1.25rem;margin:0;flex:1}p.s{margin:2px 0 10px;color:var(--mut);font-size:.85rem}
+.icon{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--card);font-size:1.1rem;cursor:pointer}
+.tabs{display:flex;gap:4px;background:var(--card);padding:4px;border-radius:12px;margin-bottom:10px}
+.tabs button{flex:1;border:0;background:transparent;color:var(--mut);padding:8px 4px;border-radius:9px;font-size:.9rem;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px}
+.tabs button small{font-size:.68rem;font-weight:500;opacity:.8}
+.tabs button.on{background:#33363e;color:var(--tx)}
+.search{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+input[type=search],input[type=text],textarea{font-size:1rem;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;width:100%;background:var(--card);color:var(--tx)}
+::placeholder{color:var(--dim)}
+#r{color:var(--mut);font-size:.85rem;min-height:1.2em}
+.stats{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:.8rem;margin:-4px 0 10px}
+.pill{padding:2px 8px;border-radius:10px;background:var(--card);border:1px solid var(--line)}
+.pill.t{border-color:var(--top);color:#7fcf9c}.pill.d{border-color:var(--dec);color:#f2b866}
+#sv{color:var(--dim);font-size:.72rem;margin-left:auto}
+.book{position:relative;display:flex;perspective:2200px;max-width:900px;margin:0 auto;filter:drop-shadow(0 8px 18px #000a)}
+.book.sw{animation:sw .35s ease}@keyframes sw{from{opacity:0;transform:translateY(8px)}}
+.book::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:linear-gradient(#0000,#000a,#0000);z-index:3;pointer-events:none}
+.pg,.face{background:var(--page);padding:8px 7px 10px}
+.pg{width:50%}
+.pg.l,.face.back,.leaf.b .face.front{border-radius:10px 2px 2px 10px;background:linear-gradient(90deg,var(--page) 86%,var(--spine))}
+.pg.r,.face.front,.leaf.b .face.back{border-radius:2px 10px 10px 2px;background:linear-gradient(270deg,var(--page) 86%,var(--spine))}
+.leaf{position:absolute;top:0;height:100%;width:50%;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;z-index:4;visibility:hidden;will-change:transform;pointer-events:none}
+.leaf.f{left:50%;transform-origin:left center}.leaf.b{left:0;transform-origin:right center}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.face.back{transform:rotateY(180deg)}
+.h{font-weight:700;font-size:.8rem;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:4px}
+.h small{font-weight:600;font-size:.62rem;color:#fff;padding:1px 6px;border-radius:9px;white-space:nowrap}
+.g1 small{background:#c94444}.g2 small{background:#b8921c}.g3 small{background:#2a8f60}.g4 small{background:#3b6fb6}.g5 small{background:#5d626b}
+.g{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.c{position:relative;aspect-ratio:63/88;border:1.5px solid var(--line);border-radius:5px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:2px;font-size:clamp(.5rem,1.9vw,.85rem);overflow:hidden;background:var(--cell)}
+.c b{color:var(--dim);font-size:.8em;font-weight:600}.c span{font-weight:600;overflow-wrap:anywhere;line-height:1.1}
+.c.e{border-style:dashed;border-color:#2c2f36;background:transparent}
+.c[data-n]{cursor:pointer}
+.c[data-n].no span{color:var(--dim)}
+.c.im{padding:0;border-width:1px}
+.c img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:3px}
+.c.no img{filter:grayscale(1) brightness(.45)}
+.c.no.im::after{content:attr(data-l);position:absolute;left:0;right:0;bottom:0;padding:2px;font-size:.75em;font-weight:600;background:#000a;color:#ccc}
+.c.top{border-color:var(--top)!important;border-width:2px;background:var(--topbg)}
+.c.decent{border-color:var(--dec)!important;border-width:2px;background:var(--decbg)}
+.c i{position:absolute;top:2px;right:2px;font-style:normal;font-size:.8em;z-index:2;width:1.5em;height:1.5em;line-height:1.5em;border-radius:50%;background:#000c;text-align:center}
+.c.top i{color:var(--top)}.c.decent i{color:var(--dec)}
+.c.hit{outline:3px solid #ffd84d;outline-offset:-1px;animation:pulse 1.2s ease-in-out 2;z-index:2}
+.c.hit:not(.im){background:#ffd84d!important}.c.hit:not(.im) span,.c.hit:not(.im) b{color:#1a1a1a!important}
+.c.hit.no img{filter:none}
+@keyframes pulse{50%{transform:scale(1.07)}}
+.nav{display:flex;justify-content:center;align-items:center;gap:16px;margin-top:14px}
+.nav button{font-size:1.3rem;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);cursor:pointer}
+.nav button:disabled{opacity:.3}
+#pi{font-size:.9rem;color:var(--mut);min-width:110px;text-align:center}
+.hint{font-size:.78rem;color:var(--dim);text-align:center;margin-top:8px}
+.sheet{position:fixed;inset:0;background:#000a;display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.sheet[hidden]{display:none}
+.sb{background:var(--card);width:100%;max-width:560px;max-height:88vh;overflow:auto;border-radius:16px 16px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+.shh{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.shh img{width:96px;border-radius:6px;cursor:zoom-in}
+#shn{font-weight:700;font-size:1.05rem}#shm{color:var(--mut);font-size:.82rem;margin-top:4px;line-height:1.4}
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.opts button{padding:12px 4px;font-size:.95rem;border-radius:10px;border:1.5px solid var(--line);background:var(--cell);cursor:pointer}
+.opts [data-s=decent]{border-color:var(--dec);background:var(--decbg)}.opts [data-s=top]{border-color:var(--top);background:var(--topbg)}
+.opts button.on{box-shadow:0 0 0 2px #fff inset}
+.pkh{display:flex;align-items:center;gap:8px;margin:16px 0 8px;font-weight:700;font-size:.9rem}
+.pkh input{flex:1;font-size:.85rem;padding:7px 10px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
+.pgrid button{border:2px solid transparent;border-radius:7px;background:var(--cell);padding:3px;cursor:pointer;display:flex;flex-direction:column;gap:3px;font-size:.66rem;color:var(--mut);text-align:left}
+.pgrid button img{width:100%;aspect-ratio:63/88;object-fit:cover;border-radius:4px;background:#2c2f36}
+.pgrid button.on{border-color:#ffd84d;color:var(--tx)}
+.pgrid .msg{grid-column:1/-1;color:var(--mut);font-size:.85rem;padding:8px 0}
+.row{display:flex;gap:8px;margin-top:12px}
+.btn{flex:1;padding:11px;border-radius:10px;border:1px solid var(--line);background:#2c2f37;cursor:pointer;font-weight:600}
+.btn.pri{background:#e9e9ec;color:#111;border-color:#e9e9ec}
+.zoom{position:fixed;inset:0;background:#000e;z-index:30;display:flex;align-items:center;justify-content:center;padding:20px}
+.zoom[hidden]{display:none}.zoom img{max-width:100%;max-height:100%;border-radius:12px}
+.set h3{font-size:.9rem;margin:18px 0 8px}.set h3:first-of-type{margin-top:4px}
+.set p{color:var(--mut);font-size:.8rem;margin:6px 0}
+.seg{display:flex;gap:4px;background:var(--bg);padding:3px;border-radius:9px}
+.seg button{flex:1;border:0;background:transparent;padding:8px;border-radius:7px;color:var(--mut);cursor:pointer}
+.seg button.on{background:#33363e;color:var(--tx)}
+details.wl{max-width:900px;margin:16px auto 0;background:var(--card);border-radius:10px;padding:10px 12px}
+details.wl summary{font-weight:700;cursor:pointer}
+.wl h3{font-size:.85rem;margin:12px 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chips button{font-size:.75rem;padding:4px 8px;border-radius:12px;border:1px solid var(--line);background:var(--cell);cursor:pointer}
+.chips.d button{border-color:var(--dec);background:var(--decbg)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#e9e9ec;color:#111;padding:9px 14px;border-radius:20px;font-size:.85rem;z-index:40;box-shadow:0 4px 14px #0008}
+.toast[hidden]{display:none}
+</style></head><body>
+<div class="top"><h1>Pokédex Binders</h1><button class="icon" id="gear" aria-label="Settings">⚙︎</button></div>
+<p class="s" id="sub"></p>
+<div class="tabs" id="tabs"></div>
+<div class="search"><input id="q" type="search" placeholder="Search name or #number, then press Enter" enterkeyhint="search" autocomplete="off"><div id="r"></div></div>
+<div class="stats" id="st"></div>
+<div class="book" id="book"><div class="pg l" id="L"></div><div class="pg r" id="R"></div>
+<div class="leaf" id="F"><div class="face front" id="FF"></div><div class="face back" id="FB"></div></div></div>
+<div class="nav"><button id="pv" aria-label="Previous">‹</button><span id="pi"></span><button id="nx" aria-label="Next">›</button></div>
+<div class="hint">Tap a pocket to mark it (↻ Decent · ★ Top) and choose which print you own</div>
+<details class="wl" id="wl"><summary>Want list (this binder)</summary><div id="wlc"></div></details>
+
+<div class="sheet" id="sh" hidden><div class="sb">
+ <div class="shh"><img id="shimg" alt="" hidden><div><div id="shn"></div><div id="shm"></div></div></div>
+ <div class="opts"><button data-s="">Don't have</button><button data-s="decent">↻ Decent</button><button data-s="top">★ Top</button></div>
+ <div class="pkh">Your print <input id="pf" type="text" placeholder="Filter: set or name"></div>
+ <div class="pgrid" id="pk"></div>
+ <div class="row"><button class="btn" id="pclr">Use default art</button><button class="btn pri" id="shd">Done</button></div>
+</div></div>
+
+<div class="sheet set" id="setg" hidden><div class="sb">
+ <h3>Default art for pockets without a chosen print</h3>
+ <div class="seg" id="ord"><button data-o="old">Oldest print</button><button data-o="new">Newest print</button></div>
+ <h3>Backup</h3>
+ <p>Your collection is stored on this device. Export a backup now and then, and use Import to move it to another device.</p>
+ <div class="row"><button class="btn" id="exf">Export file</button><button class="btn" id="exc">Copy backup</button></div>
+ <div class="row"><button class="btn" id="imf">Import file</button><input type="file" id="imfi" accept=".json,application/json,text/plain" hidden></div>
+ <textarea id="imt" rows="3" placeholder="…or paste a backup here (also works with the old Claude version)" style="margin-top:8px"></textarea>
+ <div class="row"><button class="btn" id="imp">Import pasted backup</button></div>
+ <h3>Prices</h3>
+ <p>Cardmarket trend prices (EUR) for the prints you chose. They update when you pick a print, or here for everything at once.</p>
+ <div class="row"><button class="btn" id="rp">Refresh all prices</button></div>
+ <h3>Storage</h3>
+ <div class="row"><button class="btn" id="cc">Clear cached images</button></div>
+ <p>Card data and images: TCGdex (tcgdex.dev). Prices: Cardmarket via TCGdex. Pokémon card images © The Pokémon Company, Nintendo, Game Freak, Creatures. For personal use; not affiliated.</p>
+ <div class="row"><button class="btn pri" id="setd">Done</button></div>
+</div></div>
+<div class="zoom" id="zm" hidden><img id="zmi" alt=""></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const B=[{"name": "Gen 1", "P": [{"n": 1, "g": 1, "it": [[1, "Bulbasaur"], [2, "Ivysaur"], [3, "Venusaur"], [4, "Charmander"], [5, "Charmeleon"], [6, "Charizard"], [7, "Squirtle"], [8, "Wartortle"], [9, "Blastoise"]]}, {"n": 2, "g": 1, "it": [[10, "Caterpie"], [11, "Metapod"], [12, "Butterfree"], [13, "Weedle"], [14, "Kakuna"], [15, "Beedrill"], [16, "Pidgey"], [17, "Pidgeotto"], [18, "Pidgeot"]]}, {"n": 3, "g": 1, "it": [[19, "Rattata"], [20, "Raticate"], [21, "Spearow"], [22, "Fearow"], [23, "Ekans"], [24, "Arbok"], [25, "Pikachu"], [26, "Raichu"], [27, "Sandshrew"]]}, {"n": 4, "g": 1, "it": [[28, "Sandslash"], [29, "Nidoran♀"], [30, "Nidorina"], [31, "Nidoqueen"], [32, "Nidoran♂"], [33, "Nidorino"], [34, "Nidoking"], [35, "Clefairy"], [36, "Clefable"]]}, {"n": 5, "g": 1, "it": [[37, "Vulpix"], [38, "Ninetales"], [39, "Jigglypuff"], [40, "Wigglytuff"], [41, "Zubat"], [42, "Golbat"], [43, "Oddish"], [44, "Gloom"], [45, "Vileplume"]]}, {"n": 6, "g": 1, "it": [[46, "Paras"], [47, "Parasect"], [48, "Venonat"], [49, "Venomoth"], [50, "Diglett"], [51, "Dugtrio"], [52, "Meowth"], [53, "Persian"], [54, "Psyduck"]]}, {"n": 7, "g": 1, "it": [[55, "Golduck"], [56, "Mankey"], [57, "Primeape"], [58, "Growlithe"], [59, "Arcanine"], [60, "Poliwag"], [61, "Poliwhirl"], [62, "Poliwrath"], [63, "Abra"]]}, {"n": 8, "g": 1, "it": [[64, "Kadabra"], [65, "Alakazam"], [66, "Machop"], [67, "Machoke"], [68, "Machamp"], [69, "Bellsprout"], [70, "Weepinbell"], [71, "Victreebel"], [72, "Tentacool"]]}, {"n": 9, "g": 1, "it": [[73, "Tentacruel"], [74, "Geodude"], [75, "Graveler"], [76, "Golem"], [77, "Ponyta"], [78, "Rapidash"], [79, "Slowpoke"], [80, "Slowbro"], [81, "Magnemite"]]}, {"n": 10, "g": 1, "it": [[82, "Magneton"], [83, "Farfetch'd"], [84, "Doduo"], [85, "Dodrio"], [86, "Seel"], [87, "Dewgong"], [88, "Grimer"], [89, "Muk"], [90, "Shellder"]]}, {"n": 11, "g": 1, "it": [[91, "Cloyster"], [92, "Gastly"], [93, "Haunter"], [94, "Gengar"], [95, "Onix"], [96, "Drowzee"], [97, "Hypno"], [98, "Krabby"], [99, "Kingler"]]}, {"n": 12, "g": 1, "it": [[100, "Voltorb"], [101, "Electrode"], [102, "Exeggcute"], [103, "Exeggutor"], [104, "Cubone"], [105, "Marowak"], [106, "Hitmonlee"], [107, "Hitmonchan"], [108, "Lickitung"]]}, {"n": 13, "g": 1, "it": [[109, "Koffing"], [110, "Weezing"], [111, "Rhyhorn"], [112, "Rhydon"], [113, "Chansey"], [114, "Tangela"], [115, "Kangaskhan"], [116, "Horsea"], [117, "Seadra"]]}, {"n": 14, "g": 1, "it": [[118, "Goldeen"], [119, "Seaking"], [120, "Staryu"], [121, "Starmie"], [122, "Mr. Mime"], [123, "Scyther"], [124, "Jynx"], [125, "Electabuzz"], [126, "Magmar"]]}, {"n": 15, "g": 1, "it": [[127, "Pinsir"], [128, "Tauros"], [129, "Magikarp"], [130, "Gyarados"], [131, "Lapras"], [132, "Ditto"], [133, "Eevee"], [134, "Vaporeon"], [135, "Jolteon"]]}, {"n": 16, "g": 1, "it": [[136, "Flareon"], [137, "Porygon"], [138, "Omanyte"], [139, "Omastar"], [140, "Kabuto"], [141, "Kabutops"], [142, "Aerodactyl"], [143, "Snorlax"], [144, "Articuno"]]}, {"n": 17, "g": 1, "it": [[145, "Zapdos"], [146, "Moltres"], [147, "Dratini"], [148, "Dragonair"], [149, "Dragonite"], [150, "Mewtwo"], [151, "Mew"]]}, {"n": 18, "g": 0, "it": []}]}, {"name": "Gen 2–3", "P": [{"n": 1, "g": 2, "it": [[152, "Chikorita"], [153, "Bayleef"], [154, "Meganium"], [155, "Cyndaquil"], [156, "Quilava"], [157, "Typhlosion"], [158, "Totodile"], [159, "Croconaw"], [160, "Feraligatr"]]}, {"n": 2, "g": 2, "it": [[161, "Sentret"], [162, "Furret"], [163, "Hoothoot"], [164, "Noctowl"], [165, "Ledyba"], [166, "Ledian"], [167, "Spinarak"], [168, "Ariados"], [169, "Crobat"]]}, {"n": 3, "g": 2, "it": [[170, "Chinchou"], [171, "Lanturn"], [172, "Pichu"], [173, "Cleffa"], [174, "Igglybuff"], [175, "Togepi"], [176, "Togetic"], [177, "Natu"], [178, "Xatu"]]}, {"n": 4, "g": 2, "it": [[179, "Mareep"], [180, "Flaaffy"], [181, "Ampharos"], [182, "Bellossom"], [183, "Marill"], [184, "Azumarill"], [185, "Sudowoodo"], [186, "Politoed"], [187, "Hoppip"]]}, {"n": 5, "g": 2, "it": [[188, "Skiploom"], [189, "Jumpluff"], [190, "Aipom"], [191, "Sunkern"], [192, "Sunflora"], [193, "Yanma"], [194, "Wooper"], [195, "Quagsire"], [196, "Espeon"]]}, {"n": 6, "g": 2, "it": [[197, "Umbreon"], [198, "Murkrow"], [199, "Slowking"], [200, "Misdreavus"], [201, "Unown"], [202, "Wobbuffet"], [203, "Girafarig"], [204, "Pineco"], [205, "Forretress"]]}, {"n": 7, "g": 2, "it": [[206, "Dunsparce"], [207, "Gligar"], [208, "Steelix"], [209, "Snubbull"], [210, "Granbull"], [211, "Qwilfish"], [212, "Scizor"], [213, "Shuckle"], [214, "Heracross"]]}, {"n": 8, "g": 2, "it": [[215, "Sneasel"], [216, "Teddiursa"], [217, "Ursaring"], [218, "Slugma"], [219, "Magcargo"], [220, "Swinub"], [221, "Piloswine"], [222, "Corsola"], [223, "Remoraid"]]}, {"n": 9, "g": 2, "it": [[224, "Octillery"], [225, "Delibird"], [226, "Mantine"], [227, "Skarmory"], [228, "Houndour"], [229, "Houndoom"], [230, "Kingdra"], [231, "Phanpy"], [232, "Donphan"]]}, {"n": 10, "g": 2, "it": [[233, "Porygon2"], [234, "Stantler"], [235, "Smeargle"], [236, "Tyrogue"], [237, "Hitmontop"], [238, "Smoochum"], [239, "Elekid"], [240, "Magby"], [241, "Miltank"]]}, {"n": 11, "g": 2, "it": [[242, "Blissey"], [243, "Raikou"], [244, "Entei"], [245, "Suicune"], [246, "Larvitar"], [247, "Pupitar"], [248, "Tyranitar"], [249, "Lugia"], [250, "Ho-Oh"]]}, {"n": 12, "g": 2, "it": [[251, "Celebi"]]}, {"n": 13, "g": 3, "it": [[252, "Treecko"], [253, "Grovyle"], [254, "Sceptile"], [255, "Torchic"], [256, "Combusken"], [257, "Blaziken"], [258, "Mudkip"], [259, "Marshtomp"], [260, "Swampert"]]}, {"n": 14, "g": 3, "it": [[261, "Poochyena"], [262, "Mightyena"], [263, "Zigzagoon"], [264, "Linoone"], [265, "Wurmple"], [266, "Silcoon"], [267, "Beautifly"], [268, "Cascoon"], [269, "Dustox"]]}, {"n": 15, "g": 3, "it": [[270, "Lotad"], [271, "Lombre"], [272, "Ludicolo"], [273, "Seedot"], [274, "Nuzleaf"], [275, "Shiftry"], [276, "Taillow"], [277, "Swellow"], [278, "Wingull"]]}, {"n": 16, "g": 3, "it": [[279, "Pelipper"], [280, "Ralts"], [281, "Kirlia"], [282, "Gardevoir"], [283, "Surskit"], [284, "Masquerain"], [285, "Shroomish"], [286, "Breloom"], [287, "Slakoth"]]}, {"n": 17, "g": 3, "it": [[288, "Vigoroth"], [289, "Slaking"], [290, "Nincada"], [291, "Ninjask"], [292, "Shedinja"], [293, "Whismur"], [294, "Loudred"], [295, "Exploud"], [296, "Makuhita"]]}, {"n": 18, "g": 3, "it": [[297, "Hariyama"], [298, "Azurill"], [299, "Nosepass"], [300, "Skitty"], [301, "Delcatty"], [302, "Sableye"], [303, "Mawile"], [304, "Aron"], [305, "Lairon"]]}, {"n": 19, "g": 3, "it": [[306, "Aggron"], [307, "Meditite"], [308, "Medicham"], [309, "Electrike"], [310, "Manectric"], [311, "Plusle"], [312, "Minun"], [313, "Volbeat"], [314, "Illumise"]]}, {"n": 20, "g": 3, "it": [[315, "Roselia"], [316, "Gulpin"], [317, "Swalot"], [318, "Carvanha"], [319, "Sharpedo"], [320, "Wailmer"], [321, "Wailord"], [322, "Numel"], [323, "Camerupt"]]}, {"n": 21, "g": 3, "it": [[324, "Torkoal"], [325, "Spoink"], [326, "Grumpig"], [327, "Spinda"], [328, "Trapinch"], [329, "Vibrava"], [330, "Flygon"], [331, "Cacnea"], [332, "Cacturne"]]}, {"n": 22, "g": 3, "it": [[333, "Swablu"], [334, "Altaria"], [335, "Zangoose"], [336, "Seviper"], [337, "Lunatone"], [338, "Solrock"], [339, "Barboach"], [340, "Whiscash"], [341, "Corphish"]]}, {"n": 23, "g": 3, "it": [[342, "Crawdaunt"], [343, "Baltoy"], [344, "Claydol"], [345, "Lileep"], [346, "Cradily"], [347, "Anorith"], [348, "Armaldo"], [349, "Feebas"], [350, "Milotic"]]}, {"n": 24, "g": 3, "it": [[351, "Castform"], [352, "Kecleon"], [353, "Shuppet"], [354, "Banette"], [355, "Duskull"], [356, "Dusclops"], [357, "Tropius"], [358, "Chimecho"], [359, "Absol"]]}, {"n": 25, "g": 3, "it": [[360, "Wynaut"], [361, "Snorunt"], [362, "Glalie"], [363, "Spheal"], [364, "Sealeo"], [365, "Walrein"], [366, "Clamperl"], [367, "Huntail"], [368, "Gorebyss"]]}, {"n": 26, "g": 3, "it": [[369, "Relicanth"], [370, "Luvdisc"], [371, "Bagon"], [372, "Shelgon"], [373, "Salamence"], [374, "Beldum"], [375, "Metang"], [376, "Metagross"], [377, "Regirock"]]}, {"n": 27, "g": 3, "it": [[378, "Regice"], [379, "Registeel"], [380, "Latias"], [381, "Latios"], [382, "Kyogre"], [383, "Groudon"], [384, "Rayquaza"], [385, "Jirachi"], [386, "Deoxys"]]}, {"n": 28, "g": 0, "it": []}]}, {"name": "Gen 4–5", "P": [{"n": 1, "g": 4, "it": [[387, "Turtwig"], [388, "Grotle"], [389, "Torterra"], [390, "Chimchar"], [391, "Monferno"], [392, "Infernape"], [393, "Piplup"], [394, "Prinplup"], [395, "Empoleon"]]}, {"n": 2, "g": 4, "it": [[396, "Starly"], [397, "Staravia"], [398, "Staraptor"], [399, "Bidoof"], [400, "Bibarel"], [401, "Kricketot"], [402, "Kricketune"], [403, "Shinx"], [404, "Luxio"]]}, {"n": 3, "g": 4, "it": [[405, "Luxray"], [406, "Budew"], [407, "Roserade"], [408, "Cranidos"], [409, "Rampardos"], [410, "Shieldon"], [411, "Bastiodon"], [412, "Burmy"], [413, "Wormadam"]]}, {"n": 4, "g": 4, "it": [[414, "Mothim"], [415, "Combee"], [416, "Vespiquen"], [417, "Pachirisu"], [418, "Buizel"], [419, "Floatzel"], [420, "Cherubi"], [421, "Cherrim"], [422, "Shellos"]]}, {"n": 5, "g": 4, "it": [[423, "Gastrodon"], [424, "Ambipom"], [425, "Drifloon"], [426, "Drifblim"], [427, "Buneary"], [428, "Lopunny"], [429, "Mismagius"], [430, "Honchkrow"], [431, "Glameow"]]}, {"n": 6, "g": 4, "it": [[432, "Purugly"], [433, "Chingling"], [434, "Stunky"], [435, "Skuntank"], [436, "Bronzor"], [437, "Bronzong"], [438, "Bonsly"], [439, "Mime Jr."], [440, "Happiny"]]}, {"n": 7, "g": 4, "it": [[441, "Chatot"], [442, "Spiritomb"], [443, "Gible"], [444, "Gabite"], [445, "Garchomp"], [446, "Munchlax"], [447, "Riolu"], [448, "Lucario"], [449, "Hippopotas"]]}, {"n": 8, "g": 4, "it": [[450, "Hippowdon"], [451, "Skorupi"], [452, "Drapion"], [453, "Croagunk"], [454, "Toxicroak"], [455, "Carnivine"], [456, "Finneon"], [457, "Lumineon"], [458, "Mantyke"]]}, {"n": 9, "g": 4, "it": [[459, "Snover"], [460, "Abomasnow"], [461, "Weavile"], [462, "Magnezone"], [463, "Lickilicky"], [464, "Rhyperior"], [465, "Tangrowth"], [466, "Electivire"], [467, "Magmortar"]]}, {"n": 10, "g": 4, "it": [[468, "Togekiss"], [469, "Yanmega"], [470, "Leafeon"], [471, "Glaceon"], [472, "Gliscor"], [473, "Mamoswine"], [474, "Porygon-Z"], [475, "Gallade"], [476, "Probopass"]]}, {"n": 11, "g": 4, "it": [[477, "Dusknoir"], [478, "Froslass"], [479, "Rotom"], [480, "Uxie"], [481, "Mesprit"], [482, "Azelf"], [483, "Dialga"], [484, "Palkia"], [485, "Heatran"]]}, {"n": 12, "g": 4, "it": [[486, "Regigigas"], [487, "Giratina"], [488, "Cresselia"], [489, "Phione"], [490, "Manaphy"], [491, "Darkrai"], [492, "Shaymin"], [493, "Arceus"], [494, "Victini"]]}, {"n": 13, "g": 5, "it": [[495, "Snivy"], [496, "Servine"], [497, "Serperior"], [498, "Tepig"], [499, "Pignite"], [500, "Emboar"], [501, "Oshawott"], [502, "Dewott"], [503, "Samurott"]]}, {"n": 14, "g": 5, "it": [[504, "Patrat"], [505, "Watchog"], [506, "Lillipup"], [507, "Herdier"], [508, "Stoutland"], [509, "Purrloin"], [510, "Liepard"], [511, "Pansage"], [512, "Simisage"]]}, {"n": 15, "g": 5, "it": [[513, "Pansear"], [514, "Simisear"], [515, "Panpour"], [516, "Simipour"], [517, "Munna"], [518, "Musharna"], [519, "Pidove"], [520, "Tranquill"], [521, "Unfezant"]]}, {"n": 16, "g": 5, "it": [[522, "Blitzle"], [523, "Zebstrika"], [524, "Roggenrola"], [525, "Boldore"], [526, "Gigalith"], [527, "Woobat"], [528, "Swoobat"], [529, "Drilbur"], [530, "Excadrill"]]}, {"n": 17, "g": 5, "it": [[531, "Audino"], [532, "Timburr"], [533, "Gurdurr"], [534, "Conkeldurr"], [535, "Tympole"], [536, "Palpitoad"], [537, "Seismitoad"], [538, "Throh"], [539, "Sawk"]]}, {"n": 18, "g": 5, "it": [[540, "Sewaddle"], [541, "Swadloon"], [542, "Leavanny"], [543, "Venipede"], [544, "Whirlipede"], [545, "Scolipede"], [546, "Cottonee"], [547, "Whimsicott"], [548, "Petilil"]]}, {"n": 19, "g": 5, "it": [[549, "Lilligant"], [550, "Basculin"], [551, "Sandile"], [552, "Krokorok"], [553, "Krookodile"], [554, "Darumaka"], [555, "Darmanitan"], [556, "Maractus"], [557, "Dwebble"]]}, {"n": 20, "g": 5, "it": [[558, "Crustle"], [559, "Scraggy"], [560, "Scrafty"], [561, "Sigilyph"], [562, "Yamask"], [563, "Cofagrigus"], [564, "Tirtouga"], [565, "Carracosta"], [566, "Archen"]]}, {"n": 21, "g": 5, "it": [[567, "Archeops"], [568, "Trubbish"], [569, "Garbodor"], [570, "Zorua"], [571, "Zoroark"], [572, "Minccino"], [573, "Cinccino"], [574, "Gothita"], [575, "Gothorita"]]}, {"n": 22, "g": 5, "it": [[576, "Gothitelle"], [577, "Solosis"], [578, "Duosion"], [579, "Reuniclus"], [580, "Ducklett"], [581, "Swanna"], [582, "Vanillite"], [583, "Vanillish"], [584, "Vanilluxe"]]}, {"n": 23, "g": 5, "it": [[585, "Deerling"], [586, "Sawsbuck"], [587, "Emolga"], [588, "Karrablast"], [589, "Escavalier"], [590, "Foongus"], [591, "Amoonguss"], [592, "Frillish"], [593, "Jellicent"]]}, {"n": 24, "g": 5, "it": [[594, "Alomomola"], [595, "Joltik"], [596, "Galvantula"], [597, "Ferroseed"], [598, "Ferrothorn"], [599, "Klink"], [600, "Klang"], [601, "Klinklang"], [602, "Tynamo"]]}, {"n": 25, "g": 5, "it": [[603, "Eelektrik"], [604, "Eelektross"], [605, "Elgyem"], [606, "Beheeyem"], [607, "Litwick"], [608, "Lampent"], [609, "Chandelure"], [610, "Axew"], [611, "Fraxure"]]}, {"n": 26, "g": 5, "it": [[612, "Haxorus"], [613, "Cubchoo"], [614, "Beartic"], [615, "Cryogonal"], [616, "Shelmet"], [617, "Accelgor"], [618, "Stunfisk"], [619, "Mienfoo"], [620, "Mienshao"]]}, {"n": 27, "g": 5, "it": [[621, "Druddigon"], [622, "Golett"], [623, "Golurk"], [624, "Pawniard"], [625, "Bisharp"], [626, "Bouffalant"], [627, "Rufflet"], [628, "Braviary"], [629, "Vullaby"]]}, {"n": 28, "g": 5, "it": [[630, "Mandibuzz"], [631, "Heatmor"], [632, "Durant"], [633, "Deino"], [634, "Zweilous"], [635, "Hydreigon"], [636, "Larvesta"], [637, "Volcarona"], [638, "Cobalion"]]}, {"n": 29, "g": 5, "it": [[639, "Terrakion"], [640, "Virizion"], [641, "Tornadus"], [642, "Thundurus"], [643, "Reshiram"], [644, "Zekrom"], [645, "Landorus"], [646, "Kyurem"], [647, "Keldeo"]]}, {"n": 30, "g": 5, "it": [[648, "Meloetta"], [649, "Genesect"]]}]}];
+const API='https://api.tcgdex.net/v2/en';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(3,'0');
+const N={};B.forEach(b=>b.P.forEach(p=>p.it.forEach(([n,nm])=>N[n]=nm)));
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+/* ---------- state ---------- */
+let col=ls.get('pb-col',{});            // n -> {s:'top'|'decent', c:cardId, img, set, no, p}
+let opt=Object.assign({ord:'old'},ls.get('pb-opt',{}));
+let defs=ls.get('pb-defs-'+opt.ord,{}); // n -> {c,img}
+let bi=Math.min(ls.get('pb-cur',0),B.length-1),P=B[bi].P,S=P.length/2;
+const mem=ls.get('pb-mem',B.map(()=>0));
+let spread=Math.min(mem[bi]||0,S-1),target=spread,busy=false,hits=new Set(),cur=null,sel=null;
+let saveT;
+function save(){clearTimeout(saveT);saveT=setTimeout(()=>{ls.set('pb-col',col);note('Saved on this device ✓')},300)}
+function toast(t){const e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(e._t);e._t=setTimeout(()=>e.hidden=true,2600)}
+let nt0='';function note(t){nt0=t;const e=$('sv');if(e)e.textContent=t}
+
+/* ---------- card data (TCGdex) ---------- */
+let setInfo=ls.get('pb-sets',null);     // {order:{id:i}, name:{id:name}, pocket:[ids]}
+const lists={};                          // n -> sorted array of cards
+async function getJSON(u){const r=await fetch(u);if(!r.ok)throw new Error(r.status);return r.json()}
+async function loadSets(){
+ try{const [sets,tp]=await Promise.all([getJSON(API+'/sets'),getJSON(API+'/series/tcgp').catch(()=>({sets:[]}))]);
+  setInfo={order:{},name:{},pocket:(tp.sets||[]).map(s=>s.id)};
+  sets.forEach((s,i)=>{setInfo.order[s.id]=i;setInfo.name[s.id]=s.name});ls.set('pb-sets',setInfo)}
+ catch(e){if(!setInfo)setInfo={order:{},name:{},pocket:[]}}
+}
+const setOf=id=>id.slice(0,id.lastIndexOf('-'));
+const isPocket=sid=>setInfo.pocket.includes(sid)||/^(P-A|[AB]\d)/.test(sid);
+let setsReady=null;
+async function list(n){
+ if(lists[n])return lists[n];
+ await (setsReady||(setsReady=loadSets()));
+ const raw=await getJSON(`${API}/cards?dexId=eq:${n}`);
+ const arr=raw.filter(c=>c.image&&!isPocket(setOf(c.id))).map(c=>({id:c.id,name:c.name,no:c.localId,img:c.image,sid:setOf(c.id)}));
+ arr.forEach(c=>{c.o=setInfo.order[c.sid]??9999;c.set=setInfo.name[c.sid]||c.sid});
+ arr.sort((a,b)=>a.o-b.o||(parseInt(a.no)||0)-(parseInt(b.no)||0));
+ return lists[n]=arr;
+}
+function pickDefault(arr){if(!arr.length)return null;
+ if(opt.ord==='new'){for(let i=arr.length-1;i>=0;i--)if(arr[i].o<9999)return arr[i];return arr[arr.length-1]}
+ return arr[0]}
+const pending=new Set();let rrT;
+function rerenderSoon(){clearTimeout(rrT);rrT=setTimeout(()=>{if(!busy)show()},120)}
+function ensureDefaults(sp){
+ const ns=[];for(const s of [sp,sp+1,sp-1])for(const pi of [s*2,s*2+1]){const p=P[pi];if(p)p.it.forEach(([n])=>ns.push(n))}
+ ns.filter(n=>!(col[n]&&col[n].img)&&!defs[n]&&!pending.has(n)).forEach(async n=>{
+  pending.add(n);
+  try{const d=pickDefault(await list(n));defs[n]=d?{c:d.id,img:d.img}:{none:1};ls.set('pb-defs-'+opt.ord,defs);rerenderSoon()}
+  catch(e){note('Offline — card images will load when you’re back online')}
+  finally{pending.delete(n)}});
+}
+async function priceOf(id){
+ const d=await getJSON(`${API}/cards/${encodeURIComponent(id)}`);
+ const cm=d.pricing&&d.pricing.cardmarket;if(!cm)return null;
+ const v=d.variants||{};const holoOnly=v.holo&&!v.normal;
+ const p=holoOnly?(cm['trend-holo']??cm['avg-holo']??cm.trend??cm.avg):(cm.trend??cm.avg??cm['trend-holo']);
+ return typeof p==='number'?p:null;
+}
+const eur=p=>p==null?'':'€'+p.toFixed(2);
+
+/* ---------- rendering ---------- */
+function imgOf(n){const e=col[n];if(e&&e.img)return e.img;const d=defs[n];return d&&d.img}
+function cell(n,nm){const e=col[n]||{},img=imgOf(n),s=e.s||'';
+ const cls='c'+(s?' '+s:' no')+(img?' im':'')+(hits.has(n)?' hit':'');
+ const badge=s==='top'?'<i>★</i>':s==='decent'?'<i>↻</i>':'';
+ const inner=img?`<img src="${esc(img)}/low.webp" alt="${esc(nm)}" loading="lazy" decoding="async">`:`<b>#${pad(n)}</b><span>${esc(nm)}</span>`;
+ return `<div class="${cls}" data-n="${n}" data-l="#${pad(n)} ${esc(nm)}">${inner}${badge}</div>`}
+function page(i){const p=P[i];if(!p)return'';
+ let c=p.it.map(([n,nm])=>cell(n,nm)).join('')+'<div class="c e"></div>'.repeat(9-p.it.length);
+ return `<div class="g${p.g}"><div class="h">Page ${p.n}${p.g?`<small>Gen ${p.g}</small>`:''}</div><div class="g">${c}</div></div>`}
+function show(){$('L').innerHTML=page(spread*2);$('R').innerHTML=page(spread*2+1);
+ $('pi').textContent=`Pages ${spread*2+1}–${spread*2+2} of ${P.length}`;$('pv').disabled=spread==0;$('nx').disabled=spread==S-1;ensureDefaults(spread)}
+function nums(b=bi){return B[b].P.flatMap(p=>p.it.map(x=>x[0]))}
+function tabs(){$('tabs').innerHTML=B.map((b,i)=>{const ns=nums(i),h=ns.filter(n=>col[n]&&col[n].s).length;
+ return `<button class="${i===bi?'on':''}" data-b="${i}">${b.name}<small>${h}/${ns.length}</small></button>`}).join('');
+ const ns=nums();$('sub').textContent=`9-pocket · #${ns[0]}–${ns[ns.length-1]} · ${ns.length} Pokémon · ${P.length} pages`}
+function stats(){const bn=nums(),v=bn.map(n=>col[n]).filter(e=>e&&e.s),t=v.filter(e=>e.s==='top').length,d=v.length-t;
+ const val=v.reduce((a,e)=>a+(e.p||0),0);
+ tabs();$('st').innerHTML=`<span class="pill"><b>${v.length}</b>/${bn.length} owned</span><span class="pill t">★ ${t}</span><span class="pill d">↻ ${d}</span><span class="pill">${bn.length-v.length} missing</span>${val?`<span class="pill">≈ ${eur(val)}</span>`:''}<span id="sv"></span>`;
+ $('sv').textContent=nt0;if($('wl').open)wl()}
+function wl(){const ns=nums(),dec=ns.filter(n=>col[n]&&col[n].s==='decent'),mis=ns.filter(n=>!(col[n]&&col[n].s));
+ const ch=a=>a.map(n=>`<button data-n="${n}">#${pad(n)} ${esc(N[n])}</button>`).join('')||'<span style="color:var(--dim);font-size:.8rem">None</span>';
+ $('wlc').innerHTML=`<h3>↻ Upgrade these (${dec.length})</h3><div class="chips d">${ch(dec)}</div><h3>Missing (${mis.length})</h3><div class="chips">${ch(mis)}</div>`}
+function refresh(){if(!busy)show();stats()}
+
+/* ---------- page flipping ---------- */
+function flip(dir,ms){return new Promise(res=>{const F=$('F'),nx=spread+dir;
+ F.className='leaf '+(dir>0?'f':'b');F.style.transition='none';F.style.transform='rotateY(0deg)';F.style.visibility='visible';
+ if(dir>0){$('FF').innerHTML=page(spread*2+1);$('FB').innerHTML=page(nx*2);$('R').innerHTML=page(nx*2+1)}
+ else{$('FF').innerHTML=page(spread*2);$('FB').innerHTML=page(nx*2+1);$('L').innerHTML=page(nx*2)}
+ F.offsetWidth;let done=false;const end=()=>{if(done)return;done=true;spread=nx;F.style.visibility='hidden';show();res()};
+ $('FF').style.visibility='visible';$('FB').style.visibility='hidden';
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{setTimeout(()=>{$('FF').style.visibility='hidden';$('FB').style.visibility='visible'},ms/2);
+  F.style.transition=`transform ${ms}ms cubic-bezier(.45,.05,.35,1)`;F.style.transform=`rotateY(${dir>0?-180:180}deg)`;
+  F.addEventListener('transitionend',end,{once:true});setTimeout(end,ms+120)}))})}
+async function run(){if(busy)return;busy=true;
+ while(spread!==target){const left=Math.abs(target-spread);await flip(target>spread?1:-1,left>4?160:left>1?300:650)}
+ busy=false;mem[bi]=spread;ls.set('pb-mem',mem)}
+function go(s){target=Math.max(0,Math.min(S-1,s));const b=$('book').getBoundingClientRect();
+ if(b.top<0||b.bottom>innerHeight){try{scrollTo({top:b.top+scrollY-8,behavior:'smooth'})}catch(e){}}run()}
+const idle=()=>new Promise(r=>{const w=()=>busy?setTimeout(w,50):r();w()});
+async function setBinder(i,sp){if(i===bi&&sp==null)return;target=spread;await idle();
+ mem[bi]=spread;bi=i;P=B[i].P;S=P.length/2;spread=target=Math.min(sp??mem[i]??0,S-1);
+ const bk=$('book');bk.classList.remove('sw');bk.offsetWidth;bk.classList.add('sw');
+ ls.set('pb-cur',i);ls.set('pb-mem',mem);show();stats()}
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('button[data-b]');if(b)setBinder(+b.dataset.b)});
+$('pv').onclick=()=>go(target-1);$('nx').onclick=()=>go(target+1);
+let tx=null;$('book').addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
+$('book').addEventListener('touchend',e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>40)go(target+(dx<0?1:-1));tx=null});
+document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA/.test(e.target.tagName))return;if(e.key==='ArrowRight')go(target+1);if(e.key==='ArrowLeft')go(target-1);if(e.key==='Escape')closeAll()});
+
+/* ---------- search ---------- */
+function search(){
+ const v=$('q').value.trim().toLowerCase().replace(/^#/,''),r=$('r');hits=new Set();
+ if(!v){r.textContent='';if(!busy)show();return}
+ const num=/^\d+$/.test(v),found=[];
+ [bi,...B.keys()].filter((x,i,a)=>a.indexOf(x)===i).forEach(b=>B[b].P.forEach((p,pi)=>p.it.forEach(([n,nm],k)=>{if(num?n===+v:nm.toLowerCase().includes(v)){hits.add(n);found.push({b,pi,k})}})));
+ if(!busy)show();
+ if(!found.length){r.textContent='No match';return}
+ const f=found[0],pn=f.pi+1,other=f.b!==bi;
+ const d=other?` · in your ${B[f.b].name} binder`:(cur==null||cur.b!==f.b)?'':(pn===cur.pn?' · same page as before':` · ${Math.abs(pn-cur.pn)} page${Math.abs(pn-cur.pn)>1?'s':''} ${pn>cur.pn?'forward':'back'} from page ${cur.pn}`);
+ r.textContent=(found.length>1?found.length+' matches · first: ':'')+`Page ${pn}, row ${Math.floor(f.k/3)+1}, slot ${f.k%3+1}`+d;
+ cur={b:f.b,pn};if(other)setBinder(f.b,Math.floor(f.pi/2));else setTimeout(()=>go(Math.floor(f.pi/2)),350)}
+$('q').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('q').blur();search()}});
+$('q').addEventListener('input',()=>{if(!$('q').value){hits=new Set();$('r').textContent='';if(!busy)show()}});
+$('wl').addEventListener('toggle',()=>{if($('wl').open)wl()});
+$('wlc').addEventListener('click',e=>{const b=e.target.closest('button[data-n]');if(!b)return;$('q').value='#'+b.dataset.n;search()});
+
+/* ---------- card sheet ---------- */
+function entry(n){return col[n]||(col[n]={})}
+function tidy(n){const e=col[n];if(e&&!e.s&&!e.c)delete col[n]}
+function sheetHead(){const n=sel,e=col[n]||{},img=imgOf(n);
+ $('shn').textContent=`#${pad(n)} ${N[n]}`;
+ const im=$('shimg');if(img){im.src=img+'/high.webp';im.hidden=false}else im.hidden=true;
+ $('shm').innerHTML=e.c?`${esc(e.set||'')} · #${esc(e.no||'')}${e.p!=null?`<br>Cardmarket trend: <b>${eur(e.p)}</b>`:''}`:(defs[n]&&defs[n].img?'Showing default art — pick your print below':'');
+ $('sh').querySelectorAll('.opts button').forEach(b=>b.classList.toggle('on',(b.dataset.s||'')===(e.s||'')))}
+async function picker(){const n=sel,box=$('pk');box.innerHTML='<div class="msg">Loading prints…</div>';
+ try{const arr=await list(n);if(sel!==n)return;
+  const f=$('pf').value.trim().toLowerCase(),e=col[n]||{};
+  let a=opt.ord==='new'?[...arr].reverse():arr;if(f)a=a.filter(c=>(c.set+' '+c.name).toLowerCase().includes(f));
+  box.innerHTML=a.length?a.map(c=>`<button data-id="${esc(c.id)}" class="${c.id===e.c?'on':''}"><img src="${esc(c.img)}/low.webp" alt="" loading="lazy" decoding="async"><span>${esc(c.set)} · ${esc(c.no)}</span></button>`).join(''):`<div class="msg">${f?'No prints match that filter':'No prints found'}</div>`}
+ catch(err){box.innerHTML='<div class="msg">Couldn’t load prints — check your connection.</div>'}}
+$('book').addEventListener('click',e=>{const c=e.target.closest('.c[data-n]');if(!c||busy)return;sel=+c.dataset.n;$('pf').value='';sheetHead();$('sh').hidden=false;$('sh').querySelector('.sb').scrollTop=0;picker()});
+$('sh').querySelector('.opts').addEventListener('click',e=>{const b=e.target.closest('button[data-s]');if(!b)return;const s=b.dataset.s,en=entry(sel);
+ if((en.s||'')!==s){if(s)en.s=s;else delete en.s;tidy(sel);save();refresh();sheetHead()}});
+$('pk').addEventListener('click',async e=>{const b=e.target.closest('button[data-id]');if(!b)return;const n=sel,c=(lists[n]||[]).find(x=>x.id===b.dataset.id);if(!c)return;
+ const en=entry(n);Object.assign(en,{c:c.id,img:c.img,set:c.set,no:c.no});delete en.p;save();refresh();sheetHead();
+ $('pk').querySelectorAll('button.on').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+ try{const p=await priceOf(c.id);if(col[n]&&col[n].c===c.id){if(p!=null)col[n].p=p;save();stats();if(sel===n)sheetHead()}}catch(err){}});
+$('pclr').onclick=()=>{const en=col[sel];if(en){delete en.c;delete en.img;delete en.set;delete en.no;delete en.p;tidy(sel);save();refresh();sheetHead();picker()}};
+let pfT;$('pf').addEventListener('input',()=>{clearTimeout(pfT);pfT=setTimeout(picker,200)});
+$('shimg').onclick=()=>{$('zmi').src=$('shimg').src;$('zm').hidden=false};
+$('zm').onclick=()=>$('zm').hidden=true;
+function closeAll(){$('sh').hidden=true;$('setg').hidden=true;$('zm').hidden=true}
+$('shd').onclick=closeAll;
+['sh','setg'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target===$(id))closeAll()}));
+
+/* ---------- settings ---------- */
+function segs(){$('ord').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.o===opt.ord))}
+$('gear').onclick=()=>{segs();$('setg').hidden=false};$('setd').onclick=closeAll;
+$('ord').onclick=e=>{const b=e.target.closest('button[data-o]');if(!b||b.dataset.o===opt.ord)return;opt.ord=b.dataset.o;ls.set('pb-opt',opt);defs=ls.get('pb-defs-'+opt.ord,{});segs();refresh()};
+function backup(){return JSON.stringify({app:'pokedex-binders',v:2,exported:new Date().toISOString(),col},null,1)}
+$('exf').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([backup()],{type:'application/json'}));a.download=`pokedex-binders-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();toast('Backup file saved')};
+$('exc').onclick=async()=>{try{await navigator.clipboard.writeText(backup());toast('Backup copied')}catch(e){$('imt').value=backup();$('imt').select();toast('Copy the text in the box')}};
+function importText(t){let d;try{d=JSON.parse(t)}catch(e){toast('That isn’t a valid backup');return}
+ const src=d.col||d.cards;if(!src||typeof src!=='object'){toast('No collection found in that backup');return}
+ let k=0;for(const [n,v] of Object.entries(src)){if(!N[n])continue;
+  if(typeof v==='string'){if(v==='top'||v==='decent'){entry(n).s=v;k++}}
+  else if(v&&typeof v==='object'){const en=entry(n);
+   if(v.s==='top'||v.s==='decent')en.s=v.s;
+   if(typeof v.c==='string'&&typeof v.img==='string'&&/^https:\/\/assets\.tcgdex\.net\//.test(v.img)){en.c=v.c;en.img=v.img;en.set=String(v.set||'');en.no=String(v.no||'');if(typeof v.p==='number')en.p=v.p}
+   tidy(n);k++}}
+ ls.set('pb-col',col);refresh();toast(`Imported ${k} card${k==1?'':'s'}`)}
+$('imf').onclick=()=>$('imfi').click();
+$('imfi').onchange=async()=>{const f=$('imfi').files[0];if(f)importText(await f.text());$('imfi').value=''};
+$('imp').onclick=()=>{if($('imt').value.trim())importText($('imt').value);$('imt').value=''};
+$('rp').onclick=async()=>{const ids=Object.keys(col).filter(n=>col[n].c);if(!ids.length){toast('Pick prints first to get prices');return}
+ $('rp').disabled=true;let i=0,ok=0;
+ const worker=async()=>{while(i<ids.length){const n=ids[i++];$('rp').textContent=`Refreshing… ${i}/${ids.length}`;
+  try{const p=await priceOf(col[n].c);if(p!=null){col[n].p=p;ok++}}catch(e){}}};
+ await Promise.all([worker(),worker(),worker(),worker()]);ls.set('pb-col',col);stats();
+ $('rp').disabled=false;$('rp').textContent='Refresh all prices';toast(`Updated ${ok} price${ok==1?'':'s'}`)};
+$('cc').onclick=async()=>{try{await caches.delete('pb-img-v1');toast('Image cache cleared')}catch(e){toast('Nothing to clear')}};
+
+/* ---------- start ---------- */
+note('Saved on this device');show();stats();
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+</script></body></html>

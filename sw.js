@@ -1,0 +1,43 @@
+// Pokédex Binders service worker: offline app shell + cached card images and card lists.
+const SHELL = 'pb-shell-v1', IMG = 'pb-img-v1', API = 'pb-api-v1';
+const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
+
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(SHELL).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys()
+    .then(keys => Promise.all(keys.filter(k => ![SHELL, IMG, API].includes(k)).map(k => caches.delete(k))))
+    .then(() => self.clients.claim()));
+});
+
+async function cacheFirst(req, name) {
+  const c = await caches.open(name), hit = await c.match(req);
+  if (hit) return hit;
+  const res = await fetch(req);
+  if (res.ok || res.type === 'opaque') c.put(req, res.clone());
+  return res;
+}
+async function networkFirst(req, name) {
+  const c = await caches.open(name);
+  try { const res = await fetch(req); if (res.ok) c.put(req, res.clone()); return res; }
+  catch (err) { const hit = await c.match(req); if (hit) return hit; throw err; }
+}
+async function staleWhileRevalidate(req, name) {
+  const c = await caches.open(name), hit = await c.match(req);
+  const net = fetch(req).then(res => { if (res.ok) c.put(req, res.clone()); return res; }).catch(() => hit);
+  return hit || net;
+}
+
+self.addEventListener('fetch', e => {
+  const req = e.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.hostname === 'assets.tcgdex.net') return e.respondWith(cacheFirst(req, IMG));
+  if (url.hostname === 'api.tcgdex.net') {
+    // Single card (prices) → fresh when online; lists and sets → instant from cache, refreshed in background.
+    const single = /\/cards\/[^/?]+$/.test(url.pathname);
+    return e.respondWith(single ? networkFirst(req, API) : staleWhileRevalidate(req, API));
+  }
+  if (url.origin === location.origin) return e.respondWith(networkFirst(req, SHELL));
+});
