@@ -47,7 +47,7 @@ async function start() {
     if (dirty) await write();
     await A.signOut(auth);
     app.loadCustoms({});
-    app.load({ col: {}, binders: [] });
+    app.load({ col: {}, binders: [], wants: {} });
   };
   gate('Checking your sign-in…', true);
   A.getRedirectResult(auth).catch(e => app.toast('Sign-in failed: ' + (e.code || e.message)));
@@ -84,8 +84,8 @@ async function start() {
 
   const write = () => {
     clearTimeout(pushT); dirty = false;
-    const { col, binders } = app.state();
-    return F.setDoc(ref, { col: JSON.stringify(col), binders: JSON.stringify(binders), updated: F.serverTimestamp() })
+    const { col, binders, wants } = app.state();
+    return F.setDoc(ref, { col: JSON.stringify(col), binders: JSON.stringify(binders), wants: JSON.stringify(wants || {}), updated: F.serverTimestamp() })
       .then(() => app.note('Synced to your Google account ✓'))
       .catch(() => app.note('Saved on this device – will sync when online'));
   };
@@ -112,14 +112,15 @@ async function start() {
     // Cards: cloud wins for the same Pokémon. Binders: the account's layouts, plus any local binders it doesn't have yet.
     try {
       const snap = await F.getDoc(ref), d = snap.exists() ? snap.data() : {};
-      const cloudCol = JSON.parse(d.col || '{}'), cloudBinders = JSON.parse(d.binders || '[]');
+      const cloudCol = JSON.parse(d.col || '{}'), cloudBinders = JSON.parse(d.binders || '[]'), cloudWants = JSON.parse(d.wants || '{}');
       const local = app.state();
       const col = Object.assign({}, local.col, cloudCol);
       const binders = cloudBinders.concat(local.binders.filter(b => !cloudBinders.some(c => c.id === b.id)));
-      app.load({ col, binders });
+      const wants = Object.assign({}, local.wants, cloudWants);   // want list: both devices' wants
+      app.load({ col, binders, wants });
       ready = true;
       const now = app.state();
-      if (JSON.stringify(now.col) !== (d.col || '{}') || JSON.stringify(now.binders) !== (d.binders || '[]')) write(); // applied to the local cache at once, so the listener below sees it as a pending write
+      if (JSON.stringify(now.col) !== (d.col || '{}') || JSON.stringify(now.binders) !== (d.binders || '[]') || JSON.stringify(now.wants) !== (d.wants || '{}')) write(); // applied to the local cache at once, so the listener below sees it as a pending write
       else app.note('Synced to your Google account ✓');
     } catch (e) {
       console.error(e); app.note('Saved on this device – cloud sync failed'); return;
@@ -129,9 +130,9 @@ async function start() {
     unsub = F.onSnapshot(ref, snap => {
       if (!snap.exists() || snap.metadata.hasPendingWrites || dirty) return;
       const d = snap.data(), st = app.state();
-      const c = d.col ?? JSON.stringify(st.col), b = d.binders ?? JSON.stringify(st.binders);
-      if (c !== JSON.stringify(st.col) || b !== JSON.stringify(st.binders)) {
-        app.load({ col: JSON.parse(c), binders: JSON.parse(b) });
+      const c = d.col ?? JSON.stringify(st.col), b = d.binders ?? JSON.stringify(st.binders), w = d.wants ?? JSON.stringify(st.wants);
+      if (c !== JSON.stringify(st.col) || b !== JSON.stringify(st.binders) || w !== JSON.stringify(st.wants)) {
+        app.load({ col: JSON.parse(c), binders: JSON.parse(b), wants: JSON.parse(w) });
         app.note('Synced to your Google account ✓');
       }
     });
