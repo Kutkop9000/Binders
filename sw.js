@@ -1,6 +1,6 @@
 // Pokédex Binders service worker: offline app shell + cached card images and card lists.
-const SHELL = 'pb-shell-v7', IMG = 'pb-img-v1', API = 'pb-api-v1';
-const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './sync.js', './firebase-config.js', './set-names.js'];
+const SHELL = 'pb-shell-v8', IMG = 'pb-img-v1', API = 'pb-api-v1';
+const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './sync.js?v=8', './firebase-config.js', './set-names.js?v=8'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(SHELL).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
@@ -20,7 +20,7 @@ async function cacheFirst(req, name) {
 }
 async function networkFirst(req, name) {
   const c = await caches.open(name);
-  try { const res = await fetch(req); if (res.ok) c.put(req, res.clone()); return res; }
+  try { const res = await fetch(req.url, { cache: 'no-cache' }); if (res.ok) c.put(req, res.clone()); return res; }
   catch (err) { const hit = await c.match(req); if (hit) return hit; throw err; }
 }
 async function staleWhileRevalidate(req, name) {
