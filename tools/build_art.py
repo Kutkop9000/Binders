@@ -193,6 +193,27 @@ def asian():
     return out, need
 
 
+# The file is kept small: a Limitless picture that follows from the card id is stored as "L",
+# and the common hosts are shortened. index.html (artOf) expands them again.
+PREFIXES = [('@t/', 'https://assets.tcgdex.net/'), ('@p/', 'https://images.pokemontcg.io/'),
+            ('@s/', 'https://images.scrydex.com/pokemon/')]
+
+
+def lim_url(key):
+    raw = key.split(':', 1)[1] if ':' in key else key
+    m = re.match(r'^(.+)-0*(\d+)$', raw)
+    return f'{LIM}/{m.group(1)}/{m.group(1)}_{m.group(2)}_R_JP_SM.png' if m else None
+
+
+def compact(key, url):
+    if url == 'L' or url == lim_url(key):
+        return 'L'
+    for short, full in PREFIXES:
+        if url.startswith(full):
+            return short + url[len(full):]
+    return url
+
+
 def main():
     try:
         old = json.load(open(OUT, encoding='utf-8'))
@@ -204,7 +225,7 @@ def main():
     art = {k: v for k, v in old.items() if k in still}   # keep earlier finds for cards still without a TCGdex picture
     art.update(en)
     art.update(asia)
-    art = dict(sorted(art.items()))
+    art = {k: compact(k, v) for k, v in sorted(art.items())}
     with open(OUT, 'w', encoding='utf-8') as f:
         json.dump(art, f, ensure_ascii=False, separators=(',', ':'))
     added = len(set(art) - set(old))

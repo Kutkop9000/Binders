@@ -251,6 +251,11 @@ const ARTHOST=/^https:\/\/(assets\.tcgdex\.net|images\.pokemontcg\.io|images\.sc
 /* Art for cards TCGdex has no picture for (Trainer Galleries, Shiny Vault, Galarian Gallery, Classic Collections, promos…):
    card id -> picture checked to exist on pokemontcg.io. Loaded once at start. */
 let ART={},artP=null;
+const LIM='https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc';
+// art-fill.json is stored compactly (tools/build_art.py): "L" = the Limitless picture for this card id; @t/ @p/ @s/ = common hosts.
+function artOf(key){const v=ART[key];if(!v)return '';
+ if(v==='L'){const m=splitId(key)[1].match(/^(.+)-0*(\d+)$/);return m?`${LIM}/${m[1]}/${m[1]}_${m[2]}_R_JP_SM.png`:''}
+ return v.replace(/^@t\//,'https://assets.tcgdex.net/').replace(/^@p\//,'https://images.pokemontcg.io/').replace(/^@s\//,'https://images.scrydex.com/pokemon/')}
 function artFill(){return artP||(artP=fetch('art-fill.json').then(r=>r.ok?r.json():{}).then(a=>ART=a&&typeof a==='object'?a:{}).catch(()=>{artP=null;return ART}))}
 const okImg=v=>typeof v==='string'&&(/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(v)||/^https:\/\/[^\s"'<>]+$/.test(v));
 const splitId=id=>{const i=id.indexOf(':');return i>0&&LANGS.includes(id.slice(0,i))?[id.slice(0,i),id.slice(i+1)]:['en',id]};
@@ -320,7 +325,7 @@ async function list(n){
  const [raws,nd]=await Promise.all([Promise.all(LANGS.map(l=>l==='en'?getJSON(`${API}/cards?dexId=eq:${n}`):getJSON(`${TCG}/${l}/cards?dexId=eq:${n}`).catch(()=>[]))),noDex().catch(()=>({})),artFill()]);
  LANGS.forEach((l,li)=>{const have=new Set((raws[li]||[]).map(c=>c.id));((nd[l]||{})[n]||[]).forEach(c=>{if(!have.has(c.id))raws[li].push(c)})});
  const arr=[];LANGS.forEach((l,li)=>(raws[li]||[]).forEach(c=>{const sid=setOf(c.id);if(isPocket(sid))return;
-  const os=setInfo.name[l+'|'+sid]||sid;arr.push({id:cid(l,c.id),lang:l,li,name:N[n]||c.name,no:c.localId,img:c.image||ART[cid(l,c.id)]||'',sid,o:setInfo.order[l+'|'+sid]??9999,os,set:setEn(os,cid(l,c.id))})}));
+  const os=setInfo.name[l+'|'+sid]||sid;arr.push({id:cid(l,c.id),lang:l,li,name:N[n]||c.name,no:c.localId,img:c.image||artOf(cid(l,c.id)),sid,o:setInfo.order[l+'|'+sid]??9999,os,set:setEn(os,cid(l,c.id))})}));
  arr.sort((a,b)=>a.li-b.li||a.o-b.o||(parseInt(a.no)||0)-(parseInt(b.no)||0));
  return lists[n]=arr;
 }
@@ -360,7 +365,7 @@ async function priceOf(id){if(isCustom(id))return null;const [l,raw]=splitId(id)
 const eur=p=>p==null?'':'€'+p.toFixed(2);
 
 /* ---------- rendering ---------- */
-function imgOf(n){const e=col[n];if(e&&e.c)return isCustom(e.c)?((customs[e.c.slice(7)]||{}).img||''):(e.img||ART[e.c]||'');const d=defs[n];return d&&d.img}
+function imgOf(n){const e=col[n];if(e&&e.c)return isCustom(e.c)?((customs[e.c.slice(7)]||{}).img||''):(e.img||artOf(e.c));const d=defs[n];return d&&d.img}
 function cell(n,i){if(!n)return `<div class="c e add" data-i="${i}" title="Add a Pokémon"><span>+</span></div>`;
  const nm=N[n],e=col[n]||{},img=imgOf(n),s=e.s||'';
  const cls='c'+(s?' '+s:' no')+(img?' im':'')+(hits.has(n)?' hit':'');
