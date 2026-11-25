@@ -11,4 +11,4 @@ The collection syncs across devices through Firebase. One-time setup:
 5. **Firestore → Rules:** paste the contents of `firestore.rules` and publish.
 6. **Project settings → Your apps → Web (`</>`):** register an app and copy `apiKey`, `authDomain`, `projectId`, `appId` into `firebase-config.js`.
 
-Then open ⚙︎ in the app and tap **Sign in with Google** on each device. Without a config, the app works as before (this device only).
+Signing in with Google is required: the app opens on a sign-in screen and shows your binders once you're signed in. Sign out from ⚙︎ (this clears the device; your data stays in your account).
