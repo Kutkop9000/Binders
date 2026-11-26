@@ -108,22 +108,46 @@ textarea{resize:vertical}
    pages as you slide or turn them (and the phone's tilt or the mouse), plus a slight sway (--sd), like tilting a real card. */
 @property --sh{syntax:'<number>';inherits:true;initial-value:.5}
 @property --sd{syntax:'<number>';inherits:true;initial-value:0}
-.foil{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;mix-blend-mode:color-dodge;opacity:.45;
- --pos:calc((var(--sh) + var(--sd)) * 100%);background-size:250% 250%;background-position:var(--pos) var(--pos);animation:sway 3.4s ease-in-out infinite alternate}
+.foil{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;mix-blend-mode:color-dodge;opacity:.5;
+ --pos:calc((var(--sh) + var(--sd)) * 100%);background-size:250% 250%;background-position:var(--pos) var(--pos);animation:sway 3.4s ease-in-out infinite alternate;
+ /* colour only where the light is: a band that travels with the shine; elsewhere the foil is nearly invisible */
+ -webkit-mask-image:linear-gradient(115deg,#0002 22%,#000 44%,#000 56%,#0002 78%);mask-image:linear-gradient(115deg,#0002 22%,#000 44%,#000 56%,#0002 78%);
+ -webkit-mask-size:250% 250%;mask-size:250% 250%;-webkit-mask-position:var(--pos) var(--pos);mask-position:var(--pos) var(--pos)}
 @keyframes sway{from{--sd:-.08}to{--sd:.08}}
-.foil.rainbow{background-image:linear-gradient(115deg,transparent 28%,#e86aa6 37%,#e8c76a 43%,#6ae8a6 48%,#6ab8e8 53%,#a46ae8 58%,transparent 67%)}
-.foil.cosmos{background-image:radial-gradient(#fffc 0 1px,transparent 1.6px),radial-gradient(#8ffa 0 1.4px,transparent 2px),radial-gradient(#f9fa 0 2px,transparent 2.6px),
- linear-gradient(115deg,transparent 22%,#ff4fa3 35%,#4fc4ff 50%,#a94fff 63%,transparent 76%);background-size:7px 7px,13px 13px,23px 23px,250% 250%;
- background-position:calc(var(--sh) * 16px) 0,calc(var(--sh) * -22px) 3px,5px 7px,var(--pos) var(--pos)}
-.foil.sparkle{background-image:repeating-linear-gradient(55deg,#fff4 0 1.5px,transparent 1.5px 7px),repeating-linear-gradient(-35deg,#fff3 0 1px,transparent 1px 9px),
- linear-gradient(115deg,transparent 22%,#ffd34f 36%,#4fff9a 47%,#4fc4ff 58%,transparent 72%);background-size:auto,auto,250% 250%;
- background-position:calc(var(--sh) * 10px) 0,calc(var(--sh) * -10px) 0,var(--pos) var(--pos)}
-.foil.gold{background-image:linear-gradient(115deg,transparent 18%,#ffe7a0 32%,#ffc94a 41%,#fff4cc 50%,#e2a93c 59%,transparent 72%);mix-blend-mode:overlay;opacity:.5}
+/* patterns: by era for holo / reverse holo, by rarity for full-card foil */
+.foil.rainbow{background-image:linear-gradient(115deg,transparent 30%,#e86aa6 39%,#e8c76a 44%,#6ae8a6 49%,#6ab8e8 54%,#a46ae8 59%,transparent 68%)}
+.foil.starlight{background-image:repeating-linear-gradient(78deg,#fff5 0 1px,transparent 1px 11px),radial-gradient(#fffd 0 1px,transparent 1.8px),linear-gradient(115deg,transparent 30%,#e86aa6 39%,#e8c76a 44%,#6ae8a6 49%,#6ab8e8 54%,#a46ae8 59%,transparent 68%);
+ background-size:auto,17px 23px,250% 250%;background-position:calc(var(--sh) * 12px) 0,3px 5px,var(--pos) var(--pos)}
+.foil.cosmos{background-image:radial-gradient(#fffc 0 1px,transparent 1.6px),radial-gradient(#8ffa 0 1.4px,transparent 2px),radial-gradient(#f9fa 0 2.2px,transparent 2.8px),linear-gradient(115deg,transparent 30%,#e86aa6 39%,#e8c76a 44%,#6ae8a6 49%,#6ab8e8 54%,#a46ae8 59%,transparent 68%);
+ background-size:7px 7px,13px 13px,23px 23px,250% 250%;background-position:calc(var(--sh) * 16px) 0,calc(var(--sh) * -22px) 3px,5px 7px,var(--pos) var(--pos)}
+.foil.sheen{background-image:repeating-linear-gradient(115deg,#fff3 0 1px,transparent 1px 4px),linear-gradient(115deg,transparent 30%,#e86aa6 39%,#e8c76a 44%,#6ae8a6 49%,#6ab8e8 54%,#a46ae8 59%,transparent 68%);background-size:auto,250% 250%;background-position:calc(var(--sh) * 8px) 0,var(--pos) var(--pos)}
+/* Scarlet & Violet "Mirage": the light refracts horizontally */
+.foil.mirage{background-image:repeating-linear-gradient(0deg,#fff3 0 1px,transparent 1px 4px),linear-gradient(90deg,transparent 30%,#e86aa6 40%,#e8c76a 45%,#6ae8a6 50%,#6ab8e8 55%,#a46ae8 60%,transparent 70%);
+ background-size:auto,250% 100%;background-position:0 calc(var(--sh) * 8px),var(--pos) 0;
+ -webkit-mask-image:linear-gradient(90deg,#0002 22%,#000 44%,#000 56%,#0002 78%);mask-image:linear-gradient(90deg,#0002 22%,#000 44%,#000 56%,#0002 78%);-webkit-mask-size:250% 100%;mask-size:250% 100%;-webkit-mask-position:var(--pos) 0;mask-position:var(--pos) 0}
+/* etched texture (full arts, illustration rares) */
+.foil.sparkle{background-image:repeating-linear-gradient(55deg,#fff4 0 1.5px,transparent 1.5px 7px),repeating-linear-gradient(-35deg,#fff3 0 1px,transparent 1px 9px),linear-gradient(115deg,transparent 30%,#e86aa6 39%,#e8c76a 44%,#6ae8a6 49%,#6ab8e8 54%,#a46ae8 59%,transparent 68%);
+ background-size:auto,auto,250% 250%;background-position:calc(var(--sh) * 10px) 0,calc(var(--sh) * -10px) 0,var(--pos) var(--pos)}
+/* special illustration rares: an extra layer of fine glitter */
+.foil.glitter{background-image:radial-gradient(#fff 0 .6px,transparent 1.1px),radial-gradient(#ffd6f5 0 .7px,transparent 1.2px),radial-gradient(#c9f6ff 0 .8px,transparent 1.3px),radial-gradient(#fff6c2 0 .6px,transparent 1.1px),linear-gradient(115deg,transparent 30%,#e86aa6 39%,#e8c76a 44%,#6ae8a6 49%,#6ab8e8 54%,#a46ae8 59%,transparent 68%);
+ background-size:5px 5px,7px 9px,11px 8px,13px 13px,250% 250%;background-position:calc(var(--sh) * 6px) 0,calc(var(--sh) * -9px) 2px,4px calc(var(--sh) * 7px),1px 6px,var(--pos) var(--pos)}
+/* shiny cards: silver with a cool blue sparkle */
+.foil.silver{background-image:radial-gradient(#fff 0 .8px,transparent 1.4px),radial-gradient(#bfe3ff 0 1px,transparent 1.6px),linear-gradient(115deg,transparent 28%,#d9e4f2 40%,#9fc8ff 48%,#f4f8ff 54%,#b9c7da 62%,transparent 72%);
+ background-size:9px 9px,15px 15px,250% 250%;background-position:calc(var(--sh) * 9px) 0,calc(var(--sh) * -12px) 4px,var(--pos) var(--pos)}
+/* gold cards (hyper rare): a warm gold sheen */
+.foil.gold{background-image:repeating-linear-gradient(115deg,#fff2 0 1px,transparent 1px 5px),linear-gradient(115deg,transparent 22%,#ffe7a0 36%,#ffc94a 44%,#fff4cc 50%,#e2a93c 58%,transparent 72%);
+ background-size:auto,250% 250%;background-position:calc(var(--sh) * 8px) 0,var(--pos) var(--pos);mix-blend-mode:overlay;opacity:.6}
+/* rainbow / secret rares: a soft rainbow tint across the card */
+.foil.prism{background-image:linear-gradient(115deg,#ff8ac655,#ffd88a55 20%,#8affc455 40%,#8ad4ff55 60%,#c68aff55 80%,#ff8ac655);background-size:250% 250%;mix-blend-mode:overlay;opacity:.7;
+ -webkit-mask-image:none;mask-image:none}
 .foil.holo{clip-path:inset(11% 8% 47% 8%)}.foil.full{clip-path:none}
 .foil.reverse{clip-path:polygon(evenodd,0 0,100% 0,100% 100%,0 100%,0 0,8% 11%,92% 11%,92% 53%,8% 53%,8% 11%)}
-@media (prefers-reduced-motion:reduce){.foil{animation:none}}
+/* the soft white glare where the light hits; moves with the shine */
+.glare{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:3;mix-blend-mode:soft-light;
+ background:radial-gradient(farthest-corner circle at calc((var(--sh) + var(--sd)) * 100%) 28%,#fffc,#fff3 22%,transparent 55%);animation:sway 3.4s ease-in-out infinite alternate}
+@media (prefers-reduced-motion:reduce){.foil,.glare{animation:none}}
 .shh .art{position:relative;flex:0 0 auto;border-radius:6px;overflow:hidden}.shh .art img{display:block}
-.fin{display:flex;flex-direction:column;gap:6px;margin:12px 0 0}.fin[hidden],.fin .seg[hidden]{display:none}.fin .seg button{font-size:.85rem;padding:7px 4px}
+.fin{display:flex;flex-direction:column;gap:6px;margin:12px 0 0}#finp{flex-wrap:wrap}#finp button{flex:1 0 22%}.fin[hidden],.fin .seg[hidden]{display:none}.fin .seg button{font-size:.85rem;padding:7px 4px}
 .side{font-weight:600;font-size:.72rem;color:var(--mut);border:1px solid var(--line);border-radius:9px;padding:1px 7px;white-space:nowrap}
 .h .hl{display:flex;align-items:center;gap:6px}
 .pg.l,.face.back,.leaf.b .face.front{border-radius:12px 2px 2px 12px;background:linear-gradient(90deg,var(--page) 86%,var(--spine))}
@@ -266,7 +290,7 @@ a{color:var(--acc)}
 <div class="hint">Tap a pocket to mark it (★ Top · ↻ Upgrade needed), choose your print, or replace the Pokémon</div>
 
 <div class="sheet" id="sh" hidden><div class="sb">
- <div class="shh"><div class="art"><img id="shimg" alt="" hidden><b class="foil" id="shfoil" hidden></b></div><div><div id="shn"></div><div id="shm"></div></div></div>
+ <div class="shh"><div class="art"><img id="shimg" alt="" hidden><b class="foil" id="shfoil" hidden></b><b class="glare" id="shglare" hidden></b></div><div><div id="shn"></div><div id="shm"></div></div></div>
  <div class="opts"><button data-s="">Don't have</button><button data-s="decent">↻ Upgrade needed</button><button data-s="top">★ Top</button></div>
  <div class="fin" id="fin" hidden><div class="seg" id="finv"></div><div class="seg" id="finp"></div></div>
  <div class="pkh">Your print <input id="pf" type="text" placeholder="Filter: set or name"></div>
@@ -499,13 +523,24 @@ function ensureDefaults(sp){
 }
 const varsOf=d=>{const v=d&&d.variants||{};return ['normal','holo','reverse'].filter(k=>v[k])};
 // How the foil sits on a card, by rarity (TCGdex names): the whole card, or the artwork only (classic holo)
-const RAR_FULL={'Illustration rare':'sparkle','Special illustration rare':'sparkle','Shiny rare':'sparkle','Shiny rare V':'sparkle','Shiny rare VMAX':'sparkle','Shiny Ultra Rare':'sparkle',
- 'Hyper rare':'gold','Mega Hyper Rare':'gold','Ultra Rare':'rainbow','Full Art Trainer':'rainbow','Secret Rare':'rainbow','Double rare':'rainbow',
- 'Holo Rare V':'rainbow','Holo Rare VMAX':'rainbow','Holo Rare VSTAR':'rainbow','Radiant Rare':'cosmos','Amazing Rare':'rainbow','ACE SPEC Rare':'rainbow',
- 'Rare Holo LV.X':'rainbow','Rare PRIME':'rainbow','LEGEND':'rainbow','Black White Rare':'rainbow','Mega Attack Rare':'rainbow'};
+// Full-card foil, by rarity: the pattern ('era' = the set's own holo pattern, see eraPattern)
+const RAR_FULL={'Illustration rare':'sparkle','Special illustration rare':'glitter','Shiny rare':'silver','Shiny rare V':'silver','Shiny rare VMAX':'silver','Shiny Ultra Rare':'silver',
+ 'Hyper rare':'gold','Mega Hyper Rare':'gold','Ultra Rare':'sparkle','Full Art Trainer':'sparkle','Secret Rare':'prism','Double rare':'era',
+ 'Holo Rare V':'era','Holo Rare VMAX':'era','Holo Rare VSTAR':'era','Radiant Rare':'cosmos','Amazing Rare':'prism','ACE SPEC Rare':'era',
+ 'Rare Holo LV.X':'era','Rare PRIME':'era','LEGEND':'era','Black White Rare':'prism','Mega Attack Rare':'era'};
+// The holo pattern a set's era used: Starlight (Base, Jungle, Fossil), Cosmos (Base Set 2 .. Call of Legends),
+// Sheen (Black & White .. Sword & Shield), Mirage (Scarlet & Violet onward: light refracted horizontally)
+function eraPattern(id){const raw=splitId(id||'')[1]||'',set=raw.slice(0,raw.lastIndexOf('-'));
+ if(/^(base[123]|basep)$/i.test(set))return 'starlight';
+ if(/^(sv|me|rsv|zsv|30th|SV|M\d)/.test(set))return 'mirage';
+ if(/^(bw|xy|g1|dc|sm|det|cel|swsh|pgo|fut|tk-(bw|xy|sm)|mcd1[4-9]|mcd2|BW|XY|SM|S\d|S-|SC|SI|SK|SJ|SL|SN|SP|SD|SH)/.test(set))return 'sheen';
+ return 'cosmos'}
+const PATTERNS=[['starlight','Starlight'],['cosmos','Cosmos'],['sheen','Sheen'],['mirage','Mirage'],['sparkle','Etched'],['glitter','Glitter'],['silver','Silver'],['gold','Gold'],['prism','Rainbow']];
+function autoPattern(e){const r=e.f==='full'&&RAR_FULL[e.rar];return r&&r!=='era'?r:eraPattern(e.c)}
+const patternOf=e=>e.fp||autoPattern(e);
 const RAR_HOLO=new Set(['Holo Rare','Rare Holo','Classic Collection']);
 function autoFinish(x){   // set the finish a print can only have; x: the collection entry
- if(RAR_FULL[x.rar]){x.f='full';x.fp=RAR_FULL[x.rar];return}
+ if(RAR_FULL[x.rar]){x.f='full';return}
  if(RAR_HOLO.has(x.rar)&&!(x.vars||[]).includes('normal')){x.f='holo';return}
  if(x.vars&&x.vars.length===1&&x.vars[0]!=='normal')x.f=x.vars[0]}
 async function priceOf(id,info){if(isCustom(id))return null;const [l,raw]=splitId(id);
@@ -525,7 +560,7 @@ function cell(n,i){if(!n)return `<div class="c e add" data-i="${i}" title="Add a
  const cls='c'+(s?' '+s:' no')+(img?' im':'')+(hits.has(n)?' hit':'');
  const badge=s==='top'?'<i>★</i>':s==='decent'?'<i>↻</i>':'';
  const inner=img?`<img src="${esc(pic(img,'low'))}" alt="${esc(nm)}" loading="lazy" decoding="async">`:`<b>#${pad(n)}</b><span>${esc(nm)}</span>${e.c?`<small class="ps">${e.lang&&e.lang!=='en'?LTAG[e.lang]+' · ':''}${esc(setEn(e.set,e.c))} ${esc(e.no||'')}</small>`:''}`;
- const foil=img&&e.c&&(e.f==='holo'||e.f==='reverse'||e.f==='full')?`<b class="foil ${e.f} ${e.fp||'rainbow'}"></b>`:'';
+ const foil=img&&e.c&&(e.f==='holo'||e.f==='reverse'||e.f==='full')?`<b class="foil ${e.f} ${patternOf(e)}"></b><b class="glare"></b>`:'';
  return `<div class="${cls}" data-n="${n}" data-i="${i}" data-l="#${pad(n)} ${esc(nm)}">${inner}${foil}${badge}</div>`}
 const sideOf=i=>(i+(binders[bi]&&binders[bi].right?1:0))%2===0?'left':'right';   // where page i sits in the real binder
 function page(i){const p=P[i];if(!p)return i<0?'<div class="cover">Inside cover</div>':'';
@@ -705,15 +740,16 @@ function sheetHead(){const n=sel,e=col[n]||{},img=imgOf(n);
  const im=$('shimg');if(img){im.src=pic(img,'high');im.hidden=false}else im.hidden=true;
  $('shm').innerHTML=e.c?`${isCustom(e.c)?'<i class="lt cu">Custom</i>':''}${e.lang&&e.lang!=='en'?`<i class="lt">${LTAG[e.lang]||''}</i>`:''}${esc(setEn(e.set,e.c))} · #${esc(e.no||'')}${img?'':' · no picture'}${isCustom(e.c)?' <button class="lnk" data-edit="1">Edit</button>':''}${e.p!=null?`<br>Cardmarket trend: <b>${eur(e.p)}</b>`:''}`:(defs[n]&&defs[n].img?'Showing default art — pick your print below':'');
  $('sh').querySelectorAll('.opts button').forEach(b=>b.classList.toggle('on',(b.dataset.s||'')===(e.s||'')));
- const fo=$('shfoil'),foilOn=!!(img&&e.c&&(e.f==='holo'||e.f==='reverse'||e.f==='full'));fo.hidden=!foilOn;fo.className='foil '+(foilOn?e.f+' '+(e.fp||'rainbow'):'');
+ const fo=$('shfoil'),foilOn=!!(img&&e.c&&(e.f==='holo'||e.f==='reverse'||e.f==='full'));fo.hidden=!foilOn;fo.className='foil '+(foilOn?e.f+' '+patternOf(e):'');$('shglare').hidden=!foilOn;
  $('fin').hidden=!e.c||isCustom(e.c);if(!e.c||isCustom(e.c))return;
  $('fin').title=e.rar?'Rarity: '+e.rar:'';
  const av=e.vars&&e.vars.length?[...e.vars]:['normal','holo','reverse'],F={normal:'Normal',holo:'✦ Holo',reverse:'✧ Reverse',full:'✦ Full card'};
  if(RAR_FULL[e.rar]||av.includes('holo'))av.push('full');
  $('finv').innerHTML=['normal','holo','reverse','full'].filter(k=>av.includes(k)).map(k=>`<button data-f="${k}" class="${(e.f||'normal')===k?'on':''}">${F[k]}</button>`).join('');
- $('finp').hidden=!foilOn;$('finp').innerHTML=foilOn?[['rainbow','Rainbow'],['cosmos','Cosmos'],['sparkle','Sparkle'],['gold','Gold']].map(([k,t])=>`<button data-fp="${k}" class="${(e.fp||'rainbow')===k?'on':''}">${t}</button>`).join(''):''}
+ $('finp').hidden=!foilOn;const ap=autoPattern(e),APN=Object.fromEntries(PATTERNS);
+ $('finp').innerHTML=foilOn?`<button data-fp="" class="${e.fp?'':'on'}" title="Chosen from the card's set and rarity">Auto · ${APN[ap]}</button>`+PATTERNS.map(([k,t])=>`<button data-fp="${k}" class="${e.fp===k?'on':''}">${t}</button>`).join(''):''}
 $('fin').addEventListener('click',ev=>{const en=col[sel];if(!en||!en.c)return;const b=ev.target.closest('[data-f],[data-fp]');if(!b)return;
- if(b.dataset.f){if(b.dataset.f==='normal')delete en.f;else en.f=b.dataset.f}else en.fp=b.dataset.fp;
+ if(b.dataset.f){if(b.dataset.f==='normal')delete en.f;else en.f=b.dataset.f}else if(b.dataset.fp)en.fp=b.dataset.fp;else delete en.fp;   // Auto = no own choice
  save();refresh();sheetHead()});
 const customList=n=>Object.entries(customs).filter(([,c])=>c.n===n).map(([id,c])=>({id:'custom:'+id,lang:c.lang,custom:1,name:N[n],no:c.no,img:c.img,os:c.set,set:setEn(c.set),sid:''}));
 const addTile='<button data-add="1" class="addc"><div class="ph">＋<small>Card not listed</small></div><span>Add your own card</span></button>';
@@ -927,6 +963,9 @@ $('cc').onclick=async()=>{try{await caches.delete('pb-img-v1');toast('Image cach
 
 /* ---------- start ---------- */
 note('Saved on this device');show();stats();
+try{if(!localStorage.getItem('pb-fp2')){const OLD={'Illustration rare':'sparkle','Special illustration rare':'sparkle','Shiny rare':'sparkle','Shiny rare V':'sparkle','Shiny rare VMAX':'sparkle','Shiny Ultra Rare':'sparkle','Hyper rare':'gold','Mega Hyper Rare':'gold','Radiant Rare':'cosmos'};
+ let ch=0;for(const x of Object.values(col))if(x.fp&&x.f==='full'&&(OLD[x.rar]||'rainbow')===x.fp){delete x.fp;ch++}
+ localStorage.setItem('pb-fp2','1');if(ch)save()}}catch(e){}
 setTimeout(async()=>{const todo=Object.entries(col).filter(([,x])=>x.c&&!isCustom(x.c)&&x.rar==null);let k=0;
  const worker=async()=>{while(k<todo.length){const [n,x]=todo[k++];try{const info={};await priceOf(x.c,info);if(col[n]!==x||x.rar!=null)continue;
   x.rar=info.rar||'';if(info.vars&&info.vars.length)x.vars=info.vars;if(!x.f)autoFinish(x)}catch(e){}}};
