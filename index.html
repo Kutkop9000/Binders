@@ -18,7 +18,16 @@ button:not(:disabled):active{transform:scale(.97)}
 :focus-visible{outline:none;box-shadow:var(--ring)}
 .top{display:flex;align-items:center;gap:8px}
 h1{font-size:1.2rem;font-weight:750;letter-spacing:-.015em;margin:0;flex:1;display:flex;align-items:center;gap:8px;min-width:0}
-.top{margin-bottom:14px}
+.top{margin-bottom:10px;gap:6px}
+.sp1{flex:1}
+.shelf{display:flex;align-items:center;gap:8px;min-width:0;max-width:60vw;height:42px;padding:0 12px 0 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--tx);cursor:pointer;font-weight:700;font-size:1rem}
+.shelf svg{width:22px;height:22px;flex:0 0 auto;color:var(--mut)}
+.shelf .bn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.shelf .car{color:var(--mut);font-size:.8rem}
+.shelfl{flex-direction:column;overflow:visible;padding:6px}
+.shelfl button{flex-direction:row!important;justify-content:space-between;min-width:0;padding:12px 44px 12px 14px!important;font-size:1rem!important;text-align:left}
+.shelfl button small{font-size:.85rem!important}
+.shelfl .tm{top:50%!important;transform:translateY(-50%);right:8px!important;width:30px!important;height:30px!important;font-size:1.15rem!important}
+.shelfl button.new{justify-content:center;gap:8px;padding:12px 14px!important}
 .sync{width:22px;height:22px;border:0;background:none;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}
 .sync::before{content:'';width:9px;height:9px;border-radius:50%;background:var(--dim)}
 .sync.ok::before{background:var(--top)}.sync.busy::before{background:var(--dec)}.sync.warn::before{background:#e05a5a}
@@ -49,7 +58,7 @@ p.s{margin-top:2px;margin-bottom:12px;color:var(--mut);font-size:.85rem}
 .tabs button.on{background:var(--on);color:var(--tx);box-shadow:0 1px 2px #0006}
 .fab{position:fixed;right:calc(16px + env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;border:0;background:var(--tx);color:#111;box-shadow:0 6px 18px #000a;z-index:15;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .fab svg{width:24px;height:24px}.fab .x{display:none;font-size:1.3rem;font-weight:700}.fab.on{background:#33363e;color:var(--tx)}.fab.on svg{display:none}.fab.on .x{display:block}
-.sp{position:fixed;left:12px;right:12px;bottom:calc(86px + env(safe-area-inset-bottom));max-width:560px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;box-shadow:0 10px 30px #000b;z-index:15;display:flex;flex-direction:column;gap:6px}
+.sp{position:fixed;left:12px;right:12px;top:calc(10px + env(safe-area-inset-top));max-width:560px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;box-shadow:0 10px 30px #000b;z-index:15;display:flex;flex-direction:column;gap:6px}
 .sp[hidden]{display:none}.sp .sr2{display:flex;gap:8px}.sp .sr2 .btn{flex:0 0 auto;margin:0}
 body{padding-bottom:calc(96px + env(safe-area-inset-bottom))!important}
 input[type=search],input[type=text],input[type=number],textarea,select{font:inherit;font-size:1rem;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r2);width:100%;background:var(--card);color:var(--tx);transition:border-color .15s,box-shadow .15s}
@@ -116,6 +125,7 @@ textarea{resize:vertical}
 .nav button:disabled{opacity:.3;cursor:default}
 #pi{font-size:.9rem;color:var(--mut);min-width:110px;text-align:center;font-variant-numeric:tabular-nums}
 .hint{font-size:.8rem;color:var(--dim);text-align:center;margin-top:10px}
+@media (max-width:599px){.hint{display:none}.nav{margin-top:10px}}
 .sheet{position:fixed;inset:0;background:#000b;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);display:flex;align-items:flex-end;justify-content:center;z-index:20;animation:fade .2s ease}
 .sheet[hidden]{display:none}
 .sb{position:relative;background:var(--card);border:1px solid var(--line);border-bottom:0;width:100%;max-width:560px;max-height:88vh;overflow:auto;overscroll-behavior:contain;border-radius:20px 20px 0 0;padding:22px 16px calc(16px + env(safe-area-inset-bottom));box-shadow:0 -8px 30px #0008;animation:up .28s var(--ease);scrollbar-width:thin;scrollbar-color:var(--line2) transparent}
@@ -206,8 +216,7 @@ a{color:var(--acc)}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style></head><body>
-<div class="top"><h1>Pokédex Binders<span class="ver" id="ver" title="App version" hidden></span></h1><button class="sync" id="sv" aria-label="Sync status"></button><button class="icon wb" id="wbtn" aria-label="Wants" title="Wants">♡</button><button class="icon" id="gear" aria-label="Settings">⚙︎</button></div>
-<div class="tabs" id="tabs"></div>
+<div class="top"><button class="shelf" id="shelf" aria-label="Your binders" title="Your binders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 21h20"/><rect x="4" y="6" width="4" height="15" rx="1"/><rect x="9.5" y="3" width="4" height="18" rx="1"/><path d="M15.5 7.5l3.4-.9 3 13.5-3.4.9z"/></svg><span class="bn" id="bname"></span><span class="car">▾</span></button><span class="ver" id="ver" title="App version" hidden></span><span class="sp1"></span><button class="sync" id="sv" aria-label="Sync status"></button><button class="icon wb" id="wbtn" aria-label="Wants" title="Wants">♡</button><button class="icon" id="gear" aria-label="Settings">⚙︎</button></div>
 <button class="fab" id="fab" aria-label="Search" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg><span class="x">✕</span></button>
 <div class="sp" id="sp" hidden><div class="sr2"><input id="q" type="search" placeholder="Pokémon name or #number" enterkeyhint="search" autocomplete="off"><button class="btn pri" id="qgo">Search</button></div><div id="r"></div></div>
 <div class="stats" id="st"></div>
@@ -253,6 +262,12 @@ a{color:var(--acc)}
  <input type="text" id="adno" placeholder="Card number, e.g. 012/080" maxlength="20" autocomplete="off" style="margin-top:8px">
  <select id="adlang"><option value="zh-cn">Chinese (Simplified)</option><option value="zh-tw">Chinese (Traditional)</option><option value="ja">Japanese</option><option value="ko">Korean</option><option value="en">English</option><option value="other">Other</option></select>
  <div class="row" style="margin-top:16px"><button class="btn warn" id="addel" hidden>Delete</button><button class="btn" id="adx">Cancel</button><button class="btn pri" id="ads">Save card</button></div>
+</div></div>
+
+<div class="sheet set" id="shf" hidden><div class="sb">
+ <h3>Your binders</h3>
+ <div class="tabs shelfl" id="tabs"></div>
+ <div class="row"><button class="btn pri" id="shfx">Done</button></div>
 </div></div>
 
 <div class="sheet set" id="bs" hidden><div class="sb">
@@ -461,14 +476,15 @@ function page(i){const p=P[i];if(!p)return i<0?'<div class="cover">Inside cover<
  const sz=SZ(),[cols]=SIZES[sz],c=p.it.map((n,k)=>cell(n,i*sz+k)).join('');
  return `<div class="g${p.g}" style="--cols:${cols};--k:${cols>3?(cols>4?.75:.85):1}"><div class="h"><span class="hl">Page ${p.n}${PER===1?`<span class="side" title="Side of the binder">${sideOf(i)==='left'?'◧ Left':'Right ◨'}</span>`:''}</span>${p.g?`<small>Gen ${p.g}</small>`:''}</div><div class="g">${c}</div></div>`}
 function show(){if(!binders.length){$('L').innerHTML=$('R').innerHTML='';$('pi').textContent='';return}
+ requestAnimationFrame(fitBook);
  $('book').classList.toggle('sr',PER===1&&sideOf(vp(spread,0))==='right');
  $('book').classList.toggle('one',PER===1);$('L').innerHTML=page(vp(spread,0));$('R').innerHTML=PER===1?'':page(vp(spread,1));
  const vis=[...Array(PER).keys()].map(k=>vp(spread,k)).filter(i=>P[i]);if(PER===1||!vis.includes(lastPg))lastPg=vis[0]??0;
  $('pi').textContent=vis.length>1?`Pages ${vis[0]+1}–${vis[1]+1} of ${P.length}`:`Page ${(vis[0]??0)+1} of ${P.length}`;$('pv').disabled=spread==0;$('nx').disabled=spread==S-1;ensureDefaults(spread)}
 function nums(b=bi){return binders[b]?[...new Set(binders[b].slots.filter(Boolean))]:[]}
-function tabFade(){const t=$('tabs'),m=t.scrollWidth-t.clientWidth;t.classList.toggle('fl',t.scrollLeft>2);t.classList.toggle('fr',m>2&&t.scrollLeft<m-2)}
+function tabFade(){const bnm=$('bname');if(bnm)bnm.textContent=binders[bi]?binders[bi].name:'Binders';const t=$('tabs'),m=t.scrollWidth-t.clientWidth;t.classList.toggle('fl',t.scrollLeft>2);t.classList.toggle('fr',m>2&&t.scrollLeft<m-2)}
 function tabs(){$('tabs').innerHTML=binders.map((b,i)=>{const ns=nums(i),h=ns.filter(n=>col[n]&&col[n].s).length;
- return `<button class="${i===bi?'on':''}" data-b="${i}"${i===bi?` title="${esc(binfo())}"`:''}>${esc(b.name)}<small>${h}/${ns.length}</small>${i===bi?'<span class="tm" data-bset="1" role="button" aria-label="Binder settings" title="Binder settings">⋯</span>':''}</button>`}).join('')+'<button class="new" data-new="1" aria-label="New binder">＋<small>New</small></button>';
+ return `<button class="${i===bi?'on':''}" data-b="${i}"${i===bi?` title="${esc(binfo())}"`:''}>${esc(b.name)}<small>${h}/${ns.length}</small>${i===bi?'<span class="tm" data-bset="1" role="button" aria-label="Binder settings" title="Binder settings">⋯</span>':''}</button>`}).join('')+'<button class="new" data-new="1" aria-label="New binder">＋ New binder</button>';
  tabFade()}
 function binfo(){const ns=nums(),sorted=[...ns].sort((a,b)=>a-b),run=ns.length>1&&sorted[sorted.length-1]-sorted[0]===ns.length-1;
  return binders.length?`${SZ()}-pocket · ${run?`#${sorted[0]}–${sorted[sorted.length-1]} · `:''}${ns.length} Pokémon · ${P.length} pages`:''}
@@ -506,7 +522,24 @@ async function setBinder(i,sp,force){if(i===bi&&sp==null&&!force)return;target=s
  if(binders[bi])ls.set('pb-curid',binders[bi].id);ls.set('pb-mem2',mem);show();stats();
  const on=$('tabs').querySelector('button.on');if(on)try{on.scrollIntoView({block:'nearest',inline:'nearest'})}catch(e){}}
 $('tabs').addEventListener('scroll',tabFade,{passive:true});addEventListener('resize',tabFade);
-$('tabs').addEventListener('click',e=>{if(e.target.closest('button[data-new]'))return openNew(false);if(e.target.closest('[data-bset]'))return openBset();const b=e.target.closest('button[data-b]');if(b)setBinder(+b.dataset.b)});
+$('tabs').addEventListener('click',e=>{if(e.target.closest('button[data-new]'))return openNew(false);if(e.target.closest('[data-bset]'))return openBset();const b=e.target.closest('button[data-b]');if(b){$('shf').hidden=true;setBinder(+b.dataset.b)}});
+$('shelf').onclick=()=>{closeAll();tabs();$('shf').hidden=false};
+$('shfx').onclick=closeAll;
+/* Fit one page (phone) or the spread (wide screens) between the top bar and the page arrows, so no scrolling is needed. */
+let fitH=0;
+function fitBook(){const bk=$('book');if(!binders.length)return;
+ if(document.activeElement&&/INPUT|TEXTAREA/.test(document.activeElement.tagName))return;   // the on-screen keyboard shrinks the window: ignore
+ const H=innerHeight;fitH=H;const [cols,rows]=SIZES[SZ()],gap=4;
+ const top=bk.getBoundingClientRect().top+scrollY,nav=$('pi').parentElement,navH=nav.offsetHeight+parseFloat(getComputedStyle(nav).marginTop||0);
+ const avail=H-top-navH-14;                                        // room left for the page itself
+ const over=10+12+30;                                               // page padding + "Page N" header
+ const cardH=(avail-over-(rows-1)*gap)/rows,cardW=cardH*63/88;
+ const padX=PER===1?30:15,pageW=cols*cardW+(cols-1)*gap+padX;
+ let w=Math.round(Math.max(240,Math.min(900,pageW*PER)));bk.style.maxWidth=w+'px';
+ // measure the result and shrink once if the arrows still fall below the screen
+ const over2=nav.getBoundingClientRect().bottom+scrollY-(H-8),bh=bk.offsetHeight;
+ if(over2>0&&bh>0){w=Math.round(Math.max(240,w*(bh-over2)/bh));bk.style.maxWidth=w+'px'}}
+addEventListener('resize',fitBook);
 $('pv').onclick=()=>go(target-1);$('nx').onclick=()=>go(target+1);
 let tx=null;$('book').addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
 $('book').addEventListener('touchend',e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>40)go(target+(dx<0?1:-1));tx=null});
@@ -646,7 +679,7 @@ $('pclr').onclick=()=>{const en=col[sel];if(en){delete en.c;delete en.img;delete
 let pfT;$('pf').addEventListener('input',()=>{clearTimeout(pfT);pfT=setTimeout(picker,200)});
 $('shimg').onclick=()=>{$('zmi').src=$('shimg').src;$('zm').hidden=false};
 $('zm').onclick=()=>$('zm').hidden=true;
-function closeAll(){closeSearch();$('wn').hidden=true;$('ad').hidden=true;$('bs').hidden=true;$('sh').hidden=true;$('setg').hidden=true;$('zm').hidden=true;$('ps').hidden=true;if(binders.length)$('nb').hidden=true}
+function closeAll(){closeSearch();$('shf').hidden=true;$('wn').hidden=true;$('ad').hidden=true;$('bs').hidden=true;$('sh').hidden=true;$('setg').hidden=true;$('zm').hidden=true;$('ps').hidden=true;if(binders.length)$('nb').hidden=true}
 
 /* ---------- replace / add a Pokémon in a pocket ---------- */
 function setSlot(i,n){const b=binders[bi];if(!b||i==null)return;b.slots[i]=n||0;b.slots=padSlots(b.slots,b.size);saveBinders();layout();refresh()}
@@ -711,7 +744,7 @@ $('bsx').onclick=closeAll;
 $('bsd').onclick=()=>{const b=binders[bi];if(!b||!confirm(`Delete the binder “${b.name}”? Your owned cards stay saved.`))return;
  binders.splice(bi,1);delete mem[b.id];saveBinders();closeAll();if(binders.length)setBinder(Math.max(0,bi-1),null,true);else{bi=0;layout();refresh();openNew(true)}};
 $('shd').onclick=closeAll;
-['sh','setg','ps','nb','bs','ad','wn'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target===$(id))closeAll()}));
+['sh','setg','ps','nb','bs','ad','wn','shf'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target===$(id))closeAll()}));
 
 /* ---------- settings ---------- */
 function segs(){$('ord').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.o===opt.ord));
@@ -759,7 +792,7 @@ window.pbApp={note,toast,state:()=>({col,binders,wants}),customs:()=>customs,
 
 /* ---------- phone back button: closes the open menu instead of leaving the app ---------- */
 // One history entry stands for "a menu is open". Back pops it and steps back one level; closing a menu with its own buttons removes it again.
-const OVS=['zm','ad','ps','bs','nb','setg','wn','sh','sp'];  // topmost first
+const OVS=['zm','ad','ps','bs','nb','setg','wn','shf','sh','sp'];  // topmost first
 const ovOpen=()=>OVS.some(id=>!$(id).hidden&&!(id==='nb'&&$('nbx').hidden));  // the first-binder welcome can't be closed
 let ovHist=false,ovSkip=false;
 function ovSync(){const o=ovOpen();
