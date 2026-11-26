@@ -152,9 +152,8 @@ textarea{resize:vertical}
 .c.top::before,.c.decent::before{content:'';position:absolute;left:0;right:0;bottom:0;height:4px;z-index:3}
 .c.top::before{background:var(--top)}.c.decent::before{background:var(--dec)}
 .c.top i{background:var(--top);color:#0b2015}.c.decent i{background:var(--dec);color:#2a1a05}
-.c.hit{outline:3px solid var(--hl);outline-offset:-1px;animation:pulse 1.2s ease-in-out 2;z-index:2}
-.c.hit:not(.im){background:var(--hl)!important}.c.hit:not(.im) span,.c.hit:not(.im) b{color:#1a1a1a!important}
-.c.hit.no img{filter:none}
+.c.hit{outline:3px solid var(--hl);outline-offset:-1px;box-shadow:0 0 18px 2px var(--hl);animation:pulse 1.2s ease-in-out 2;z-index:2}
+/* found by search: marked by the yellow outline only; a card you don't have keeps its grey look */
 @keyframes pulse{50%{transform:scale(1.07)}}
 .nav{display:flex;justify-content:center;align-items:center;gap:16px;margin-top:16px}
 .nav button{font-size:1.4rem;line-height:1;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--card);cursor:pointer;display:grid;place-items:center;padding:0 0 3px}
