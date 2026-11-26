@@ -75,13 +75,6 @@ textarea{resize:vertical}
 .book::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:linear-gradient(#0000,#000a,#0000);z-index:3;pointer-events:none}
 .pg,.face{background:var(--page);padding:10px 8px 12px}
 .pg{width:50%}
-.book.one::after{display:none}.book.one .pg.l{flex:1;width:auto;min-width:0;border-radius:12px}
-/* the facing page peeks out next to the spine (dimmed); tap it to turn to it */
-.book.one .pg.r{display:flex;flex:0 0 26px;width:26px;padding:10px 0 12px;overflow:hidden;position:relative;cursor:pointer;border-radius:0 12px 12px 0;background:var(--page)}
-.book.one .pg.r .pk{flex:0 0 var(--pw,300px);width:var(--pw,300px);padding:0 8px;opacity:.38;pointer-events:none;filter:saturate(.6)}
-.book.one .pg.r::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#0004,#000a)}
-.book.one.sr .pg.r{order:-1;justify-content:flex-end;border-radius:12px 0 0 12px}
-.book.one.sr .pg.r::after{background:linear-gradient(270deg,#0004,#000a)}
 /* folded corner on the outer edge: this is where the page turns over (tap it to turn) */
 .curl{position:absolute;bottom:0;width:34px;height:34px;z-index:4;cursor:pointer;border:0;padding:0;background:none}
 .curl::before{content:"";position:absolute;inset:0;filter:drop-shadow(-2px -2px 3px #0009)}
@@ -90,13 +83,33 @@ textarea{resize:vertical}
 .curl{animation:curlhint 2.4s ease-in-out 1s 2}
 @keyframes curlhint{0%,100%{transform:scale(1)}50%{transform:scale(1.35)}}
 .curl.r{transform-origin:100% 100%}.curl.l{transform-origin:0 100%}
-/* one page at a time: draw the spine on the side it is on in the binder */
-.book.one .pg.l{position:relative;border-radius:12px 0 0 12px;padding-right:22px;background:var(--page)}
-.book.one.sr .pg.l{border-radius:0 12px 12px 0;padding-right:7px;padding-left:22px}
-/* binder spine with rings, on the edge where the page is held */
-.book.one .pg.l::after{content:"";position:absolute;top:0;bottom:0;right:0;width:15px;border-radius:0 3px 3px 0;
- background:radial-gradient(circle at 50% 50%,#8b9099 0 3px,#3a3e47 3.5px 4.5px,transparent 5px) 50% 12%/15px 38% repeat-y,linear-gradient(90deg,#0d0e11,#191b20)}
-.book.one.sr .pg.l::after{right:auto;left:0;border-radius:3px 0 0 3px;background:radial-gradient(circle at 50% 50%,#8b9099 0 3px,#3a3e47 3.5px 4.5px,transparent 5px) 50% 12%/15px 38% repeat-y,linear-gradient(270deg,#0d0e11,#191b20)}
+/* phone: the open spread (left + right page) sits side by side; one page fills the screen and the other
+   peeks out next to the spine. --tx slides the pair, a page's own --ry turns it over the spine. */
+.book.one{overflow:hidden;touch-action:pan-y;--tx:0px}
+.book.one::after{display:none}
+.book.one .pg{flex:0 0 var(--W,300px);width:var(--W,300px);min-width:0;position:relative;background:var(--page);
+ transform:translateX(var(--tx)) rotateY(var(--ry,0deg));transition:filter .25s;will-change:transform;backface-visibility:hidden}
+.book.one .pg.l{border-radius:12px 0 0 12px;padding-right:22px}
+.book.one .pg.r{border-radius:0 12px 12px 0;padding-left:22px;padding-right:8px}
+.book.one .pg.l::after,.book.one .pg.r::after{content:"";position:absolute;top:0;bottom:0;width:15px;pointer-events:none}
+.book.one .pg.l::after{right:0;background:radial-gradient(circle at 50% 50%,#8b9099 0 3px,#3a3e47 3.5px 4.5px,transparent 5px) 50% 12%/15px 38% repeat-y,linear-gradient(90deg,#0d0e11,#191b20)}
+.book.one .pg.r::after{left:0;background:radial-gradient(circle at 50% 50%,#8b9099 0 3px,#3a3e47 3.5px 4.5px,transparent 5px) 50% 12%/15px 38% repeat-y,linear-gradient(270deg,#0d0e11,#191b20)}
+.book.one:not(.sr) .pg.r,.book.one.sr .pg.l{filter:brightness(.5) saturate(.7)}   /* the page that only peeks out */
+.book.one .pg .blank{height:100%}
+/* foil: holo shines on the artwork, reverse holo on everything but the artwork */
+.foil{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;mix-blend-mode:color-dodge;opacity:.6;
+ background-size:260% 260%;animation:foil 7s ease-in-out infinite alternate}
+.foil.rainbow{background-image:linear-gradient(115deg,transparent 18%,#ff4fa3 30%,#ffd34f 38%,#4fff9a 46%,#4fc4ff 54%,#a94fff 62%,transparent 76%)}
+.foil.cosmos{background-image:radial-gradient(#fff 0 1px,transparent 1.6px),radial-gradient(#8ff 0 1.4px,transparent 2px),radial-gradient(#f9f 0 2px,transparent 2.6px),
+ linear-gradient(115deg,transparent 20%,#ff4fa3 34%,#4fc4ff 50%,#a94fff 64%,transparent 80%);background-size:7px 7px,13px 13px,23px 23px,260% 260%}
+.foil.sparkle{background-image:repeating-linear-gradient(55deg,#fff5 0 1.5px,transparent 1.5px 7px),repeating-linear-gradient(-35deg,#fff3 0 1px,transparent 1px 9px),
+ linear-gradient(115deg,transparent 20%,#ffd34f 36%,#4fff9a 48%,#4fc4ff 60%,transparent 78%);background-size:auto,auto,260% 260%}
+.foil.holo{clip-path:inset(11% 8% 47% 8%)}
+.foil.reverse{clip-path:polygon(evenodd,0 0,100% 0,100% 100%,0 100%,0 0,8% 11%,92% 11%,92% 53%,8% 53%,8% 11%)}
+@keyframes foil{from{background-position:0 0,0 0,0 0,0% 0%}to{background-position:0 0,0 0,0 0,100% 100%}}
+@media (prefers-reduced-motion:reduce){.foil{animation:none}}
+.shh .art{position:relative;flex:0 0 auto;border-radius:6px;overflow:hidden}.shh .art img{display:block}
+.fin{display:flex;flex-direction:column;gap:6px;margin:12px 0 0}.fin[hidden],.fin .seg[hidden]{display:none}.fin .seg button{font-size:.85rem;padding:7px 4px}
 .side{font-weight:600;font-size:.72rem;color:var(--mut);border:1px solid var(--line);border-radius:9px;padding:1px 7px;white-space:nowrap}
 .h .hl{display:flex;align-items:center;gap:6px}
 .pg.l,.face.back,.leaf.b .face.front{border-radius:12px 2px 2px 12px;background:linear-gradient(90deg,var(--page) 86%,var(--spine))}
@@ -238,11 +251,11 @@ a{color:var(--acc)}
 <div class="leaf" id="F"><div class="face front" id="FF"></div><div class="face back" id="FB"></div></div></div>
 <div class="nav"><button id="pv" aria-label="Previous">‹</button><span id="pi"></span><button id="nx" aria-label="Next">›</button></div>
 <div class="hint">Tap a pocket to mark it (★ Top · ↻ Upgrade needed), choose your print, or replace the Pokémon</div>
-<details class="wl" id="wl"><summary>Missing &amp; upgrades (this binder)</summary><div id="wlc"></div></details>
 
 <div class="sheet" id="sh" hidden><div class="sb">
- <div class="shh"><img id="shimg" alt="" hidden><div><div id="shn"></div><div id="shm"></div></div></div>
+ <div class="shh"><div class="art"><img id="shimg" alt="" hidden><b class="foil" id="shfoil" hidden></b></div><div><div id="shn"></div><div id="shm"></div></div></div>
  <div class="opts"><button data-s="">Don't have</button><button data-s="decent">↻ Upgrade needed</button><button data-s="top">★ Top</button></div>
+ <div class="fin" id="fin" hidden><div class="seg" id="finv"></div><div class="seg" id="finp"></div></div>
  <div class="pkh">Your print <input id="pf" type="text" placeholder="Filter: set or name"></div>
  <div class="seg" id="plang"><button data-l="">All</button><button data-l="en">English</button><button data-l="ja">Japanese</button><button data-l="zh-tw">Chinese (Trad.)</button><button data-l="zh-cn">Chinese (Simp.)</button></div>
  <div class="pgrid" id="pk"></div>
@@ -251,11 +264,14 @@ a{color:var(--acc)}
 </div></div>
 
 <div class="sheet set" id="wn" hidden><div class="sb">
- <h3>♡ Wants</h3>
+ <div class="seg" id="wtab" style="margin-bottom:12px"><button data-t="w" class="on">♥ Wants</button><button data-t="m">Missing &amp; upgrades</button></div>
+ <div id="mpane" hidden><p id="mph" style="margin-top:0"></p><div class="wl" id="wlc"></div></div>
+ <div id="wpane">
  <input type="search" id="wq" placeholder="Find a Pokémon to add cards: name or #number" autocomplete="off" enterkeyhint="search">
  <div id="wres"></div>
  <h3 id="wlh">Your want list</h3>
  <div class="pgrid" id="wlist"></div>
+ </div>
  <div class="row"><button class="btn pri" id="wx">Done</button></div>
 </div></div>
 
@@ -468,8 +484,10 @@ function ensureDefaults(sp){
   catch(e){note('Offline — card images will load when you’re back online')}
   finally{pending.delete(n)}});
 }
-async function priceOf(id){if(isCustom(id))return null;const [l,raw]=splitId(id);if(l!=='en')return null; // Cardmarket prices only exist for English prints
- const d=await getJSON(`${TCG}/${l}/cards/${encodeURIComponent(raw)}`);
+const varsOf=d=>{const v=d&&d.variants||{};return ['normal','holo','reverse'].filter(k=>v[k])};
+async function priceOf(id,info){if(isCustom(id))return null;const [l,raw]=splitId(id);
+ const d=await getJSON(`${TCG}/${l}/cards/${encodeURIComponent(raw)}`);if(info)info.vars=varsOf(d);
+ if(l!=='en')return null; // Cardmarket prices only exist for English prints
  const cm=d.pricing&&d.pricing.cardmarket;if(!cm)return null;
  const v=d.variants||{};const holoOnly=v.holo&&!v.normal;
  const p=holoOnly?(cm['trend-holo']??cm['avg-holo']??cm.trend??cm.avg):(cm.trend??cm.avg??cm['trend-holo']);
@@ -484,7 +502,8 @@ function cell(n,i){if(!n)return `<div class="c e add" data-i="${i}" title="Add a
  const cls='c'+(s?' '+s:' no')+(img?' im':'')+(hits.has(n)?' hit':'');
  const badge=s==='top'?'<i>★</i>':s==='decent'?'<i>↻</i>':'';
  const inner=img?`<img src="${esc(pic(img,'low'))}" alt="${esc(nm)}" loading="lazy" decoding="async">`:`<b>#${pad(n)}</b><span>${esc(nm)}</span>${e.c?`<small class="ps">${e.lang&&e.lang!=='en'?LTAG[e.lang]+' · ':''}${esc(setEn(e.set,e.c))} ${esc(e.no||'')}</small>`:''}`;
- return `<div class="${cls}" data-n="${n}" data-i="${i}" data-l="#${pad(n)} ${esc(nm)}">${inner}${badge}</div>`}
+ const foil=img&&e.c&&(e.f==='holo'||e.f==='reverse')?`<b class="foil ${e.f} ${e.fp||'rainbow'}"></b>`:'';
+ return `<div class="${cls}" data-n="${n}" data-i="${i}" data-l="#${pad(n)} ${esc(nm)}">${inner}${foil}${badge}</div>`}
 const sideOf=i=>(i+(binders[bi]&&binders[bi].right?1:0))%2===0?'left':'right';   // where page i sits in the real binder
 function page(i){const p=P[i];if(!p)return i<0?'<div class="cover">Inside cover</div>':'';
  const sz=SZ(),[cols]=SIZES[sz],c=p.it.map((n,k)=>cell(n,i*sz+k)).join('');
@@ -492,13 +511,14 @@ function page(i){const p=P[i];if(!p)return i<0?'<div class="cover">Inside cover<
 function show(){if(!binders.length){$('L').innerHTML=$('R').innerHTML='';$('pi').textContent='';return}
  requestAnimationFrame(fitBook);
  $('book').classList.toggle('sr',PER===1&&sideOf(vp(spread,0))==='right');
- $('book').classList.toggle('one',PER===1);$('L').innerHTML=page(vp(spread,0));
- if(PER===1){const i=vp(spread,0),sd=sideOf(i),fi=sd==='right'?i-1:i+1;          // the facing page, for the peek strip
-  const nextTurn=sd==='right'?(i+1<P.length):(i>0);                    // is there a sheet to turn on the outer edge?
-  if(nextTurn)$('L').insertAdjacentHTML('beforeend',`<button class="curl ${sd==='right'?'r':'l'}" data-curl="1" aria-label="Turn the page" title="Turn the page"></button>`);
-  $('R').innerHTML=`<div class="pk">${fi>=0&&fi<P.length?page(fi):''}</div>`;$('R').title=fi>=0&&fi<P.length?`Page ${fi+1}`:'';
-  $('R').style.setProperty('--pw',($('L').offsetWidth||300)+'px')}
- else{$('R').innerHTML=page(vp(spread,1));$('R').title=''}
+ $('book').classList.toggle('one',PER===1);
+ if(PER===1){const i=vp(spread,0),sd=sideOf(i),lp=sd==='left'?i:i-1;     // the open spread: left page lp, right page lp+1
+  $('L').innerHTML=page(lp)||'<div class="blank"></div>';$('R').innerHTML=page(lp+1)||'<div class="blank"></div>';
+  if(lp>0)$('L').insertAdjacentHTML('beforeend','<button class="curl l" data-curl="-1" aria-label="Turn the page back" title="Turn the page back"></button>');
+  if(lp+2<P.length)$('R').insertAdjacentHTML('beforeend','<button class="curl r" data-curl="1" aria-label="Turn the page" title="Turn the page"></button>');
+  for(const el of [$('L'),$('R')]){el.style.removeProperty('--ry');el.style.transformOrigin='';el.title=''}
+  setTx(focusTx(sd));preloadAround(lp)}
+ else{$('L').innerHTML=page(vp(spread,0));$('R').innerHTML=page(vp(spread,1));$('R').title=''}
  const vis=[...Array(PER).keys()].map(k=>vp(spread,k)).filter(i=>P[i]);if(PER===1||!vis.includes(lastPg))lastPg=vis[0]??0;
  $('pi').textContent=vis.length>1?`Pages ${vis[0]+1}–${vis[1]+1} of ${P.length}`:`Page ${(vis[0]??0)+1} of ${P.length}`;$('pv').disabled=spread==0;$('nx').disabled=spread==S-1;ensureDefaults(spread)}
 function nums(b=bi){return binders[b]?[...new Set(binders[b].slots.filter(Boolean))]:[]}
@@ -512,25 +532,16 @@ function stats(){if(!binders.length){tabs();$('st').innerHTML='';return}const bn
  const val=v.reduce((a,e)=>a+(e.p||0),0);
  tabs();const pct=bn.length?Math.round(v.length/bn.length*100):0;
  $('st').innerHTML=`<div class="prog" title="${v.length} of ${bn.length} owned · ${bn.length-v.length} missing"><span><b>${v.length}</b>/${bn.length}</span><span class="bar"><i style="width:${pct}%"></i></span><span class="pt" title="Top">★ ${t}</span><span class="pd" title="Upgrade needed">↻ ${d}</span>${val?`<span class="pv" title="Cardmarket value">${eur(val)}</span>`:''}</div>`;
- if($('wl').open)wl()}
+ if(!$('wn').hidden&&wTab==='m')wl()}
 function wl(){const ns=nums(),dec=ns.filter(n=>col[n]&&col[n].s==='decent'),mis=ns.filter(n=>!(col[n]&&col[n].s));
  const ch=a=>a.map(n=>`<button data-n="${n}">#${pad(n)} ${esc(N[n])}</button>`).join('')||'<span style="color:var(--dim);font-size:.8rem">None</span>';
  $('wlc').innerHTML=`<h3>↻ Upgrade needed (${dec.length})</h3><div class="chips d">${ch(dec)}</div><h3>Missing (${mis.length})</h3><div class="chips">${ch(mis)}</div>`}
 function refresh(){if(!busy)show();else idle().then(()=>{if(!busy)show()});stats()}
 
 /* ---------- page flipping ---------- */
-function flip(dir,ms){if(PER===1)return new Promise(res=>{const L=$('L'),side=sideOf(vp(spread,0));
-  // Phone. Forward from a right page, or back from a left page, turns the sheet over: show a real page turn.
-  // Otherwise (left -> right of the same opened spread, and back) just slide across.
-  const turn=(dir>0&&side==='right')||(dir<0&&side==='left');
-  if(!turn){spread+=dir;show();const a=L.animate([{transform:`translateX(${dir*40}px)`,opacity:.2},{transform:'none',opacity:1}],{duration:Math.min(ms,240),easing:'ease-out'});a.onfinish=a.oncancel=res;return}
-  const half=Math.max(90,Math.min(ms,560)/2),out=side==='right'?-1:1;   // the page swings over the spine
-  L.style.transformOrigin=side==='right'?'left center':'right center';
-  const a1=L.animate([{transform:'rotateY(0deg)',filter:'brightness(1)'},{transform:`rotateY(${out*88}deg)`,filter:'brightness(.45)'}],{duration:half,easing:'cubic-bezier(.5,0,.9,.6)'});
-  a1.onfinish=a1.oncancel=()=>{spread+=dir;show();const ns=sideOf(vp(spread,0));
-   L.style.transformOrigin=ns==='left'?'right center':'left center';
-   const a2=L.animate([{transform:`rotateY(${-out*88}deg)`,filter:'brightness(.45)'},{transform:'rotateY(0deg)',filter:'brightness(1)'}],{duration:half,easing:'cubic-bezier(.1,.4,.5,1)'});
-   a2.onfinish=a2.oncancel=()=>{L.style.transformOrigin='';res()}}});
+function flip(dir,ms){if(PER===1){const m=moveKind(dir);   // phone: slide across the spread, or turn the sheet over
+  const st={dir,phase:0},dur=m==='turn'?Math.max(180,Math.min(ms,620)):Math.max(140,Math.min(ms,300));
+  return tween(0,1,dur,p=>m==='turn'?turnTo(st,p):slideTo(dir,p)).then(()=>{if(m==='slide'){spread+=dir;show()}else endTurn()})}
  return new Promise(res=>{const F=$('F'),nx=spread+dir;
  F.className='leaf '+(dir>0?'f':'b');F.style.transition='none';F.style.transform='rotateY(0deg)';F.style.visibility='visible';
  if(dir>0){$('FF').innerHTML=page(vp(spread,1));$('FB').innerHTML=page(vp(nx,0));$('R').innerHTML=page(vp(nx,1))}
@@ -546,6 +557,51 @@ async function run(){if(busy)return;busy=true;
 function go(s){target=Math.max(0,Math.min(S-1,s));const b=$('book').getBoundingClientRect();
  if(b.top<0||b.bottom>innerHeight){try{scrollTo({top:b.top+scrollY-8,behavior:'smooth'})}catch(e){}}run()}
 const idle=()=>new Promise(r=>{const w=()=>busy?setTimeout(w,50):r();w()});
+
+/* ---------- phone: move between pages with your finger ---------- */
+// The open spread is two pages side by side (each --W wide); the book shows one and PEEK px of the other.
+// Within a spread you slide the pair (--tx). Past the edge you turn the sheet: the page swings over the spine
+// (rotateY), and halfway the next spread is put in place and its page comes down on the other side.
+const PEEK=26;
+const oneW=()=>Math.max(100,$('book').clientWidth-PEEK);
+const focusTx=sd=>sd==='left'?0:-(oneW()-PEEK);
+function setTx(px){$('book').style.setProperty('--tx',px+'px')}
+function moveKind(dir){const sd=sideOf(vp(spread,0));return (dir>0&&sd==='right')||(dir<0&&sd==='left')?'turn':'slide'}
+function slideTo(dir,p){const a=dir>0?0:-(oneW()-PEEK),b=dir>0?-(oneW()-PEEK):0;setTx(a+(b-a)*p)}
+function turnTo(st,p){   // st.dir: +1 forward (turn a right page), -1 back (turn a left page); p: 0..1
+ if(p>=.5&&st.phase===0){spread+=st.dir;show();st.phase=1}
+ else if(p<.5&&st.phase===1){spread-=st.dir;show();st.phase=0}
+ const fwd=st.dir>0;
+ if(st.phase===0){const el=fwd?$('R'):$('L');el.style.transformOrigin=fwd?'left center':'right center';
+  el.style.setProperty('--ry',(fwd?-1:1)*180*p+'deg');el.style.filter=`brightness(${1-.6*p*2})`}
+ else{const el=fwd?$('L'):$('R');el.style.transformOrigin=fwd?'right center':'left center';
+  el.style.setProperty('--ry',(fwd?1:-1)*180*(1-p)+'deg');el.style.filter=`brightness(${1-.6*(1-p)*2})`}}
+function endTurn(){for(const el of [$('L'),$('R')]){el.style.removeProperty('--ry');el.style.transformOrigin='';el.style.filter=''}}
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+function tween(from,to,ms,fn){return new Promise(res=>{const t0=performance.now();
+ const step=now=>{const k=Math.min(1,(now-t0)/ms);fn(from+(to-from)*ease(k));k<1?requestAnimationFrame(step):res()};requestAnimationFrame(step)})}
+// load the pictures of the neighbouring spreads before you get there
+const preloaded=new Set();
+function preloadAround(lp){for(const pg of [lp-2,lp-1,lp+2,lp+3]){const p=P[pg];if(!p)continue;
+ p.it.forEach(n=>{const im=n&&imgOf(n);if(im&&!preloaded.has(im)){preloaded.add(im);const x=new Image();x.decoding='async';x.src=pic(im,'low')}})}}
+let drag=null,noClick=false;
+$('book').addEventListener('pointerdown',e=>{if(PER!==1||busy||e.button>0||e.target.closest('[data-curl]'))return;
+ drag={x:e.clientX,y:e.clientY,t:performance.now(),mode:null,p:0}});
+$('book').addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
+ if(!drag.mode){if(Math.abs(dx)<8)return;if(Math.abs(dy)>Math.abs(dx)){drag=null;return}
+  const dir=dx<0?1:-1,ok=dir>0?spread<S-1:spread>0;if(!ok){drag=null;return}
+  drag.dir=dir;drag.mode=moveKind(dir);drag.st={dir,phase:0};busy=true;target=spread;
+  try{$('book').setPointerCapture(e.pointerId)}catch(_){}}
+ const dist=drag.mode==='turn'?oneW():oneW()-PEEK;drag.p=Math.max(0,Math.min(1,-drag.dir*dx/dist));
+ drag.v=-drag.dir*dx/Math.max(1,performance.now()-drag.t);
+ drag.mode==='turn'?turnTo(drag.st,drag.p):slideTo(drag.dir,drag.p)});
+function dragEnd(){if(!drag)return;const d=drag;drag=null;if(!d.mode)return;noClick=true;setTimeout(()=>noClick=false,0);
+ const done=d.p>(d.mode==='turn'?.35:.3)||d.v>.5,to=done?1:0,ms=Math.max(90,(d.mode==='turn'?520:280)*Math.abs(to-d.p));
+ tween(d.p,to,ms,p=>d.mode==='turn'?turnTo(d.st,p):slideTo(d.dir,p)).then(()=>{
+  if(d.mode==='slide'){if(done)spread+=d.dir;show()}else{endTurn();if(!done&&d.st.phase===1){spread-=d.dir;show()}}
+  target=spread;busy=false;if(binders[bi])mem[binders[bi].id]=Math.max(0,vp(spread,0));ls.set('pb-mem2',mem)})}
+$('book').addEventListener('pointerup',dragEnd);$('book').addEventListener('pointercancel',dragEnd);
+$('book').addEventListener('click',e=>{if(noClick){e.stopPropagation();e.preventDefault();noClick=false}},true);
 async function setBinder(i,sp,force){if(i===bi&&sp==null&&!force)return;target=spread;await idle();
  if(binders[bi])mem[binders[bi].id]=Math.max(0,vp(spread,0));bi=Math.max(0,Math.min(i,binders.length-1));layout();spread=target=Math.min(pv(sp??(binders[bi]?mem[binders[bi].id]||0:0)),S-1);
  const bk=$('book');bk.classList.remove('sw');bk.offsetWidth;bk.classList.add('sw');
@@ -569,10 +625,10 @@ function fitBook(){const bk=$('book');if(!binders.length)return;
  // measure the result and shrink once if the arrows still fall below the screen
  const over2=nav.getBoundingClientRect().bottom+scrollY-(H-8),bh=bk.offsetHeight;
  if(over2>0&&bh>0){w=Math.round(Math.max(240,w*(bh-over2)/bh));bk.style.maxWidth=w+'px'}
- if(PER===1)$('R').style.setProperty('--pw',$('L').offsetWidth+'px')}
+ if(PER===1){bk.style.setProperty('--W',oneW()+'px');if(!drag)setTx(focusTx(sideOf(vp(spread,0))))}}
 addEventListener('resize',fitBook);
 $('pv').onclick=()=>go(target-1);$('nx').onclick=()=>go(target+1);
-let tx=null;$('book').addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
+let tx=null;$('book').addEventListener('touchstart',e=>{tx=PER===1?null:e.touches[0].clientX},{passive:true});
 $('book').addEventListener('touchend',e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>40)go(target+(dx<0?1:-1));tx=null});
 document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA/.test(e.target.tagName))return;if(e.key==='ArrowRight')go(target+1);if(e.key==='ArrowLeft')go(target-1);if(e.key==='Escape')closeAll()});
 
@@ -599,8 +655,8 @@ $('qgo').onclick=runSearch;
 $('q').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();runSearch()}if(e.key==='Escape')closeSearch()});
 $('q').addEventListener('focus',()=>{if(!$('q').value&&!hits.size)return;$('q').value='';hits=new Set();$('r').textContent='';if(!busy)show()});
 $('q').addEventListener('input',()=>{if(!$('q').value){hits=new Set();$('r').textContent='';if(!busy)show()}});
-$('wl').addEventListener('toggle',()=>{if($('wl').open)wl()});
-$('wlc').addEventListener('click',e=>{const b=e.target.closest('button[data-n]');if(!b)return;$('q').value='#'+b.dataset.n;search();if($('r').textContent)toast($('r').textContent,5000)});
+
+$('wlc').addEventListener('click',e=>{const b=e.target.closest('button[data-n]');if(!b)return;closeAll();$('q').value='#'+b.dataset.n;search();if($('r').textContent)toast($('r').textContent,5000)});
 
 /* ---------- card sheet ---------- */
 function entry(n){return col[n]||(col[n]={})}
@@ -609,7 +665,15 @@ function sheetHead(){const n=sel,e=col[n]||{},img=imgOf(n);
  $('shn').textContent=`#${pad(n)} ${N[n]}`;
  const im=$('shimg');if(img){im.src=pic(img,'high');im.hidden=false}else im.hidden=true;
  $('shm').innerHTML=e.c?`${isCustom(e.c)?'<i class="lt cu">Custom</i>':''}${e.lang&&e.lang!=='en'?`<i class="lt">${LTAG[e.lang]||''}</i>`:''}${esc(setEn(e.set,e.c))} · #${esc(e.no||'')}${img?'':' · no picture'}${isCustom(e.c)?' <button class="lnk" data-edit="1">Edit</button>':''}${e.p!=null?`<br>Cardmarket trend: <b>${eur(e.p)}</b>`:''}`:(defs[n]&&defs[n].img?'Showing default art — pick your print below':'');
- $('sh').querySelectorAll('.opts button').forEach(b=>b.classList.toggle('on',(b.dataset.s||'')===(e.s||'')))}
+ $('sh').querySelectorAll('.opts button').forEach(b=>b.classList.toggle('on',(b.dataset.s||'')===(e.s||'')));
+ const fo=$('shfoil'),foilOn=!!(img&&e.c&&(e.f==='holo'||e.f==='reverse'));fo.hidden=!foilOn;fo.className='foil '+(foilOn?e.f+' '+(e.fp||'rainbow'):'');
+ $('fin').hidden=!e.c||isCustom(e.c);if(!e.c||isCustom(e.c))return;
+ const av=e.vars&&e.vars.length?e.vars:['normal','holo','reverse'],F={normal:'Normal',holo:'✦ Holo',reverse:'✧ Reverse holo'};
+ $('finv').innerHTML=['normal','holo','reverse'].filter(k=>av.includes(k)).map(k=>`<button data-f="${k}" class="${(e.f||'normal')===k?'on':''}">${F[k]}</button>`).join('');
+ $('finp').hidden=!foilOn;$('finp').innerHTML=foilOn?[['rainbow','Rainbow'],['cosmos','Cosmos'],['sparkle','Sparkle']].map(([k,t])=>`<button data-fp="${k}" class="${(e.fp||'rainbow')===k?'on':''}">${t}</button>`).join(''):''}
+$('fin').addEventListener('click',ev=>{const en=col[sel];if(!en||!en.c)return;const b=ev.target.closest('[data-f],[data-fp]');if(!b)return;
+ if(b.dataset.f){if(b.dataset.f==='normal')delete en.f;else en.f=b.dataset.f}else en.fp=b.dataset.fp;
+ save();refresh();sheetHead()});
 const customList=n=>Object.entries(customs).filter(([,c])=>c.n===n).map(([id,c])=>({id:'custom:'+id,lang:c.lang,custom:1,name:N[n],no:c.no,img:c.img,os:c.set,set:setEn(c.set),sid:''}));
 const addTile='<button data-add="1" class="addc"><div class="ph">＋<small>Card not listed</small></div><span>Add your own card</span></button>';
 const wantN=n=>Object.values(wants).filter(w=>w.n===n).length;
@@ -626,8 +690,10 @@ async function picker(){const n=sel,box=$('pk');box.innerHTML=addTile+customList
   box.innerHTML=addTile+(a.length?a.map(c=>tile(c,e)).join(''):`<div class="msg">${f||lg?'No prints match that filter':'No prints found'}</div>`)
    +(hid?`<div class="msg">${hid} print${hid>1?'s':''} without a picture hidden · <button class="lnk" data-shownopic="1" style="padding:0">Show them</button></div>`:'')}
  catch(err){if(sel===n)box.innerHTML=addTile+customList(n).map(c=>tile(c,col[n]||{})).join('')+'<div class="msg">Couldn’t load prints — check your connection.</div>'}}
-$('book').addEventListener('click',e=>{if(PER===1&&e.target.closest('#R')){if(!busy)go(target+($('book').classList.contains('sr')?-1:1));return}
- if(e.target.closest('[data-curl]')){if(!busy)go(target+(sideOf(vp(spread,0))==='right'?1:-1));return}
+$('book').addEventListener('click',e=>{const cu=e.target.closest('[data-curl]');if(cu){if(!busy){const sd=sideOf(vp(spread,0)),d=+cu.dataset.curl;
+  go(target+(d>0?(sd==='right'?1:2):(sd==='left'?-1:-2)))}return}
+ if(PER===1){const pg=e.target.closest('.pg'),sr=$('book').classList.contains('sr');
+  if(pg&&((pg.id==='R'&&!sr)||(pg.id==='L'&&sr))){if(!busy)go(target+(pg.id==='R'?1:-1));return}}
  const a=e.target.closest('.c.add[data-i]');if(a&&!busy){selI=+a.dataset.i;sel=null;return openPick()}
  const c=e.target.closest('.c[data-n]');if(!c||busy)return;sel=+c.dataset.n;selI=+c.dataset.i;$('pf').value='';sheetHead();$('sh').hidden=false;$('pk').scrollTop=0;picker()});
 $('sh').querySelector('.opts').addEventListener('click',e=>{const b=e.target.closest('button[data-s]');if(!b)return;const s=b.dataset.s,en=entry(sel);
@@ -639,15 +705,22 @@ $('pk').addEventListener('click',async e=>{if(e.target.closest('button[data-add]
  const en=entry(n);Object.assign(en,{c:c.id,img:c.custom?'':c.img,set:c.set,no:c.no});if(c.lang!=='en')en.lang=c.lang;else delete en.lang;delete en.p;if(!en.s)en.s='top';save();refresh();sheetHead();
  if(wants[c.id]){delete wants[c.id];saveWants();b.classList.remove('want');const h=b.querySelector('.wh');if(h){h.classList.remove('on');h.textContent='♡'}toast('You have it now – removed from your want list')}
  $('pk').querySelectorAll('button.on').forEach(x=>x.classList.remove('on'));b.classList.add('on');
- try{const p=await priceOf(c.id);if(col[n]&&col[n].c===c.id){if(p!=null)col[n].p=p;save();stats();if(sel===n)sheetHead()}}catch(err){}});
+ delete en.f;delete en.fp;delete en.vars;
+ try{const info={},p=await priceOf(c.id,info);if(col[n]&&col[n].c===c.id){const x=col[n];if(p!=null)x.p=p;
+  if(info.vars&&info.vars.length){x.vars=info.vars;if(info.vars.length===1&&info.vars[0]!=='normal')x.f=info.vars[0]}   // e.g. a holo-only card
+  save();refresh();if(sel===n)sheetHead()}}catch(err){}});
 /* ---------- want list: specific cards you want, across all binders ---------- */
 function saveWants(){ls.set('pb-wants',wants);wbtn()}
-function wbtn(){const k=Object.keys(wants).length;$('wbtn').textContent=k?'♥':'♡';$('wbtn').title=k?`Wants (${k})`:'Wants'}
+function wbtn(){const k=Object.keys(wants).length;$('wbtn').textContent=k?'♥':'♡';$('wbtn').title=k?`Wants (${k}) · Missing & upgrades`:'Wants · Missing & upgrades'}
 function toggleWant(n,id){if(wants[id]){delete wants[id];saveWants();toast('Removed from your want list');return}
  const c=[...customList(n),...(lists[n]||[])].find(x=>x.id===id);if(!c)return;
  wants[id]={n,set:c.set,no:c.no,lang:c.lang||'en',img:c.custom?'':(c.img||''),at:Date.now()};saveWants();toast(`♥ Added to your want list`)}
 let wSel=null,wT;
-function openWants(){closeAll();wSel=null;$('wq').value='';wres();wlist();$('wn').hidden=false}
+let wTab='w';
+function setWTab(t){wTab=t;$('wtab').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+ $('wpane').hidden=t!=='w';$('mpane').hidden=t!=='m';if(t==='m'){$('mph').textContent=binders[bi]?`In your binder “${binders[bi].name}”. Tap a Pokémon to jump to its pocket.`:'';wl()}}
+$('wtab').onclick=e=>{const b=e.target.closest('button[data-t]');if(b)setWTab(b.dataset.t)};
+function openWants(){closeAll();wSel=null;$('wq').value='';wres();wlist();setWTab(wTab);$('wn').hidden=false}
 function wres(){const box=$('wres'),v=$('wq').value.trim().toLowerCase().replace(/^#/,'');
  if(wSel){wPrints();return}
  if(!v){box.innerHTML='';return}
@@ -708,7 +781,7 @@ $('addel').onclick=()=>{const id=adId;if(!id||!confirm('Delete this card? Pocket
 $('shm').addEventListener('click',e=>{if(e.target.closest('[data-edit]')){const en=col[sel];if(en&&isCustom(en.c))openAdd(en.c.slice(7))}});
 
 $('plang').onclick=e=>{const b=e.target.closest('button[data-l]');if(!b)return;opt.lang=b.dataset.l;ls.set('pb-opt',opt);picker()};
-$('pclr').onclick=()=>{const en=col[sel];if(en){delete en.c;delete en.img;delete en.set;delete en.no;delete en.p;delete en.lang;tidy(sel);save();refresh();sheetHead();picker()}};
+$('pclr').onclick=()=>{const en=col[sel];if(en){delete en.c;delete en.img;delete en.set;delete en.no;delete en.p;delete en.lang;delete en.f;delete en.fp;delete en.vars;tidy(sel);save();refresh();sheetHead();picker()}};
 let pfT;$('pf').addEventListener('input',()=>{clearTimeout(pfT);pfT=setTimeout(picker,200)});
 $('shimg').onclick=()=>{$('zmi').src=$('shimg').src;$('zm').hidden=false};
 $('zm').onclick=()=>$('zm').hidden=true;

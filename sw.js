@@ -1,6 +1,6 @@
 // Pokédex Binders service worker: offline app shell + cached card images and card lists.
 // Bump this number on every change: it is also the version shown next to the app title.
-const SHELL = 'pb-shell-v20', IMG = 'pb-img-v1', API = 'pb-api-v1';
+const SHELL = 'pb-shell-v21', IMG = 'pb-img-v1', API = 'pb-api-v1';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './sync.js?v=9', './firebase-config.js', './set-names.js?v=8', './names-intl.json', './art-fill.json'];
 
 self.addEventListener('install', e => {
