@@ -75,10 +75,16 @@ textarea{resize:vertical}
 .book::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:linear-gradient(#0000,#000a,#0000);z-index:3;pointer-events:none}
 .pg,.face{background:var(--page);padding:10px 8px 12px}
 .pg{width:50%}
-.book.one::after{display:none}.book.one .pg.l{width:100%;border-radius:12px}.book.one .pg.r{display:none}
+.book.one::after{display:none}.book.one .pg.l{flex:1;width:auto;min-width:0;border-radius:12px}
+/* the facing page peeks out next to the spine (dimmed); tap it to turn to it */
+.book.one .pg.r{display:flex;flex:0 0 26px;width:26px;padding:10px 0 12px;overflow:hidden;position:relative;cursor:pointer;border-radius:0 12px 12px 0;background:var(--page)}
+.book.one .pg.r .pk{flex:0 0 var(--pw,300px);width:var(--pw,300px);padding:0 8px;opacity:.38;pointer-events:none;filter:saturate(.6)}
+.book.one .pg.r::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#0004,#000a)}
+.book.one.sr .pg.r{order:-1;justify-content:flex-end;border-radius:12px 0 0 12px}
+.book.one.sr .pg.r::after{background:linear-gradient(270deg,#0004,#000a)}
 /* one page at a time: draw the spine on the side it is on in the binder */
-.book.one .pg.l{position:relative;border-radius:12px 3px 3px 12px;padding-right:22px;background:var(--page)}
-.book.one.sr .pg.l{border-radius:3px 12px 12px 3px;padding-right:7px;padding-left:22px}
+.book.one .pg.l{position:relative;border-radius:12px 0 0 12px;padding-right:22px;background:var(--page)}
+.book.one.sr .pg.l{border-radius:0 12px 12px 0;padding-right:7px;padding-left:22px}
 /* binder spine with rings, on the edge where the page is held */
 .book.one .pg.l::after{content:"";position:absolute;top:0;bottom:0;right:0;width:15px;border-radius:0 3px 3px 0;
  background:radial-gradient(circle at 50% 50%,#8b9099 0 3px,#3a3e47 3.5px 4.5px,transparent 5px) 50% 12%/15px 38% repeat-y,linear-gradient(90deg,#0d0e11,#191b20)}
@@ -474,11 +480,15 @@ function cell(n,i){if(!n)return `<div class="c e add" data-i="${i}" title="Add a
 const sideOf=i=>(i+(binders[bi]&&binders[bi].right?1:0))%2===0?'left':'right';   // where page i sits in the real binder
 function page(i){const p=P[i];if(!p)return i<0?'<div class="cover">Inside cover</div>':'';
  const sz=SZ(),[cols]=SIZES[sz],c=p.it.map((n,k)=>cell(n,i*sz+k)).join('');
- return `<div class="g${p.g}" style="--cols:${cols};--k:${cols>3?(cols>4?.75:.85):1}"><div class="h"><span class="hl">Page ${p.n}${PER===1?`<span class="side" title="Side of the binder">${sideOf(i)==='left'?'◧ Left':'Right ◨'}</span>`:''}</span>${p.g?`<small>Gen ${p.g}</small>`:''}</div><div class="g">${c}</div></div>`}
+ return `<div class="g${p.g}" style="--cols:${cols};--k:${cols>3?(cols>4?.75:.85):1}"><div class="h"><span class="hl">Page ${p.n}${PER===1?`<span class="side" title="Side of the binder">${sideOf(i)==='left'?'◧ Left page':'Right page ◨'}</span>`:''}</span>${p.g?`<small>Gen ${p.g}</small>`:''}</div><div class="g">${c}</div></div>`}
 function show(){if(!binders.length){$('L').innerHTML=$('R').innerHTML='';$('pi').textContent='';return}
  requestAnimationFrame(fitBook);
  $('book').classList.toggle('sr',PER===1&&sideOf(vp(spread,0))==='right');
- $('book').classList.toggle('one',PER===1);$('L').innerHTML=page(vp(spread,0));$('R').innerHTML=PER===1?'':page(vp(spread,1));
+ $('book').classList.toggle('one',PER===1);$('L').innerHTML=page(vp(spread,0));
+ if(PER===1){const i=vp(spread,0),fi=sideOf(i)==='right'?i-1:i+1;          // the facing page, for the peek strip
+  $('R').innerHTML=`<div class="pk">${fi>=0&&fi<P.length?page(fi):''}</div>`;$('R').title=fi>=0&&fi<P.length?`Page ${fi+1}`:'';
+  $('R').style.setProperty('--pw',($('L').offsetWidth||300)+'px')}
+ else{$('R').innerHTML=page(vp(spread,1));$('R').title=''}
  const vis=[...Array(PER).keys()].map(k=>vp(spread,k)).filter(i=>P[i]);if(PER===1||!vis.includes(lastPg))lastPg=vis[0]??0;
  $('pi').textContent=vis.length>1?`Pages ${vis[0]+1}–${vis[1]+1} of ${P.length}`:`Page ${(vis[0]??0)+1} of ${P.length}`;$('pv').disabled=spread==0;$('nx').disabled=spread==S-1;ensureDefaults(spread)}
 function nums(b=bi){return binders[b]?[...new Set(binders[b].slots.filter(Boolean))]:[]}
@@ -534,11 +544,12 @@ function fitBook(){const bk=$('book');if(!binders.length)return;
  const avail=H-top-navH-14;                                        // room left for the page itself
  const over=10+12+30;                                               // page padding + "Page N" header
  const cardH=(avail-over-(rows-1)*gap)/rows,cardW=cardH*63/88;
- const padX=PER===1?30:15,pageW=cols*cardW+(cols-1)*gap+padX;
+ const padX=PER===1?30+26:15,pageW=cols*cardW+(cols-1)*gap+padX;
  let w=Math.round(Math.max(240,Math.min(900,pageW*PER)));bk.style.maxWidth=w+'px';
  // measure the result and shrink once if the arrows still fall below the screen
  const over2=nav.getBoundingClientRect().bottom+scrollY-(H-8),bh=bk.offsetHeight;
- if(over2>0&&bh>0){w=Math.round(Math.max(240,w*(bh-over2)/bh));bk.style.maxWidth=w+'px'}}
+ if(over2>0&&bh>0){w=Math.round(Math.max(240,w*(bh-over2)/bh));bk.style.maxWidth=w+'px'}
+ if(PER===1)$('R').style.setProperty('--pw',$('L').offsetWidth+'px')}
 addEventListener('resize',fitBook);
 $('pv').onclick=()=>go(target-1);$('nx').onclick=()=>go(target+1);
 let tx=null;$('book').addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
@@ -595,7 +606,8 @@ async function picker(){const n=sel,box=$('pk');box.innerHTML=addTile+customList
   box.innerHTML=addTile+(a.length?a.map(c=>tile(c,e)).join(''):`<div class="msg">${f||lg?'No prints match that filter':'No prints found'}</div>`)
    +(hid?`<div class="msg">${hid} print${hid>1?'s':''} without a picture hidden · <button class="lnk" data-shownopic="1" style="padding:0">Show them</button></div>`:'')}
  catch(err){if(sel===n)box.innerHTML=addTile+customList(n).map(c=>tile(c,col[n]||{})).join('')+'<div class="msg">Couldn’t load prints — check your connection.</div>'}}
-$('book').addEventListener('click',e=>{const a=e.target.closest('.c.add[data-i]');if(a&&!busy){selI=+a.dataset.i;sel=null;return openPick()}
+$('book').addEventListener('click',e=>{if(PER===1&&e.target.closest('#R')){if(!busy)go(target+($('book').classList.contains('sr')?-1:1));return}
+ const a=e.target.closest('.c.add[data-i]');if(a&&!busy){selI=+a.dataset.i;sel=null;return openPick()}
  const c=e.target.closest('.c[data-n]');if(!c||busy)return;sel=+c.dataset.n;selI=+c.dataset.i;$('pf').value='';sheetHead();$('sh').hidden=false;$('pk').scrollTop=0;picker()});
 $('sh').querySelector('.opts').addEventListener('click',e=>{const b=e.target.closest('button[data-s]');if(!b)return;const s=b.dataset.s,en=entry(sel);
  if((en.s||'')!==s){if(s)en.s=s;else delete en.s;tidy(sel);save();refresh();sheetHead()}});
