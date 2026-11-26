@@ -96,6 +96,14 @@ textarea{resize:vertical}
 .book.one .pg.r::after{left:0;background:radial-gradient(circle at 50% 50%,#8b9099 0 3px,#3a3e47 3.5px 4.5px,transparent 5px) 50% 12%/15px 38% repeat-y,linear-gradient(270deg,#0d0e11,#191b20)}
 .book.one:not(.sr) .pg.r,.book.one.sr .pg.l{filter:brightness(.5) saturate(.7)}   /* the page that only peeks out */
 .book.one .pg .blank{height:100%}
+/* the sheet being turned: its front is the page you leave, its back the page you land on */
+.book.one .leaf{visibility:hidden;transform-style:preserve-3d;will-change:transform}
+.book.one .leaf .face{background:var(--page)}
+.book.one .leaf.one-f .face.front,.book.one .leaf.one-b .face.back{border-radius:0 12px 12px 0;padding:10px 8px 12px 22px}
+.book.one .leaf.one-f .face.back,.book.one .leaf.one-b .face.front{border-radius:12px 0 0 12px;padding:10px 22px 12px 8px}
+.book.one .leaf .face::after{content:"";position:absolute;top:0;bottom:0;width:15px;pointer-events:none}
+.book.one .leaf.one-f .face.front::after,.book.one .leaf.one-b .face.back::after{left:0;background:radial-gradient(circle at 50% 50%,#8b9099 0 3px,#3a3e47 3.5px 4.5px,transparent 5px) 50% 12%/15px 38% repeat-y,linear-gradient(270deg,#0d0e11,#191b20)}
+.book.one .leaf.one-f .face.back::after,.book.one .leaf.one-b .face.front::after{right:0;background:radial-gradient(circle at 50% 50%,#8b9099 0 3px,#3a3e47 3.5px 4.5px,transparent 5px) 50% 12%/15px 38% repeat-y,linear-gradient(90deg,#0d0e11,#191b20)}
 /* foil: holo shines on the artwork, reverse holo on everything but the artwork */
 .foil{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;mix-blend-mode:color-dodge;opacity:.6;
  background-size:260% 260%;animation:foil 7s ease-in-out infinite alternate}
@@ -104,7 +112,8 @@ textarea{resize:vertical}
  linear-gradient(115deg,transparent 20%,#ff4fa3 34%,#4fc4ff 50%,#a94fff 64%,transparent 80%);background-size:7px 7px,13px 13px,23px 23px,260% 260%}
 .foil.sparkle{background-image:repeating-linear-gradient(55deg,#fff5 0 1.5px,transparent 1.5px 7px),repeating-linear-gradient(-35deg,#fff3 0 1px,transparent 1px 9px),
  linear-gradient(115deg,transparent 20%,#ffd34f 36%,#4fff9a 48%,#4fc4ff 60%,transparent 78%);background-size:auto,auto,260% 260%}
-.foil.holo{clip-path:inset(11% 8% 47% 8%)}
+.foil.holo{clip-path:inset(11% 8% 47% 8%)}.foil.full{clip-path:none}
+.foil.gold{background-image:linear-gradient(115deg,transparent 15%,#ffe7a0 30%,#ffc94a 40%,#fff4cc 50%,#e2a93c 60%,transparent 78%);mix-blend-mode:overlay;opacity:.75}
 .foil.reverse{clip-path:polygon(evenodd,0 0,100% 0,100% 100%,0 100%,0 0,8% 11%,92% 11%,92% 53%,8% 53%,8% 11%)}
 @keyframes foil{from{background-position:0 0,0 0,0 0,0% 0%}to{background-position:0 0,0 0,0 0,100% 100%}}
 @media (prefers-reduced-motion:reduce){.foil{animation:none}}
@@ -485,8 +494,18 @@ function ensureDefaults(sp){
   finally{pending.delete(n)}});
 }
 const varsOf=d=>{const v=d&&d.variants||{};return ['normal','holo','reverse'].filter(k=>v[k])};
+// How the foil sits on a card, by rarity (TCGdex names): the whole card, or the artwork only (classic holo)
+const RAR_FULL={'Illustration rare':'sparkle','Special illustration rare':'sparkle','Shiny rare':'sparkle','Shiny rare V':'sparkle','Shiny rare VMAX':'sparkle','Shiny Ultra Rare':'sparkle',
+ 'Hyper rare':'gold','Mega Hyper Rare':'gold','Ultra Rare':'rainbow','Full Art Trainer':'rainbow','Secret Rare':'rainbow','Double rare':'rainbow',
+ 'Holo Rare V':'rainbow','Holo Rare VMAX':'rainbow','Holo Rare VSTAR':'rainbow','Radiant Rare':'cosmos','Amazing Rare':'rainbow','ACE SPEC Rare':'rainbow',
+ 'Rare Holo LV.X':'rainbow','Rare PRIME':'rainbow','LEGEND':'rainbow','Black White Rare':'rainbow','Mega Attack Rare':'rainbow'};
+const RAR_HOLO=new Set(['Holo Rare','Rare Holo','Classic Collection']);
+function autoFinish(x){   // set the finish a print can only have; x: the collection entry
+ if(RAR_FULL[x.rar]){x.f='full';x.fp=RAR_FULL[x.rar];return}
+ if(RAR_HOLO.has(x.rar)&&!(x.vars||[]).includes('normal')){x.f='holo';return}
+ if(x.vars&&x.vars.length===1&&x.vars[0]!=='normal')x.f=x.vars[0]}
 async function priceOf(id,info){if(isCustom(id))return null;const [l,raw]=splitId(id);
- const d=await getJSON(`${TCG}/${l}/cards/${encodeURIComponent(raw)}`);if(info)info.vars=varsOf(d);
+ const d=await getJSON(`${TCG}/${l}/cards/${encodeURIComponent(raw)}`);if(info){info.vars=varsOf(d);info.rar=d.rarity||''}
  if(l!=='en')return null; // Cardmarket prices only exist for English prints
  const cm=d.pricing&&d.pricing.cardmarket;if(!cm)return null;
  const v=d.variants||{};const holoOnly=v.holo&&!v.normal;
@@ -502,7 +521,7 @@ function cell(n,i){if(!n)return `<div class="c e add" data-i="${i}" title="Add a
  const cls='c'+(s?' '+s:' no')+(img?' im':'')+(hits.has(n)?' hit':'');
  const badge=s==='top'?'<i>★</i>':s==='decent'?'<i>↻</i>':'';
  const inner=img?`<img src="${esc(pic(img,'low'))}" alt="${esc(nm)}" loading="lazy" decoding="async">`:`<b>#${pad(n)}</b><span>${esc(nm)}</span>${e.c?`<small class="ps">${e.lang&&e.lang!=='en'?LTAG[e.lang]+' · ':''}${esc(setEn(e.set,e.c))} ${esc(e.no||'')}</small>`:''}`;
- const foil=img&&e.c&&(e.f==='holo'||e.f==='reverse')?`<b class="foil ${e.f} ${e.fp||'rainbow'}"></b>`:'';
+ const foil=img&&e.c&&(e.f==='holo'||e.f==='reverse'||e.f==='full')?`<b class="foil ${e.f} ${e.fp||'rainbow'}"></b>`:'';
  return `<div class="${cls}" data-n="${n}" data-i="${i}" data-l="#${pad(n)} ${esc(nm)}">${inner}${foil}${badge}</div>`}
 const sideOf=i=>(i+(binders[bi]&&binders[bi].right?1:0))%2===0?'left':'right';   // where page i sits in the real binder
 function page(i){const p=P[i];if(!p)return i<0?'<div class="cover">Inside cover</div>':'';
@@ -540,8 +559,9 @@ function refresh(){if(!busy)show();else idle().then(()=>{if(!busy)show()});stats
 
 /* ---------- page flipping ---------- */
 function flip(dir,ms){if(PER===1){const m=moveKind(dir);   // phone: slide across the spread, or turn the sheet over
-  const st={dir,phase:0},dur=m==='turn'?Math.max(180,Math.min(ms,620)):Math.max(140,Math.min(ms,300));
-  return tween(0,1,dur,p=>m==='turn'?turnTo(st,p):slideTo(dir,p)).then(()=>{if(m==='slide'){spread+=dir;show()}else endTurn()})}
+  const dur=m==='turn'?Math.max(160,Math.min(ms,520)):Math.max(120,Math.min(ms,260));
+  if(m==='slide')return tween(0,1,dur,p=>slideTo(dir,p)).then(()=>{spread+=dir;show()});
+  const st=turnStart(dir);return tween(0,1,dur,p=>turnTo(st,p)).then(()=>turnEnd(st,true))}
  return new Promise(res=>{const F=$('F'),nx=spread+dir;
  F.className='leaf '+(dir>0?'f':'b');F.style.transition='none';F.style.transform='rotateY(0deg)';F.style.visibility='visible';
  if(dir>0){$('FF').innerHTML=page(vp(spread,1));$('FB').innerHTML=page(vp(nx,0));$('R').innerHTML=page(vp(nx,1))}
@@ -568,16 +588,24 @@ const focusTx=sd=>sd==='left'?0:-(oneW()-PEEK);
 function setTx(px){$('book').style.setProperty('--tx',px+'px')}
 function moveKind(dir){const sd=sideOf(vp(spread,0));return (dir>0&&sd==='right')||(dir<0&&sd==='left')?'turn':'slide'}
 function slideTo(dir,p){const a=dir>0?0:-(oneW()-PEEK),b=dir>0?-(oneW()-PEEK):0;setTx(a+(b-a)*p)}
-function turnTo(st,p){   // st.dir: +1 forward (turn a right page), -1 back (turn a left page); p: 0..1
- if(p>=.5&&st.phase===0){spread+=st.dir;show();st.phase=1}
- else if(p<.5&&st.phase===1){spread-=st.dir;show();st.phase=0}
- const fwd=st.dir>0;
- if(st.phase===0){const el=fwd?$('R'):$('L');el.style.transformOrigin=fwd?'left center':'right center';
-  el.style.setProperty('--ry',(fwd?-1:1)*180*p+'deg');el.style.filter=`brightness(${1-.6*p*2})`}
- else{const el=fwd?$('L'):$('R');el.style.transformOrigin=fwd?'right center':'left center';
-  el.style.setProperty('--ry',(fwd?1:-1)*180*(1-p)+'deg');el.style.filter=`brightness(${1-.6*(1-p)*2})`}}
-function endTurn(){for(const el of [$('L'),$('R')]){el.style.removeProperty('--ry');el.style.transformOrigin='';el.style.filter=''}}
-const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+// Turning a sheet, like a real binder: the sheet stays hinged at the spine. Its front is the page you leave,
+// its back the page you land on, the page underneath is already in place, and the view follows the sheet over.
+const blank='<div class="blank"></div>';
+function turnStart(dir){const i=vp(spread,0),lp=sideOf(i)==='left'?i:i-1,W=oneW(),F=$('F');
+ const st={dir,W,tx0:dir>0?-(W-PEEK):0,tx1:dir>0?0:-(W-PEEK)};
+ if(dir>0){$('FF').innerHTML=page(lp+1)||blank;$('FB').innerHTML=page(lp+2)||blank;$('R').innerHTML=page(lp+3)||blank}   // right page turns forward
+ else{$('FF').innerHTML=page(lp)||blank;$('FB').innerHTML=page(lp-1)||blank;$('L').innerHTML=page(lp-2)||blank}         // left page turns back
+ F.className='leaf '+(dir>0?'one-f':'one-b');F.style.left=(dir>0?W:0)+'px';F.style.width=W+'px';
+ F.style.transformOrigin=dir>0?'left center':'right center';F.style.transition='none';F.style.visibility='visible';
+ turnTo(st,0);return st}
+function turnTo(st,p){const a=(st.dir>0?-180:180)*p,tx=st.tx0+(st.tx1-st.tx0)*p,F=$('F'),back=Math.abs(a)>90;
+ setTx(tx);F.style.transform=`translateX(${tx}px) rotateY(${a}deg)`;
+ $('FF').style.visibility=back?'hidden':'visible';$('FB').style.visibility=back?'visible':'hidden';
+ $('FF').style.filter=`brightness(${1-.55*Math.min(1,p*2)})`;$('FB').style.filter=`brightness(${.45+.55*Math.max(0,p*2-1)})`}
+function turnEnd(st,done){const F=$('F');F.style.visibility='hidden';F.style.transform='';F.style.left='';F.style.width='';F.className='leaf';
+ for(const el of [$('FF'),$('FB')]){el.style.visibility='';el.style.filter='';el.innerHTML=''}
+ if(done)spread+=st.dir;show()}
+const ease=t=>1-Math.pow(1-t,3);   // starts at finger speed, settles softly
 function tween(from,to,ms,fn){return new Promise(res=>{const t0=performance.now();
  const step=now=>{const k=Math.min(1,(now-t0)/ms);fn(from+(to-from)*ease(k));k<1?requestAnimationFrame(step):res()};requestAnimationFrame(step)})}
 // load the pictures of the neighbouring spreads before you get there
@@ -590,15 +618,16 @@ $('book').addEventListener('pointerdown',e=>{if(PER!==1||busy||e.button>0||e.tar
 $('book').addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
  if(!drag.mode){if(Math.abs(dx)<8)return;if(Math.abs(dy)>Math.abs(dx)){drag=null;return}
   const dir=dx<0?1:-1,ok=dir>0?spread<S-1:spread>0;if(!ok){drag=null;return}
-  drag.dir=dir;drag.mode=moveKind(dir);drag.st={dir,phase:0};busy=true;target=spread;
+  drag.dir=dir;drag.mode=moveKind(dir);busy=true;target=spread;if(drag.mode==='turn')drag.st=turnStart(dir);
   try{$('book').setPointerCapture(e.pointerId)}catch(_){}}
- const dist=drag.mode==='turn'?oneW():oneW()-PEEK;drag.p=Math.max(0,Math.min(1,-drag.dir*dx/dist));
- drag.v=-drag.dir*dx/Math.max(1,performance.now()-drag.t);
+ const dist=drag.mode==='turn'?oneW()*.62:(oneW()-PEEK)*.8;drag.p=Math.max(0,Math.min(1,-drag.dir*dx/dist));
+ const now=performance.now();drag.v=-drag.dir*(e.clientX-(drag.lx??drag.x))/Math.max(1,now-(drag.lt??drag.t));drag.lx=e.clientX;drag.lt=now;   // speed of the last move
  drag.mode==='turn'?turnTo(drag.st,drag.p):slideTo(drag.dir,drag.p)});
-function dragEnd(){if(!drag)return;const d=drag;drag=null;if(!d.mode)return;noClick=true;setTimeout(()=>noClick=false,0);
- const done=d.p>(d.mode==='turn'?.35:.3)||d.v>.5,to=done?1:0,ms=Math.max(90,(d.mode==='turn'?520:280)*Math.abs(to-d.p));
+function dragEnd(){if(!drag)return;const d=drag;drag=null;if(!d.mode)return;if(performance.now()-(d.lt||d.t)>120)d.v=0;   // paused before letting go: not a flick
+ noClick=true;setTimeout(()=>noClick=false,0);
+ const done=d.v>.25||(d.v>-.25&&d.p>.22),to=done?1:0,ms=Math.max(80,(d.mode==='turn'?380:220)*Math.abs(to-d.p));
  tween(d.p,to,ms,p=>d.mode==='turn'?turnTo(d.st,p):slideTo(d.dir,p)).then(()=>{
-  if(d.mode==='slide'){if(done)spread+=d.dir;show()}else{endTurn();if(!done&&d.st.phase===1){spread-=d.dir;show()}}
+  if(d.mode==='slide'){if(done)spread+=d.dir;show()}else turnEnd(d.st,done);
   target=spread;busy=false;if(binders[bi])mem[binders[bi].id]=Math.max(0,vp(spread,0));ls.set('pb-mem2',mem)})}
 $('book').addEventListener('pointerup',dragEnd);$('book').addEventListener('pointercancel',dragEnd);
 $('book').addEventListener('click',e=>{if(noClick){e.stopPropagation();e.preventDefault();noClick=false}},true);
@@ -666,11 +695,13 @@ function sheetHead(){const n=sel,e=col[n]||{},img=imgOf(n);
  const im=$('shimg');if(img){im.src=pic(img,'high');im.hidden=false}else im.hidden=true;
  $('shm').innerHTML=e.c?`${isCustom(e.c)?'<i class="lt cu">Custom</i>':''}${e.lang&&e.lang!=='en'?`<i class="lt">${LTAG[e.lang]||''}</i>`:''}${esc(setEn(e.set,e.c))} · #${esc(e.no||'')}${img?'':' · no picture'}${isCustom(e.c)?' <button class="lnk" data-edit="1">Edit</button>':''}${e.p!=null?`<br>Cardmarket trend: <b>${eur(e.p)}</b>`:''}`:(defs[n]&&defs[n].img?'Showing default art — pick your print below':'');
  $('sh').querySelectorAll('.opts button').forEach(b=>b.classList.toggle('on',(b.dataset.s||'')===(e.s||'')));
- const fo=$('shfoil'),foilOn=!!(img&&e.c&&(e.f==='holo'||e.f==='reverse'));fo.hidden=!foilOn;fo.className='foil '+(foilOn?e.f+' '+(e.fp||'rainbow'):'');
+ const fo=$('shfoil'),foilOn=!!(img&&e.c&&(e.f==='holo'||e.f==='reverse'||e.f==='full'));fo.hidden=!foilOn;fo.className='foil '+(foilOn?e.f+' '+(e.fp||'rainbow'):'');
  $('fin').hidden=!e.c||isCustom(e.c);if(!e.c||isCustom(e.c))return;
- const av=e.vars&&e.vars.length?e.vars:['normal','holo','reverse'],F={normal:'Normal',holo:'✦ Holo',reverse:'✧ Reverse holo'};
- $('finv').innerHTML=['normal','holo','reverse'].filter(k=>av.includes(k)).map(k=>`<button data-f="${k}" class="${(e.f||'normal')===k?'on':''}">${F[k]}</button>`).join('');
- $('finp').hidden=!foilOn;$('finp').innerHTML=foilOn?[['rainbow','Rainbow'],['cosmos','Cosmos'],['sparkle','Sparkle']].map(([k,t])=>`<button data-fp="${k}" class="${(e.fp||'rainbow')===k?'on':''}">${t}</button>`).join(''):''}
+ $('fin').title=e.rar?'Rarity: '+e.rar:'';
+ const av=e.vars&&e.vars.length?[...e.vars]:['normal','holo','reverse'],F={normal:'Normal',holo:'✦ Holo',reverse:'✧ Reverse',full:'✦ Full card'};
+ if(RAR_FULL[e.rar]||av.includes('holo'))av.push('full');
+ $('finv').innerHTML=['normal','holo','reverse','full'].filter(k=>av.includes(k)).map(k=>`<button data-f="${k}" class="${(e.f||'normal')===k?'on':''}">${F[k]}</button>`).join('');
+ $('finp').hidden=!foilOn;$('finp').innerHTML=foilOn?[['rainbow','Rainbow'],['cosmos','Cosmos'],['sparkle','Sparkle'],['gold','Gold']].map(([k,t])=>`<button data-fp="${k}" class="${(e.fp||'rainbow')===k?'on':''}">${t}</button>`).join(''):''}
 $('fin').addEventListener('click',ev=>{const en=col[sel];if(!en||!en.c)return;const b=ev.target.closest('[data-f],[data-fp]');if(!b)return;
  if(b.dataset.f){if(b.dataset.f==='normal')delete en.f;else en.f=b.dataset.f}else en.fp=b.dataset.fp;
  save();refresh();sheetHead()});
@@ -705,9 +736,9 @@ $('pk').addEventListener('click',async e=>{if(e.target.closest('button[data-add]
  const en=entry(n);Object.assign(en,{c:c.id,img:c.custom?'':c.img,set:c.set,no:c.no});if(c.lang!=='en')en.lang=c.lang;else delete en.lang;delete en.p;if(!en.s)en.s='top';save();refresh();sheetHead();
  if(wants[c.id]){delete wants[c.id];saveWants();b.classList.remove('want');const h=b.querySelector('.wh');if(h){h.classList.remove('on');h.textContent='♡'}toast('You have it now – removed from your want list')}
  $('pk').querySelectorAll('button.on').forEach(x=>x.classList.remove('on'));b.classList.add('on');
- delete en.f;delete en.fp;delete en.vars;
+ delete en.f;delete en.fp;delete en.vars;delete en.rar;
  try{const info={},p=await priceOf(c.id,info);if(col[n]&&col[n].c===c.id){const x=col[n];if(p!=null)x.p=p;
-  if(info.vars&&info.vars.length){x.vars=info.vars;if(info.vars.length===1&&info.vars[0]!=='normal')x.f=info.vars[0]}   // e.g. a holo-only card
+  if(info.vars&&info.vars.length)x.vars=info.vars;if(info.rar)x.rar=info.rar;autoFinish(x);   // e.g. an Illustration rare: foil on the whole card
   save();refresh();if(sel===n)sheetHead()}}catch(err){}});
 /* ---------- want list: specific cards you want, across all binders ---------- */
 function saveWants(){ls.set('pb-wants',wants);wbtn()}
@@ -781,7 +812,7 @@ $('addel').onclick=()=>{const id=adId;if(!id||!confirm('Delete this card? Pocket
 $('shm').addEventListener('click',e=>{if(e.target.closest('[data-edit]')){const en=col[sel];if(en&&isCustom(en.c))openAdd(en.c.slice(7))}});
 
 $('plang').onclick=e=>{const b=e.target.closest('button[data-l]');if(!b)return;opt.lang=b.dataset.l;ls.set('pb-opt',opt);picker()};
-$('pclr').onclick=()=>{const en=col[sel];if(en){delete en.c;delete en.img;delete en.set;delete en.no;delete en.p;delete en.lang;delete en.f;delete en.fp;delete en.vars;tidy(sel);save();refresh();sheetHead();picker()}};
+$('pclr').onclick=()=>{const en=col[sel];if(en){delete en.c;delete en.img;delete en.set;delete en.no;delete en.p;delete en.lang;delete en.f;delete en.fp;delete en.vars;delete en.rar;tidy(sel);save();refresh();sheetHead();picker()}};
 let pfT;$('pf').addEventListener('input',()=>{clearTimeout(pfT);pfT=setTimeout(picker,200)});
 $('shimg').onclick=()=>{$('zmi').src=$('shimg').src;$('zm').hidden=false};
 $('zm').onclick=()=>$('zm').hidden=true;
@@ -886,6 +917,10 @@ $('cc').onclick=async()=>{try{await caches.delete('pb-img-v1');toast('Image cach
 
 /* ---------- start ---------- */
 note('Saved on this device');show();stats();
+setTimeout(async()=>{const todo=Object.entries(col).filter(([,x])=>x.c&&!isCustom(x.c)&&x.rar==null);let k=0;
+ const worker=async()=>{while(k<todo.length){const [n,x]=todo[k++];try{const info={};await priceOf(x.c,info);if(col[n]!==x||x.rar!=null)continue;
+  x.rar=info.rar||'';if(info.vars&&info.vars.length)x.vars=info.vars;if(!x.f)autoFinish(x)}catch(e){}}};
+ if(todo.length){await Promise.all([worker(),worker(),worker()]);save();refresh()}},2500);
 // Version label: the number in sw.js (pb-shell-vN), the single place it is bumped. Changes when an update arrives.
 fetch('sw.js',{cache:'no-cache'}).then(r=>r.text()).then(t=>{const m=t.match(/pb-shell-v(\d+)/);if(m){$('ver').textContent='v'+m[1];$('ver').hidden=false}}).catch(()=>{});artFill().then(()=>refresh());if(!binders.length)openNew(true);
 /* bridge for sync.js: read the state, or replace it with the cloud copy without re-uploading it */
