@@ -36,12 +36,16 @@ p.s{margin-top:2px;margin-bottom:12px;color:var(--mut);font-size:.85rem}
 .tabs button{flex:1;min-width:76px;border:0;background:transparent;color:var(--mut);padding:8px 6px;border-radius:var(--r2);font-size:.9rem;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;white-space:nowrap}
 .tabs button small{font-size:.75rem;font-weight:500;opacity:.8;font-variant-numeric:tabular-nums}
 .tabs button.on{background:var(--on);color:var(--tx);box-shadow:0 1px 2px #0006}
-.search{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.fab{position:fixed;right:calc(16px + env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;border:0;background:var(--tx);color:#111;box-shadow:0 6px 18px #000a;z-index:15;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.fab svg{width:24px;height:24px}.fab .x{display:none;font-size:1.3rem;font-weight:700}.fab.on{background:#33363e;color:var(--tx)}.fab.on svg{display:none}.fab.on .x{display:block}
+.sp{position:fixed;left:12px;right:12px;bottom:calc(86px + env(safe-area-inset-bottom));max-width:560px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;box-shadow:0 10px 30px #000b;z-index:15;display:flex;flex-direction:column;gap:6px}
+.sp[hidden]{display:none}.sp .sr2{display:flex;gap:8px}.sp .sr2 .btn{flex:0 0 auto;margin:0}
+body{padding-bottom:calc(96px + env(safe-area-inset-bottom))!important}
 input[type=search],input[type=text],input[type=number],textarea,select{font:inherit;font-size:1rem;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r2);width:100%;background:var(--card);color:var(--tx);transition:border-color .15s,box-shadow .15s}
 input:focus,textarea:focus,select:focus{border-color:var(--acc);box-shadow:0 0 0 3px #9cc3ff33}
 textarea{resize:vertical}
 ::placeholder{color:var(--dim)}
-#r{color:var(--mut);font-size:.85rem;min-height:1.2em}
+#r{color:var(--mut);font-size:.85rem;padding:0 4px}#r:empty{display:none}
 .stats{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:.85rem;margin:-4px auto 12px;font-variant-numeric:tabular-nums}
 .pill{padding:3px 10px;border-radius:999px;background:var(--card);border:1px solid var(--line)}
 .pill.t{border-color:#3fbf7288;color:#7fcf9c}.pill.d{border-color:#f0a03a88;color:#f2b866}
@@ -153,7 +157,7 @@ details.wl[open] summary::after{transform:rotate(90deg)}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chips button{font-size:.78rem;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--cell);cursor:pointer}
 .chips.d button{border-color:var(--dec);background:var(--decbg)}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--tx);color:#111;padding:10px 16px;border-radius:999px;font-size:.85rem;font-weight:500;z-index:40;box-shadow:0 6px 20px #0009;animation:toast .25s var(--ease);max-width:calc(100% - 32px)}
+.toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--tx);color:#111;padding:10px 16px;border-radius:999px;font-size:.85rem;font-weight:500;z-index:40;box-shadow:0 6px 20px #0009;animation:toast .25s var(--ease);max-width:calc(100% - 32px)}
 @keyframes toast{from{opacity:0;transform:translate(-50%,10px)}}
 .toast[hidden]{display:none}
 .tabs.fr{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 48px),#0000);mask-image:linear-gradient(90deg,#000 calc(100% - 48px),#0000)}
@@ -194,7 +198,8 @@ a{color:var(--acc)}
 <div class="top"><h1>Pokédex Binders <span class="ver" id="ver" title="App version" hidden></span></h1><button class="icon wb" id="wbtn" aria-label="Wants" title="Wants">♡</button><button class="icon" id="gear" aria-label="Settings">⚙︎</button></div>
 <p class="s"><span id="sub"></span><button class="lnk" id="bset" hidden>⚙︎ Binder settings</button></p>
 <div class="tabs" id="tabs"></div>
-<div class="search"><input id="q" type="search" placeholder="Search name or #number, then press Enter" enterkeyhint="search" autocomplete="off"><div id="r"></div></div>
+<button class="fab" id="fab" aria-label="Search" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg><span class="x">✕</span></button>
+<div class="sp" id="sp" hidden><div class="sr2"><input id="q" type="search" placeholder="Pokémon name or #number" enterkeyhint="search" autocomplete="off"><button class="btn pri" id="qgo">Search</button></div><div id="r"></div></div>
 <div class="stats" id="st"></div>
 <div class="book" id="book"><div class="pg l" id="L"></div><div class="pg r" id="R"></div>
 <div class="leaf" id="F"><div class="face front" id="FF"></div><div class="face back" id="FB"></div></div></div>
@@ -370,7 +375,7 @@ let spread=Math.min(binders[bi]?pv(mem[binders[bi].id]||0):0,S-1),target=spread,
 function saveBinders(){ls.set('pb-binders',binders)}
 let saveT;
 function save(){clearTimeout(saveT);saveT=setTimeout(()=>{ls.set('pb-col',col);note('Saved on this device ✓')},300)}
-function toast(t){const e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(e._t);e._t=setTimeout(()=>e.hidden=true,2600)}
+function toast(t,ms=2600){const e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(e._t);e._t=setTimeout(()=>e.hidden=true,ms)}
 let nt0='';function note(t){nt0=t;const e=$('sv');if(e)e.textContent=t}
 
 /* ---------- card data (TCGdex) ---------- */
@@ -507,11 +512,18 @@ function search(){
  r.textContent=(found.length>1?found.length+' matches · first: ':'')+`Page ${pn}, row ${Math.floor(f.k/f.cols)+1}, slot ${f.k%f.cols+1}`+d;
  cur={b:f.b,pn};lastPg=f.pi;if(other)setBinder(f.b,f.pi);else setTimeout(()=>go(pv(f.pi)),350)}
 MQ.addEventListener('change',async()=>{target=spread;await idle();const vis=[vp(spread,0),vp(spread,1)];const pg=PER===2&&vis.includes(lastPg)?lastPg:Math.max(0,vp(spread,0));PER=MQ.matches?1:2;layout();spread=target=Math.min(pv(pg),S-1);show()});
-$('q').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('q').blur();search()}});
+/* search lives behind the floating 🔍 button */
+function openSearch(){$('q').value='';hits=new Set();$('r').textContent='';if(!busy)show();$('sp').hidden=false;$('fab').classList.add('on');$('fab').setAttribute('aria-label','Close search');setTimeout(()=>$('q').focus(),30)}
+function closeSearch(){$('sp').hidden=true;$('fab').classList.remove('on');$('fab').setAttribute('aria-label','Search')}
+function runSearch(){if(!$('q').value.trim())return;$('q').blur();search();const t=$('r').textContent;
+ if(t&&t!=='No match'){closeSearch();toast(t,5000)}}
+$('fab').onclick=()=>$('sp').hidden?openSearch():closeSearch();
+$('qgo').onclick=runSearch;
+$('q').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();runSearch()}if(e.key==='Escape')closeSearch()});
 $('q').addEventListener('focus',()=>{if(!$('q').value&&!hits.size)return;$('q').value='';hits=new Set();$('r').textContent='';if(!busy)show()});
 $('q').addEventListener('input',()=>{if(!$('q').value){hits=new Set();$('r').textContent='';if(!busy)show()}});
 $('wl').addEventListener('toggle',()=>{if($('wl').open)wl()});
-$('wlc').addEventListener('click',e=>{const b=e.target.closest('button[data-n]');if(!b)return;$('q').value='#'+b.dataset.n;search()});
+$('wlc').addEventListener('click',e=>{const b=e.target.closest('button[data-n]');if(!b)return;$('q').value='#'+b.dataset.n;search();if($('r').textContent)toast($('r').textContent,5000)});
 
 /* ---------- card sheet ---------- */
 function entry(n){return col[n]||(col[n]={})}
@@ -621,7 +633,7 @@ $('pclr').onclick=()=>{const en=col[sel];if(en){delete en.c;delete en.img;delete
 let pfT;$('pf').addEventListener('input',()=>{clearTimeout(pfT);pfT=setTimeout(picker,200)});
 $('shimg').onclick=()=>{$('zmi').src=$('shimg').src;$('zm').hidden=false};
 $('zm').onclick=()=>$('zm').hidden=true;
-function closeAll(){$('wn').hidden=true;$('ad').hidden=true;$('bs').hidden=true;$('sh').hidden=true;$('setg').hidden=true;$('zm').hidden=true;$('ps').hidden=true;if(binders.length)$('nb').hidden=true}
+function closeAll(){closeSearch();$('wn').hidden=true;$('ad').hidden=true;$('bs').hidden=true;$('sh').hidden=true;$('setg').hidden=true;$('zm').hidden=true;$('ps').hidden=true;if(binders.length)$('nb').hidden=true}
 
 /* ---------- replace / add a Pokémon in a pocket ---------- */
 function setSlot(i,n){const b=binders[bi];if(!b||i==null)return;b.slots[i]=n||0;b.slots=padSlots(b.slots,b.size);saveBinders();layout();refresh()}
@@ -733,7 +745,7 @@ window.pbApp={note,toast,state:()=>({col,binders,wants}),customs:()=>customs,
 
 /* ---------- phone back button: closes the open menu instead of leaving the app ---------- */
 // One history entry stands for "a menu is open". Back pops it and steps back one level; closing a menu with its own buttons removes it again.
-const OVS=['zm','ad','ps','bs','nb','setg','wn','sh'];  // topmost first
+const OVS=['zm','ad','ps','bs','nb','setg','wn','sh','sp'];  // topmost first
 const ovOpen=()=>OVS.some(id=>!$(id).hidden&&!(id==='nb'&&$('nbx').hidden));  // the first-binder welcome can't be closed
 let ovHist=false,ovSkip=false;
 function ovSync(){const o=ovOpen();
