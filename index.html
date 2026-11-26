@@ -52,6 +52,15 @@ textarea{resize:vertical}
 .pg,.face{background:var(--page);padding:10px 8px 12px}
 .pg{width:50%}
 .book.one::after{display:none}.book.one .pg.l{width:100%;border-radius:12px}.book.one .pg.r{display:none}
+/* one page at a time: draw the spine on the side it is on in the binder */
+.book.one .pg.l{position:relative;border-radius:12px 3px 3px 12px;padding-right:22px;background:var(--page)}
+.book.one.sr .pg.l{border-radius:3px 12px 12px 3px;padding-right:7px;padding-left:22px}
+/* binder spine with rings, on the edge where the page is held */
+.book.one .pg.l::after{content:"";position:absolute;top:0;bottom:0;right:0;width:15px;border-radius:0 3px 3px 0;
+ background:radial-gradient(circle at 50% 50%,#8b9099 0 3px,#3a3e47 3.5px 4.5px,transparent 5px) 50% 12%/15px 38% repeat-y,linear-gradient(90deg,#0d0e11,#191b20)}
+.book.one.sr .pg.l::after{right:auto;left:0;border-radius:3px 0 0 3px;background:radial-gradient(circle at 50% 50%,#8b9099 0 3px,#3a3e47 3.5px 4.5px,transparent 5px) 50% 12%/15px 38% repeat-y,linear-gradient(270deg,#0d0e11,#191b20)}
+.side{font-weight:600;font-size:.72rem;color:var(--mut);border:1px solid var(--line);border-radius:9px;padding:1px 7px;white-space:nowrap}
+.h .hl{display:flex;align-items:center;gap:6px}
 .pg.l,.face.back,.leaf.b .face.front{border-radius:12px 2px 2px 12px;background:linear-gradient(90deg,var(--page) 86%,var(--spine))}
 .pg.r,.face.front,.leaf.b .face.back{border-radius:2px 12px 12px 2px;background:linear-gradient(270deg,var(--page) 86%,var(--spine))}
 .leaf{position:absolute;top:0;height:100%;width:50%;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;z-index:4;visibility:hidden;will-change:transform;pointer-events:none}
@@ -431,10 +440,12 @@ function cell(n,i){if(!n)return `<div class="c e add" data-i="${i}" title="Add a
  const badge=s==='top'?'<i>★</i>':s==='decent'?'<i>↻</i>':'';
  const inner=img?`<img src="${esc(pic(img,'low'))}" alt="${esc(nm)}" loading="lazy" decoding="async">`:`<b>#${pad(n)}</b><span>${esc(nm)}</span>${e.c?`<small class="ps">${e.lang&&e.lang!=='en'?LTAG[e.lang]+' · ':''}${esc(setEn(e.set,e.c))} ${esc(e.no||'')}</small>`:''}`;
  return `<div class="${cls}" data-n="${n}" data-i="${i}" data-l="#${pad(n)} ${esc(nm)}">${inner}${badge}</div>`}
+const sideOf=i=>(i+(binders[bi]&&binders[bi].right?1:0))%2===0?'left':'right';   // where page i sits in the real binder
 function page(i){const p=P[i];if(!p)return i<0?'<div class="cover">Inside cover</div>':'';
  const sz=SZ(),[cols]=SIZES[sz],c=p.it.map((n,k)=>cell(n,i*sz+k)).join('');
- return `<div class="g${p.g}" style="--cols:${cols};--k:${cols>3?(cols>4?.75:.85):1}"><div class="h">Page ${p.n}${p.g?`<small>Gen ${p.g}</small>`:''}</div><div class="g">${c}</div></div>`}
+ return `<div class="g${p.g}" style="--cols:${cols};--k:${cols>3?(cols>4?.75:.85):1}"><div class="h"><span class="hl">Page ${p.n}${PER===1?`<span class="side" title="Side of the binder">${sideOf(i)==='left'?'◧ Left':'Right ◨'}</span>`:''}</span>${p.g?`<small>Gen ${p.g}</small>`:''}</div><div class="g">${c}</div></div>`}
 function show(){if(!binders.length){$('L').innerHTML=$('R').innerHTML='';$('pi').textContent='';return}
+ $('book').classList.toggle('sr',PER===1&&sideOf(vp(spread,0))==='right');
  $('book').classList.toggle('one',PER===1);$('L').innerHTML=page(vp(spread,0));$('R').innerHTML=PER===1?'':page(vp(spread,1));
  const vis=[...Array(PER).keys()].map(k=>vp(spread,k)).filter(i=>P[i]);if(PER===1||!vis.includes(lastPg))lastPg=vis[0]??0;
  $('pi').textContent=vis.length>1?`Pages ${vis[0]+1}–${vis[1]+1} of ${P.length}`:`Page ${(vis[0]??0)+1} of ${P.length}`;$('pv').disabled=spread==0;$('nx').disabled=spread==S-1;ensureDefaults(spread)}
@@ -497,6 +508,7 @@ function search(){
  cur={b:f.b,pn};lastPg=f.pi;if(other)setBinder(f.b,f.pi);else setTimeout(()=>go(pv(f.pi)),350)}
 MQ.addEventListener('change',async()=>{target=spread;await idle();const vis=[vp(spread,0),vp(spread,1)];const pg=PER===2&&vis.includes(lastPg)?lastPg:Math.max(0,vp(spread,0));PER=MQ.matches?1:2;layout();spread=target=Math.min(pv(pg),S-1);show()});
 $('q').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('q').blur();search()}});
+$('q').addEventListener('focus',()=>{if(!$('q').value&&!hits.size)return;$('q').value='';hits=new Set();$('r').textContent='';if(!busy)show()});
 $('q').addEventListener('input',()=>{if(!$('q').value){hits=new Set();$('r').textContent='';if(!busy)show()}});
 $('wl').addEventListener('toggle',()=>{if($('wl').open)wl()});
 $('wlc').addEventListener('click',e=>{const b=e.target.closest('button[data-n]');if(!b)return;$('q').value='#'+b.dataset.n;search()});
