@@ -82,6 +82,14 @@ textarea{resize:vertical}
 .book.one .pg.r::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#0004,#000a)}
 .book.one.sr .pg.r{order:-1;justify-content:flex-end;border-radius:12px 0 0 12px}
 .book.one.sr .pg.r::after{background:linear-gradient(270deg,#0004,#000a)}
+/* folded corner on the outer edge: this is where the page turns over (tap it to turn) */
+.curl{position:absolute;bottom:0;width:34px;height:34px;z-index:4;cursor:pointer;border:0;padding:0;background:none}
+.curl::before{content:"";position:absolute;inset:0;filter:drop-shadow(-2px -2px 3px #0009)}
+.curl.r{right:0;border-radius:0 0 12px 0;background:linear-gradient(315deg,var(--bg) 0 47%,#5a5f6a 50%,#3a3e47 75%,transparent 76%)}
+.curl.l{left:0;border-radius:0 0 0 12px;background:linear-gradient(45deg,var(--bg) 0 47%,#5a5f6a 50%,#3a3e47 75%,transparent 76%)}
+.curl{animation:curlhint 2.4s ease-in-out 1s 2}
+@keyframes curlhint{0%,100%{transform:scale(1)}50%{transform:scale(1.35)}}
+.curl.r{transform-origin:100% 100%}.curl.l{transform-origin:0 100%}
 /* one page at a time: draw the spine on the side it is on in the binder */
 .book.one .pg.l{position:relative;border-radius:12px 0 0 12px;padding-right:22px;background:var(--page)}
 .book.one.sr .pg.l{border-radius:0 12px 12px 0;padding-right:7px;padding-left:22px}
@@ -485,7 +493,9 @@ function show(){if(!binders.length){$('L').innerHTML=$('R').innerHTML='';$('pi')
  requestAnimationFrame(fitBook);
  $('book').classList.toggle('sr',PER===1&&sideOf(vp(spread,0))==='right');
  $('book').classList.toggle('one',PER===1);$('L').innerHTML=page(vp(spread,0));
- if(PER===1){const i=vp(spread,0),fi=sideOf(i)==='right'?i-1:i+1;          // the facing page, for the peek strip
+ if(PER===1){const i=vp(spread,0),sd=sideOf(i),fi=sd==='right'?i-1:i+1;          // the facing page, for the peek strip
+  const nextTurn=sd==='right'?(i+1<P.length):(i>0);                    // is there a sheet to turn on the outer edge?
+  if(nextTurn)$('L').insertAdjacentHTML('beforeend',`<button class="curl ${sd==='right'?'r':'l'}" data-curl="1" aria-label="Turn the page" title="Turn the page"></button>`);
   $('R').innerHTML=`<div class="pk">${fi>=0&&fi<P.length?page(fi):''}</div>`;$('R').title=fi>=0&&fi<P.length?`Page ${fi+1}`:'';
   $('R').style.setProperty('--pw',($('L').offsetWidth||300)+'px')}
  else{$('R').innerHTML=page(vp(spread,1));$('R').title=''}
@@ -509,8 +519,18 @@ function wl(){const ns=nums(),dec=ns.filter(n=>col[n]&&col[n].s==='decent'),mis=
 function refresh(){if(!busy)show();else idle().then(()=>{if(!busy)show()});stats()}
 
 /* ---------- page flipping ---------- */
-function flip(dir,ms){if(PER===1)return new Promise(res=>{spread+=dir;show(); // phone: quick slide instead of a page turn
-  const a=$('L').animate([{transform:`translateX(${dir*40}px)`,opacity:.2},{transform:'none',opacity:1}],{duration:Math.min(ms,240),easing:'ease-out'});a.onfinish=a.oncancel=res});
+function flip(dir,ms){if(PER===1)return new Promise(res=>{const L=$('L'),side=sideOf(vp(spread,0));
+  // Phone. Forward from a right page, or back from a left page, turns the sheet over: show a real page turn.
+  // Otherwise (left -> right of the same opened spread, and back) just slide across.
+  const turn=(dir>0&&side==='right')||(dir<0&&side==='left');
+  if(!turn){spread+=dir;show();const a=L.animate([{transform:`translateX(${dir*40}px)`,opacity:.2},{transform:'none',opacity:1}],{duration:Math.min(ms,240),easing:'ease-out'});a.onfinish=a.oncancel=res;return}
+  const half=Math.max(90,Math.min(ms,560)/2),out=side==='right'?-1:1;   // the page swings over the spine
+  L.style.transformOrigin=side==='right'?'left center':'right center';
+  const a1=L.animate([{transform:'rotateY(0deg)',filter:'brightness(1)'},{transform:`rotateY(${out*88}deg)`,filter:'brightness(.45)'}],{duration:half,easing:'cubic-bezier(.5,0,.9,.6)'});
+  a1.onfinish=a1.oncancel=()=>{spread+=dir;show();const ns=sideOf(vp(spread,0));
+   L.style.transformOrigin=ns==='left'?'right center':'left center';
+   const a2=L.animate([{transform:`rotateY(${-out*88}deg)`,filter:'brightness(.45)'},{transform:'rotateY(0deg)',filter:'brightness(1)'}],{duration:half,easing:'cubic-bezier(.1,.4,.5,1)'});
+   a2.onfinish=a2.oncancel=()=>{L.style.transformOrigin='';res()}}});
  return new Promise(res=>{const F=$('F'),nx=spread+dir;
  F.className='leaf '+(dir>0?'f':'b');F.style.transition='none';F.style.transform='rotateY(0deg)';F.style.visibility='visible';
  if(dir>0){$('FF').innerHTML=page(vp(spread,1));$('FB').innerHTML=page(vp(nx,0));$('R').innerHTML=page(vp(nx,1))}
@@ -607,6 +627,7 @@ async function picker(){const n=sel,box=$('pk');box.innerHTML=addTile+customList
    +(hid?`<div class="msg">${hid} print${hid>1?'s':''} without a picture hidden · <button class="lnk" data-shownopic="1" style="padding:0">Show them</button></div>`:'')}
  catch(err){if(sel===n)box.innerHTML=addTile+customList(n).map(c=>tile(c,col[n]||{})).join('')+'<div class="msg">Couldn’t load prints — check your connection.</div>'}}
 $('book').addEventListener('click',e=>{if(PER===1&&e.target.closest('#R')){if(!busy)go(target+($('book').classList.contains('sr')?-1:1));return}
+ if(e.target.closest('[data-curl]')){if(!busy)go(target+(sideOf(vp(spread,0))==='right'?1:-1));return}
  const a=e.target.closest('.c.add[data-i]');if(a&&!busy){selI=+a.dataset.i;sel=null;return openPick()}
  const c=e.target.closest('.c[data-n]');if(!c||busy)return;sel=+c.dataset.n;selI=+c.dataset.i;$('pf').value='';sheetHead();$('sh').hidden=false;$('pk').scrollTop=0;picker()});
 $('sh').querySelector('.opts').addEventListener('click',e=>{const b=e.target.closest('button[data-s]');if(!b)return;const s=b.dataset.s,en=entry(sel);
