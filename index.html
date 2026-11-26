@@ -17,7 +17,18 @@ button:not(:disabled):active{transform:scale(.97)}
 :focus{outline:none}
 :focus-visible{outline:none;box-shadow:var(--ring)}
 .top{display:flex;align-items:center;gap:8px}
-h1{font-size:1.35rem;font-weight:750;letter-spacing:-.015em;margin:0;flex:1}
+h1{font-size:1.2rem;font-weight:750;letter-spacing:-.015em;margin:0;flex:1;display:flex;align-items:center;gap:8px;min-width:0}
+.top{margin-bottom:14px}
+.sync{width:22px;height:22px;border:0;background:none;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}
+.sync::before{content:'';width:9px;height:9px;border-radius:50%;background:var(--dim)}
+.sync.ok::before{background:var(--top)}.sync.busy::before{background:var(--dec)}.sync.warn::before{background:#e05a5a}
+.prog{display:flex;align-items:center;gap:10px;font-size:.85rem;margin:-2px 2px 14px;font-variant-numeric:tabular-nums;color:var(--mut)}
+.prog b{color:var(--tx);font-weight:700}.prog .bar{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden;min-width:40px}
+.prog .bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,#2f9e5e,var(--top))}
+.prog .pt{color:#7fcf9c}.prog .pd{color:#f2b866}.prog .pv{color:var(--mut)}
+.tabs button{position:relative}
+.tabs .tm{position:absolute;top:3px;right:4px;width:24px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1rem;line-height:1;color:var(--mut);letter-spacing:1px}
+.tabs .tm:hover{background:#ffffff14;color:var(--tx)}
 .icon.wb{color:var(--want);font-size:1.15rem}
 .pgrid button{position:relative}
 .pgrid button.want{border-color:var(--want)}
@@ -28,7 +39,7 @@ h1{font-size:1.35rem;font-weight:750;letter-spacing:-.015em;margin:0;flex:1}
 .plist .grp{grid-column:1/-1;font-size:.8rem;font-weight:700;color:var(--mut);margin:6px 0 0}
 #wres .back{margin:4px 0 10px}
 .wl-own{position:absolute;left:6px;top:6px;background:var(--top);color:#0b2015;font-weight:700;font-size:.7rem;border-radius:8px;padding:1px 6px;z-index:2}
-.ver{font-size:.7rem;font-weight:600;letter-spacing:0;color:var(--mut);border:1px solid var(--line);border-radius:8px;padding:1px 6px;margin-left:4px;vertical-align:middle}
+.ver{font-size:.68rem;font-weight:600;letter-spacing:0;color:var(--dim);background:#ffffff0d;border-radius:6px;padding:1px 6px}
 p.s{margin-top:2px;margin-bottom:12px;color:var(--mut);font-size:.85rem}
 .icon{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--card);font-size:1.1rem;cursor:pointer;display:grid;place-items:center}
 .tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;background:var(--card);border:1px solid var(--line);padding:4px;border-radius:var(--r3);margin-bottom:12px}
@@ -46,7 +57,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--acc);box-shadow:0 0 0
 textarea{resize:vertical}
 ::placeholder{color:var(--dim)}
 #r{color:var(--mut);font-size:.85rem;padding:0 4px}#r:empty{display:none}
-.stats{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:.85rem;margin:-4px auto 12px;font-variant-numeric:tabular-nums}
+.stats{max-width:900px;margin:0 auto}
 .pill{padding:3px 10px;border-radius:999px;background:var(--card);border:1px solid var(--line)}
 .pill.t{border-color:#3fbf7288;color:#7fcf9c}.pill.d{border-color:#f0a03a88;color:#f2b866}
 #sv{color:var(--dim);font-size:.75rem;margin-left:auto}
@@ -195,8 +206,7 @@ a{color:var(--acc)}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style></head><body>
-<div class="top"><h1>Pokédex Binders <span class="ver" id="ver" title="App version" hidden></span></h1><button class="icon wb" id="wbtn" aria-label="Wants" title="Wants">♡</button><button class="icon" id="gear" aria-label="Settings">⚙︎</button></div>
-<p class="s"><span id="sub"></span><button class="lnk" id="bset" hidden>⚙︎ Binder settings</button></p>
+<div class="top"><h1>Pokédex Binders<span class="ver" id="ver" title="App version" hidden></span></h1><button class="sync" id="sv" aria-label="Sync status"></button><button class="icon wb" id="wbtn" aria-label="Wants" title="Wants">♡</button><button class="icon" id="gear" aria-label="Settings">⚙︎</button></div>
 <div class="tabs" id="tabs"></div>
 <button class="fab" id="fab" aria-label="Search" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg><span class="x">✕</span></button>
 <div class="sp" id="sp" hidden><div class="sr2"><input id="q" type="search" placeholder="Pokémon name or #number" enterkeyhint="search" autocomplete="off"><button class="btn pri" id="qgo">Search</button></div><div id="r"></div></div>
@@ -376,7 +386,8 @@ function saveBinders(){ls.set('pb-binders',binders)}
 let saveT;
 function save(){clearTimeout(saveT);saveT=setTimeout(()=>{ls.set('pb-col',col);note('Saved on this device ✓')},300)}
 function toast(t,ms=2600){const e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(e._t);e._t=setTimeout(()=>e.hidden=true,ms)}
-let nt0='';function note(t){nt0=t;const e=$('sv');if(e)e.textContent=t}
+let nt0='';function note(t){nt0=t;const e=$('sv');if(!e)return;e.title=t;e.setAttribute('aria-label',t);
+ e.className='sync'+(/Synced/.test(t)?' ok':/Syncing/.test(t)?' busy':/fail|offline|Offline|will sync/i.test(t)?' warn':'')}
 
 /* ---------- card data (TCGdex) ---------- */
 let setInfo=ls.get('pb-sets2',null);    // {order:{'lang|set':i}, name:{'lang|set':name}, pocket:[ids]}
@@ -457,13 +468,15 @@ function show(){if(!binders.length){$('L').innerHTML=$('R').innerHTML='';$('pi')
 function nums(b=bi){return binders[b]?[...new Set(binders[b].slots.filter(Boolean))]:[]}
 function tabFade(){const t=$('tabs'),m=t.scrollWidth-t.clientWidth;t.classList.toggle('fl',t.scrollLeft>2);t.classList.toggle('fr',m>2&&t.scrollLeft<m-2)}
 function tabs(){$('tabs').innerHTML=binders.map((b,i)=>{const ns=nums(i),h=ns.filter(n=>col[n]&&col[n].s).length;
- return `<button class="${i===bi?'on':''}" data-b="${i}">${esc(b.name)}<small>${h}/${ns.length}</small></button>`}).join('')+'<button class="new" data-new="1" aria-label="New binder">＋<small>New</small></button>';
- const ns=nums(),sorted=[...ns].sort((a,b)=>a-b),run=ns.length>1&&sorted[sorted.length-1]-sorted[0]===ns.length-1;
- $('bset').hidden=!binders.length;$('sub').textContent=binders.length?`${SZ()}-pocket · ${run?`#${sorted[0]}–${sorted[sorted.length-1]} · `:''}${ns.length} Pokémon · ${P.length} pages`:'';tabFade()}
+ return `<button class="${i===bi?'on':''}" data-b="${i}"${i===bi?` title="${esc(binfo())}"`:''}>${esc(b.name)}<small>${h}/${ns.length}</small>${i===bi?'<span class="tm" data-bset="1" role="button" aria-label="Binder settings" title="Binder settings">⋯</span>':''}</button>`}).join('')+'<button class="new" data-new="1" aria-label="New binder">＋<small>New</small></button>';
+ tabFade()}
+function binfo(){const ns=nums(),sorted=[...ns].sort((a,b)=>a-b),run=ns.length>1&&sorted[sorted.length-1]-sorted[0]===ns.length-1;
+ return binders.length?`${SZ()}-pocket · ${run?`#${sorted[0]}–${sorted[sorted.length-1]} · `:''}${ns.length} Pokémon · ${P.length} pages`:''}
 function stats(){if(!binders.length){tabs();$('st').innerHTML='';return}const bn=nums(),v=bn.map(n=>col[n]).filter(e=>e&&e.s),t=v.filter(e=>e.s==='top').length,d=v.length-t;
  const val=v.reduce((a,e)=>a+(e.p||0),0);
- tabs();$('st').innerHTML=`<span class="pill"><b>${v.length}</b>/${bn.length} owned</span><span class="pill t" title="Top">★ ${t}</span><span class="pill d" title="Upgrade needed">↻ ${d}</span><span class="pill">${bn.length-v.length} missing</span>${val?`<span class="pill">≈ ${eur(val)}</span>`:''}<span id="sv"></span>`;
- $('sv').textContent=nt0;if($('wl').open)wl()}
+ tabs();const pct=bn.length?Math.round(v.length/bn.length*100):0;
+ $('st').innerHTML=`<div class="prog" title="${v.length} of ${bn.length} owned · ${bn.length-v.length} missing"><span><b>${v.length}</b>/${bn.length}</span><span class="bar"><i style="width:${pct}%"></i></span><span class="pt" title="Top">★ ${t}</span><span class="pd" title="Upgrade needed">↻ ${d}</span>${val?`<span class="pv" title="Cardmarket value">${eur(val)}</span>`:''}</div>`;
+ if($('wl').open)wl()}
 function wl(){const ns=nums(),dec=ns.filter(n=>col[n]&&col[n].s==='decent'),mis=ns.filter(n=>!(col[n]&&col[n].s));
  const ch=a=>a.map(n=>`<button data-n="${n}">#${pad(n)} ${esc(N[n])}</button>`).join('')||'<span style="color:var(--dim);font-size:.8rem">None</span>';
  $('wlc').innerHTML=`<h3>↻ Upgrade needed (${dec.length})</h3><div class="chips d">${ch(dec)}</div><h3>Missing (${mis.length})</h3><div class="chips">${ch(mis)}</div>`}
@@ -493,7 +506,7 @@ async function setBinder(i,sp,force){if(i===bi&&sp==null&&!force)return;target=s
  if(binders[bi])ls.set('pb-curid',binders[bi].id);ls.set('pb-mem2',mem);show();stats();
  const on=$('tabs').querySelector('button.on');if(on)try{on.scrollIntoView({block:'nearest',inline:'nearest'})}catch(e){}}
 $('tabs').addEventListener('scroll',tabFade,{passive:true});addEventListener('resize',tabFade);
-$('tabs').addEventListener('click',e=>{if(e.target.closest('button[data-new]'))return openNew(false);const b=e.target.closest('button[data-b]');if(b)setBinder(+b.dataset.b)});
+$('tabs').addEventListener('click',e=>{if(e.target.closest('button[data-new]'))return openNew(false);if(e.target.closest('[data-bset]'))return openBset();const b=e.target.closest('button[data-b]');if(b)setBinder(+b.dataset.b)});
 $('pv').onclick=()=>go(target-1);$('nx').onclick=()=>go(target+1);
 let tx=null;$('book').addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
 $('book').addEventListener('touchend',e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>40)go(target+(dx<0?1:-1));tx=null});
@@ -682,7 +695,8 @@ function bsUI(){const b=binders[bi];if(!b)return;
  $('bsr').querySelectorAll('button').forEach(x=>x.classList.toggle('on',+x.dataset.r===+b.right));
  $('bsc').textContent=`${P.length} pages · ${b.slots.length} pockets`}
 function bsChanged(keepPage){const pg=Math.max(0,vp(spread,0));saveBinders();layout();spread=target=Math.min(pv(keepPage??pg),S-1);refresh();bsUI()}
-$('bset').onclick=()=>{const b=binders[bi];if(!b)return;closeAll();$('bsn').value=b.name;bsUI();$('bs').hidden=false};
+$('sv').onclick=()=>toast(nt0||'Saved on this device');
+function openBset(){const b=binders[bi];if(!b)return;closeAll();$('bsn').value=b.name;bsUI();$('bs').hidden=false};
 $('bsn').addEventListener('change',()=>{const b=binders[bi],v=$('bsn').value.trim();if(b&&v){b.name=v.slice(0,30);saveBinders();stats()}});
 $('bsz').onclick=e=>{const x=e.target.closest('button[data-z]'),b=binders[bi];if(!x||!b||+x.dataset.z===b.size)return;
  const first=b.slots[Math.max(0,vp(spread,0))*b.size];reflow(b,+x.dataset.z);const at=first?b.slots.indexOf(first):-1;
