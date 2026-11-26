@@ -88,13 +88,12 @@ textarea{resize:vertical}
 .book.one{overflow:hidden;touch-action:pan-y;--tx:0px}
 .book.one::after{display:none}
 .book.one .pg{flex:0 0 var(--W,300px);width:var(--W,300px);min-width:0;position:relative;background:var(--page);
- transform:translateX(var(--tx)) rotateY(var(--ry,0deg));transition:filter .25s;will-change:transform;backface-visibility:hidden}
+ transform:translateX(var(--tx)) rotateY(var(--ry,0deg));will-change:transform;backface-visibility:hidden}
 .book.one .pg.l{border-radius:12px 0 0 12px;padding-right:22px}
 .book.one .pg.r{border-radius:0 12px 12px 0;padding-left:22px;padding-right:8px}
 .book.one .pg.l::after,.book.one .pg.r::after{content:"";position:absolute;top:0;bottom:0;width:15px;pointer-events:none}
 .book.one .pg.l::after{right:0;background:radial-gradient(circle at 50% 50%,#8b9099 0 3px,#3a3e47 3.5px 4.5px,transparent 5px) 50% 12%/15px 38% repeat-y,linear-gradient(90deg,#0d0e11,#191b20)}
 .book.one .pg.r::after{left:0;background:radial-gradient(circle at 50% 50%,#8b9099 0 3px,#3a3e47 3.5px 4.5px,transparent 5px) 50% 12%/15px 38% repeat-y,linear-gradient(270deg,#0d0e11,#191b20)}
-.book.one:not(.sr) .pg.r,.book.one.sr .pg.l{filter:brightness(.5) saturate(.7)}   /* the page that only peeks out */
 .book.one .pg .blank{height:100%}
 /* the sheet being turned: its front is the page you leave, its back the page you land on */
 .book.one .leaf{visibility:hidden;transform-style:preserve-3d;will-change:transform}
@@ -105,17 +104,23 @@ textarea{resize:vertical}
 .book.one .leaf.one-f .face.front::after,.book.one .leaf.one-b .face.back::after{left:0;background:radial-gradient(circle at 50% 50%,#8b9099 0 3px,#3a3e47 3.5px 4.5px,transparent 5px) 50% 12%/15px 38% repeat-y,linear-gradient(270deg,#0d0e11,#191b20)}
 .book.one .leaf.one-f .face.back::after,.book.one .leaf.one-b .face.front::after{right:0;background:radial-gradient(circle at 50% 50%,#8b9099 0 3px,#3a3e47 3.5px 4.5px,transparent 5px) 50% 12%/15px 38% repeat-y,linear-gradient(90deg,#0d0e11,#191b20)}
 /* foil: holo shines on the artwork, reverse holo on everything but the artwork */
-.foil{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;mix-blend-mode:color-dodge;opacity:.6;
- background-size:260% 260%;animation:foil 7s ease-in-out infinite alternate}
-.foil.rainbow{background-image:linear-gradient(115deg,transparent 18%,#ff4fa3 30%,#ffd34f 38%,#4fff9a 46%,#4fc4ff 54%,#a94fff 62%,transparent 76%)}
+/* foil: holo shines on the artwork, reverse holo around it, full-card foil all over. The shine position (--sh) follows the
+   pages as you slide or turn them (and the phone's tilt or the mouse), plus a slight sway (--sd), like tilting a real card. */
+@property --sh{syntax:'<number>';inherits:true;initial-value:.5}
+@property --sd{syntax:'<number>';inherits:true;initial-value:0}
+.foil{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;mix-blend-mode:color-dodge;opacity:.8;
+ --pos:calc((var(--sh) + var(--sd)) * 100%);background-size:250% 250%;background-position:var(--pos) var(--pos);animation:sway 3.4s ease-in-out infinite alternate}
+@keyframes sway{from{--sd:-.08}to{--sd:.08}}
+.foil.rainbow{background-image:linear-gradient(115deg,transparent 24%,#ff4fa3 34%,#ffd34f 41%,#4fff9a 47%,#4fc4ff 53%,#a94fff 60%,transparent 70%)}
 .foil.cosmos{background-image:radial-gradient(#fff 0 1px,transparent 1.6px),radial-gradient(#8ff 0 1.4px,transparent 2px),radial-gradient(#f9f 0 2px,transparent 2.6px),
- linear-gradient(115deg,transparent 20%,#ff4fa3 34%,#4fc4ff 50%,#a94fff 64%,transparent 80%);background-size:7px 7px,13px 13px,23px 23px,260% 260%}
-.foil.sparkle{background-image:repeating-linear-gradient(55deg,#fff5 0 1.5px,transparent 1.5px 7px),repeating-linear-gradient(-35deg,#fff3 0 1px,transparent 1px 9px),
- linear-gradient(115deg,transparent 20%,#ffd34f 36%,#4fff9a 48%,#4fc4ff 60%,transparent 78%);background-size:auto,auto,260% 260%}
+ linear-gradient(115deg,transparent 22%,#ff4fa3 35%,#4fc4ff 50%,#a94fff 63%,transparent 76%);background-size:7px 7px,13px 13px,23px 23px,250% 250%;
+ background-position:calc(var(--sh) * 16px) 0,calc(var(--sh) * -22px) 3px,5px 7px,var(--pos) var(--pos)}
+.foil.sparkle{background-image:repeating-linear-gradient(55deg,#fff6 0 1.5px,transparent 1.5px 7px),repeating-linear-gradient(-35deg,#fff4 0 1px,transparent 1px 9px),
+ linear-gradient(115deg,transparent 22%,#ffd34f 36%,#4fff9a 47%,#4fc4ff 58%,transparent 72%);background-size:auto,auto,250% 250%;
+ background-position:calc(var(--sh) * 10px) 0,calc(var(--sh) * -10px) 0,var(--pos) var(--pos)}
+.foil.gold{background-image:linear-gradient(115deg,transparent 18%,#ffe7a0 32%,#ffc94a 41%,#fff4cc 50%,#e2a93c 59%,transparent 72%);mix-blend-mode:overlay;opacity:.85}
 .foil.holo{clip-path:inset(11% 8% 47% 8%)}.foil.full{clip-path:none}
-.foil.gold{background-image:linear-gradient(115deg,transparent 15%,#ffe7a0 30%,#ffc94a 40%,#fff4cc 50%,#e2a93c 60%,transparent 78%);mix-blend-mode:overlay;opacity:.75}
 .foil.reverse{clip-path:polygon(evenodd,0 0,100% 0,100% 100%,0 100%,0 0,8% 11%,92% 11%,92% 53%,8% 53%,8% 11%)}
-@keyframes foil{from{background-position:0 0,0 0,0 0,0% 0%}to{background-position:0 0,0 0,0 0,100% 100%}}
 @media (prefers-reduced-motion:reduce){.foil{animation:none}}
 .shh .art{position:relative;flex:0 0 auto;border-radius:6px;overflow:hidden}.shh .art img{display:block}
 .fin{display:flex;flex-direction:column;gap:6px;margin:12px 0 0}.fin[hidden],.fin .seg[hidden]{display:none}.fin .seg button{font-size:.85rem;padding:7px 4px}
@@ -485,7 +490,7 @@ function pickDefault(all){const arr=all.filter(c=>c.lang==='en'&&c.img);if(!arr.
 const pending=new Set();let rrT;
 function rerenderSoon(){clearTimeout(rrT);rrT=setTimeout(()=>{if(!busy)show()},120)}
 function ensureDefaults(sp){
- const ns=[];for(const s of [sp,sp+1,sp-1])for(let k=0;k<PER;k++){const p=P[vp(s,k)];if(p)p.it.forEach(n=>{if(n)ns.push(n)})}
+ const ns=[];for(const s of PER===1?[sp,sp+1,sp-1,sp+2,sp-2,sp+3]:[sp,sp+1,sp-1])for(let k=0;k<PER;k++){   /* phones: also the pages a turn reveals */const p=P[vp(s,k)];if(p)p.it.forEach(n=>{if(n)ns.push(n)})}
  ns.filter(n=>!(col[n]&&col[n].c)&&!defs[n]&&!pending.has(n)).forEach(async n=>{
   pending.add(n);
   try{const d=pickDefault(await list(n));defs[n]=d?{c:d.id,img:d.img}:{none:1};ls.set('pb-defs-'+opt.ord,defs);rerenderSoon()}
@@ -584,7 +589,12 @@ const idle=()=>new Promise(r=>{const w=()=>busy?setTimeout(w,50):r();w()});
 const PEEK=26;
 const oneW=()=>Math.max(100,$('book').clientWidth-PEEK);
 const focusTx=sd=>sd==='left'?0:-(oneW()-PEEK);
-function setTx(px){$('book').style.setProperty('--tx',px+'px')}
+function setTx(px){$('book').style.setProperty('--tx',px+'px');shBase=.25+.5*Math.min(1,Math.max(0,-px/Math.max(1,oneW()-PEEK)));shine()}
+// foil shine position: follows the pages (shBase), plus the phone's tilt or the mouse (shTilt)
+let shBase=.5,shTilt=0;
+function shine(){document.documentElement.style.setProperty('--sh',(shBase+shTilt).toFixed(3))}
+addEventListener('deviceorientation',e=>{if(e.gamma==null)return;shTilt=Math.max(-.35,Math.min(.35,e.gamma/60));shine()});
+addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;shTilt=(e.clientX/innerWidth-.5)*.7;shine()},{passive:true});
 function moveKind(dir){const sd=sideOf(vp(spread,0));return (dir>0&&sd==='right')||(dir<0&&sd==='left')?'turn':'slide'}
 function slideTo(dir,p){const a=dir>0?0:-(oneW()-PEEK),b=dir>0?-(oneW()-PEEK):0;setTx(a+(b-a)*p)}
 // Turning a sheet, like a real binder: the sheet stays hinged at the spine. Its front is the page you leave,
@@ -598,9 +608,10 @@ function turnStart(dir){const i=vp(spread,0),lp=sideOf(i)==='left'?i:i-1,W=oneW(
  F.style.transformOrigin=dir>0?'left center':'right center';F.style.transition='none';F.style.visibility='visible';
  turnTo(st,0);return st}
 function turnTo(st,p){const a=(st.dir>0?-180:180)*p,tx=st.tx0+(st.tx1-st.tx0)*p,F=$('F'),back=Math.abs(a)>90;
- setTx(tx);F.style.transform=`translateX(${tx}px) rotateY(${a}deg)`;
+ setTx(tx);shBase+=(st.dir>0?-.55:.55)*Math.sin(p*Math.PI);shine();   /* the light sweeps over the foil as the sheet lifts */
+ F.style.transform=`translateX(${tx}px) rotateY(${a}deg)`;
  $('FF').style.visibility=back?'hidden':'visible';$('FB').style.visibility=back?'visible':'hidden';
- $('FF').style.filter=`brightness(${1-.55*Math.min(1,p*2)})`;$('FB').style.filter=`brightness(${.45+.55*Math.max(0,p*2-1)})`}
+}
 function turnEnd(st,done){const F=$('F');F.style.visibility='hidden';F.style.transform='';F.style.left='';F.style.width='';F.className='leaf';
  for(const el of [$('FF'),$('FB')]){el.style.visibility='';el.style.filter='';el.innerHTML=''}
  if(done)spread+=st.dir;show()}
