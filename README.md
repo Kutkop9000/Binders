@@ -12,3 +12,8 @@ The collection syncs across devices through Firebase. One-time setup:
 6. **Project settings → Your apps → Web (`</>`):** register an app and copy `apiKey`, `authDomain`, `projectId`, `appId` into `firebase-config.js`.
 
 Signing in with Google is required: the app opens on a sign-in screen and shows your binders once you're signed in. Sign out from ⚙︎ (this clears the device; your data stays in your account).
+
+## Licence
+
+This app is licensed under the GNU General Public License v3.0 (see `LICENSE`).
+The holo effects in `holo/` come from [pokemon-cards-css](https://github.com/simeydotme/pokemon-cards-css) by Simon Goellner (GPL-3.0).
