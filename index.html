@@ -17,7 +17,27 @@ button:not(:disabled):active{transform:scale(.97)}
 :focus{outline:none}
 :focus-visible{outline:none;box-shadow:var(--ring)}
 .top{display:flex;align-items:center;gap:8px}
-h1{font-size:1.35rem;font-weight:750;letter-spacing:-.015em;margin:0;flex:1}
+h1{font-size:1.2rem;font-weight:750;letter-spacing:-.015em;margin:0;flex:1;display:flex;align-items:center;gap:8px;min-width:0}
+.top{margin-bottom:10px;gap:6px}
+.sp1{flex:1}
+.shelf{display:flex;align-items:center;gap:8px;min-width:0;max-width:60vw;height:42px;padding:0 12px 0 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--tx);cursor:pointer;font-weight:700;font-size:1rem}
+.shelf svg{width:22px;height:22px;flex:0 0 auto;color:var(--mut)}
+.shelf .bn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.shelf .car{color:var(--mut);font-size:.8rem}
+.shelfl{flex-direction:column;overflow:visible;padding:6px}
+.shelfl button{flex-direction:row!important;justify-content:space-between;min-width:0;padding:12px 44px 12px 14px!important;font-size:1rem!important;text-align:left}
+.shelfl button small{font-size:.85rem!important}
+.shelfl .tm{top:50%!important;transform:translateY(-50%);right:8px!important;width:30px!important;height:30px!important;font-size:1.15rem!important}
+.shelfl button.new{justify-content:center;gap:8px;padding:12px 14px!important}
+.sync{width:22px;height:22px;border:0;background:none;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}
+.sync::before{content:'';width:9px;height:9px;border-radius:50%;background:var(--dim)}
+.sync.ok::before{background:var(--top)}.sync.busy::before{background:var(--dec)}.sync.warn::before{background:#e05a5a}
+.prog{display:flex;align-items:center;gap:10px;font-size:.85rem;margin:-2px 2px 14px;font-variant-numeric:tabular-nums;color:var(--mut)}
+.prog b{color:var(--tx);font-weight:700}.prog .bar{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden;min-width:40px}
+.prog .bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,#2f9e5e,var(--top))}
+.prog .pt{color:#7fcf9c}.prog .pd{color:#f2b866}.prog .pv{color:var(--mut)}
+.tabs button{position:relative}
+.tabs .tm{position:absolute;top:3px;right:4px;width:24px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1rem;line-height:1;color:var(--mut);letter-spacing:1px}
+.tabs .tm:hover{background:#ffffff14;color:var(--tx)}
 .icon.wb{color:var(--want);font-size:1.15rem}
 .pgrid button{position:relative}
 .pgrid button.want{border-color:var(--want)}
@@ -28,7 +48,7 @@ h1{font-size:1.35rem;font-weight:750;letter-spacing:-.015em;margin:0;flex:1}
 .plist .grp{grid-column:1/-1;font-size:.8rem;font-weight:700;color:var(--mut);margin:6px 0 0}
 #wres .back{margin:4px 0 10px}
 .wl-own{position:absolute;left:6px;top:6px;background:var(--top);color:#0b2015;font-weight:700;font-size:.7rem;border-radius:8px;padding:1px 6px;z-index:2}
-.ver{font-size:.7rem;font-weight:600;letter-spacing:0;color:var(--mut);border:1px solid var(--line);border-radius:8px;padding:1px 6px;margin-left:4px;vertical-align:middle}
+.ver{font-size:.68rem;font-weight:600;letter-spacing:0;color:var(--dim);background:#ffffff0d;border-radius:6px;padding:1px 6px}
 p.s{margin-top:2px;margin-bottom:12px;color:var(--mut);font-size:.85rem}
 .icon{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--card);font-size:1.1rem;cursor:pointer;display:grid;place-items:center}
 .tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;background:var(--card);border:1px solid var(--line);padding:4px;border-radius:var(--r3);margin-bottom:12px}
@@ -36,13 +56,17 @@ p.s{margin-top:2px;margin-bottom:12px;color:var(--mut);font-size:.85rem}
 .tabs button{flex:1;min-width:76px;border:0;background:transparent;color:var(--mut);padding:8px 6px;border-radius:var(--r2);font-size:.9rem;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;white-space:nowrap}
 .tabs button small{font-size:.75rem;font-weight:500;opacity:.8;font-variant-numeric:tabular-nums}
 .tabs button.on{background:var(--on);color:var(--tx);box-shadow:0 1px 2px #0006}
-.search{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.fab{position:fixed;right:calc(16px + env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;border:0;background:var(--tx);color:#111;box-shadow:0 6px 18px #000a;z-index:15;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.fab svg{width:24px;height:24px}.fab .x{display:none;font-size:1.3rem;font-weight:700}.fab.on{background:#33363e;color:var(--tx)}.fab.on svg{display:none}.fab.on .x{display:block}
+.sp{position:fixed;left:12px;right:12px;top:calc(10px + env(safe-area-inset-top));max-width:560px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;box-shadow:0 10px 30px #000b;z-index:15;display:flex;flex-direction:column;gap:6px}
+.sp[hidden]{display:none}.sp .sr2{display:flex;gap:8px}.sp .sr2 .btn{flex:0 0 auto;margin:0}
+body{padding-bottom:calc(96px + env(safe-area-inset-bottom))!important}
 input[type=search],input[type=text],input[type=number],textarea,select{font:inherit;font-size:1rem;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r2);width:100%;background:var(--card);color:var(--tx);transition:border-color .15s,box-shadow .15s}
 input:focus,textarea:focus,select:focus{border-color:var(--acc);box-shadow:0 0 0 3px #9cc3ff33}
 textarea{resize:vertical}
 ::placeholder{color:var(--dim)}
-#r{color:var(--mut);font-size:.85rem;min-height:1.2em}
-.stats{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:.85rem;margin:-4px auto 12px;font-variant-numeric:tabular-nums}
+#r{color:var(--mut);font-size:.85rem;padding:0 4px}#r:empty{display:none}
+.stats{max-width:900px;margin:0 auto}
 .pill{padding:3px 10px;border-radius:999px;background:var(--card);border:1px solid var(--line)}
 .pill.t{border-color:#3fbf7288;color:#7fcf9c}.pill.d{border-color:#f0a03a88;color:#f2b866}
 #sv{color:var(--dim);font-size:.75rem;margin-left:auto}
@@ -51,7 +75,81 @@ textarea{resize:vertical}
 .book::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:linear-gradient(#0000,#000a,#0000);z-index:3;pointer-events:none}
 .pg,.face{background:var(--page);padding:10px 8px 12px}
 .pg{width:50%}
-.book.one::after{display:none}.book.one .pg.l{width:100%;border-radius:12px}.book.one .pg.r{display:none}
+/* folded corner on the outer edge: this is where the page turns over (tap it to turn) */
+.curl{position:absolute;bottom:0;width:34px;height:34px;z-index:4;cursor:pointer;border:0;padding:0;background:none}
+.curl::before{content:"";position:absolute;inset:0;filter:drop-shadow(-2px -2px 3px #0009)}
+.curl.r{right:0;border-radius:0 0 12px 0;background:linear-gradient(315deg,var(--bg) 0 47%,#5a5f6a 50%,#3a3e47 75%,transparent 76%)}
+.curl.l{left:0;border-radius:0 0 0 12px;background:linear-gradient(45deg,var(--bg) 0 47%,#5a5f6a 50%,#3a3e47 75%,transparent 76%)}
+.curl{animation:curlhint 2.4s ease-in-out 1s 2}
+@keyframes curlhint{0%,100%{transform:scale(1)}50%{transform:scale(1.35)}}
+.curl.r{transform-origin:100% 100%}.curl.l{transform-origin:0 100%}
+/* phone: the open spread (left + right page) sits side by side; one page fills the screen and the other
+   peeks out next to the spine. --tx slides the pair, a page's own --ry turns it over the spine. */
+.book.one{overflow:hidden;touch-action:pan-y;--tx:0px}
+.book.one::after{display:none}
+.book.one .pg{flex:0 0 var(--W,300px);width:var(--W,300px);min-width:0;position:relative;background:var(--page);
+ transform:translateX(var(--tx)) rotateY(var(--ry,0deg));will-change:transform;backface-visibility:hidden}
+.book.one .pg.l{border-radius:12px 0 0 12px;padding-right:22px}
+.book.one .pg.r{border-radius:0 12px 12px 0;padding-left:22px;padding-right:8px}
+.book.one .pg.l::after,.book.one .pg.r::after{content:"";position:absolute;top:0;bottom:0;width:15px;pointer-events:none}
+.book.one .pg.l::after{right:0;background:radial-gradient(circle at 50% 50%,#8b9099 0 3px,#3a3e47 3.5px 4.5px,transparent 5px) 50% 12%/15px 38% repeat-y,linear-gradient(90deg,#0d0e11,#191b20)}
+.book.one .pg.r::after{left:0;background:radial-gradient(circle at 50% 50%,#8b9099 0 3px,#3a3e47 3.5px 4.5px,transparent 5px) 50% 12%/15px 38% repeat-y,linear-gradient(270deg,#0d0e11,#191b20)}
+.book.one .pg .blank{height:100%}
+/* the sheet being turned: its front is the page you leave, its back the page you land on */
+.book.one .leaf{visibility:hidden;transform-style:preserve-3d;will-change:transform}
+.book.one .leaf .face{background:var(--page)}
+.book.one .leaf.one-f .face.front,.book.one .leaf.one-b .face.back{border-radius:0 12px 12px 0;padding:10px 8px 12px 22px}
+.book.one .leaf.one-f .face.back,.book.one .leaf.one-b .face.front{border-radius:12px 0 0 12px;padding:10px 22px 12px 8px}
+.book.one .leaf .face::after{content:"";position:absolute;top:0;bottom:0;width:15px;pointer-events:none}
+.book.one .leaf.one-f .face.front::after,.book.one .leaf.one-b .face.back::after{left:0;background:radial-gradient(circle at 50% 50%,#8b9099 0 3px,#3a3e47 3.5px 4.5px,transparent 5px) 50% 12%/15px 38% repeat-y,linear-gradient(270deg,#0d0e11,#191b20)}
+.book.one .leaf.one-f .face.back::after,.book.one .leaf.one-b .face.front::after{right:0;background:radial-gradient(circle at 50% 50%,#8b9099 0 3px,#3a3e47 3.5px 4.5px,transparent 5px) 50% 12%/15px 38% repeat-y,linear-gradient(90deg,#0d0e11,#191b20)}
+/* foil: holo shines on the artwork, reverse holo on everything but the artwork */
+/* foil: holo shines on the artwork, reverse holo around it, full-card foil all over. The shine position (--sh) follows the
+   pages as you slide or turn them (and the phone's tilt or the mouse), plus a slight sway (--sd), like tilting a real card. */
+@property --sh{syntax:'<number>';inherits:true;initial-value:.5}
+@property --sd{syntax:'<number>';inherits:true;initial-value:0}
+.foil{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;mix-blend-mode:color-dodge;opacity:.5;
+ --pos:calc((var(--sh) + var(--sd)) * 100%);background-size:250% 250%;background-position:var(--pos) var(--pos);animation:sway 3.4s ease-in-out infinite alternate;
+ /* colour only where the light is: a band that travels with the shine; elsewhere the foil is nearly invisible */
+ -webkit-mask-image:linear-gradient(115deg,#0002 22%,#000 44%,#000 56%,#0002 78%);mask-image:linear-gradient(115deg,#0002 22%,#000 44%,#000 56%,#0002 78%);
+ -webkit-mask-size:250% 250%;mask-size:250% 250%;-webkit-mask-position:var(--pos) var(--pos);mask-position:var(--pos) var(--pos)}
+@keyframes sway{from{--sd:-.08}to{--sd:.08}}
+/* patterns: by era for holo / reverse holo, by rarity for full-card foil */
+.foil.rainbow{background-image:linear-gradient(115deg,transparent 30%,#e86aa6 39%,#e8c76a 44%,#6ae8a6 49%,#6ab8e8 54%,#a46ae8 59%,transparent 68%)}
+.foil.starlight{background-image:repeating-linear-gradient(78deg,#fff5 0 1px,transparent 1px 11px),radial-gradient(#fffd 0 1px,transparent 1.8px),linear-gradient(115deg,transparent 30%,#e86aa6 39%,#e8c76a 44%,#6ae8a6 49%,#6ab8e8 54%,#a46ae8 59%,transparent 68%);
+ background-size:auto,17px 23px,250% 250%;background-position:calc(var(--sh) * 12px) 0,3px 5px,var(--pos) var(--pos)}
+.foil.cosmos{background-image:radial-gradient(#fffc 0 1px,transparent 1.6px),radial-gradient(#8ffa 0 1.4px,transparent 2px),radial-gradient(#f9fa 0 2.2px,transparent 2.8px),linear-gradient(115deg,transparent 30%,#e86aa6 39%,#e8c76a 44%,#6ae8a6 49%,#6ab8e8 54%,#a46ae8 59%,transparent 68%);
+ background-size:7px 7px,13px 13px,23px 23px,250% 250%;background-position:calc(var(--sh) * 16px) 0,calc(var(--sh) * -22px) 3px,5px 7px,var(--pos) var(--pos)}
+.foil.sheen{background-image:repeating-linear-gradient(115deg,#fff3 0 1px,transparent 1px 4px),linear-gradient(115deg,transparent 30%,#e86aa6 39%,#e8c76a 44%,#6ae8a6 49%,#6ab8e8 54%,#a46ae8 59%,transparent 68%);background-size:auto,250% 250%;background-position:calc(var(--sh) * 8px) 0,var(--pos) var(--pos)}
+/* Scarlet & Violet "Mirage": the light refracts horizontally */
+.foil.mirage{background-image:repeating-linear-gradient(0deg,#fff3 0 1px,transparent 1px 4px),linear-gradient(90deg,transparent 30%,#e86aa6 40%,#e8c76a 45%,#6ae8a6 50%,#6ab8e8 55%,#a46ae8 60%,transparent 70%);
+ background-size:auto,250% 100%;background-position:0 calc(var(--sh) * 8px),var(--pos) 0;
+ -webkit-mask-image:linear-gradient(90deg,#0002 22%,#000 44%,#000 56%,#0002 78%);mask-image:linear-gradient(90deg,#0002 22%,#000 44%,#000 56%,#0002 78%);-webkit-mask-size:250% 100%;mask-size:250% 100%;-webkit-mask-position:var(--pos) 0;mask-position:var(--pos) 0}
+/* etched texture (full arts, illustration rares) */
+.foil.sparkle{background-image:repeating-linear-gradient(55deg,#fff4 0 1.5px,transparent 1.5px 7px),repeating-linear-gradient(-35deg,#fff3 0 1px,transparent 1px 9px),linear-gradient(115deg,transparent 30%,#e86aa6 39%,#e8c76a 44%,#6ae8a6 49%,#6ab8e8 54%,#a46ae8 59%,transparent 68%);
+ background-size:auto,auto,250% 250%;background-position:calc(var(--sh) * 10px) 0,calc(var(--sh) * -10px) 0,var(--pos) var(--pos)}
+/* special illustration rares: an extra layer of fine glitter */
+.foil.glitter{background-image:radial-gradient(#fff 0 .6px,transparent 1.1px),radial-gradient(#ffd6f5 0 .7px,transparent 1.2px),radial-gradient(#c9f6ff 0 .8px,transparent 1.3px),radial-gradient(#fff6c2 0 .6px,transparent 1.1px),linear-gradient(115deg,transparent 30%,#e86aa6 39%,#e8c76a 44%,#6ae8a6 49%,#6ab8e8 54%,#a46ae8 59%,transparent 68%);
+ background-size:5px 5px,7px 9px,11px 8px,13px 13px,250% 250%;background-position:calc(var(--sh) * 6px) 0,calc(var(--sh) * -9px) 2px,4px calc(var(--sh) * 7px),1px 6px,var(--pos) var(--pos)}
+/* shiny cards: silver with a cool blue sparkle */
+.foil.silver{background-image:radial-gradient(#fff 0 .8px,transparent 1.4px),radial-gradient(#bfe3ff 0 1px,transparent 1.6px),linear-gradient(115deg,transparent 28%,#d9e4f2 40%,#9fc8ff 48%,#f4f8ff 54%,#b9c7da 62%,transparent 72%);
+ background-size:9px 9px,15px 15px,250% 250%;background-position:calc(var(--sh) * 9px) 0,calc(var(--sh) * -12px) 4px,var(--pos) var(--pos)}
+/* gold cards (hyper rare): a warm gold sheen */
+.foil.gold{background-image:repeating-linear-gradient(115deg,#fff2 0 1px,transparent 1px 5px),linear-gradient(115deg,transparent 22%,#ffe7a0 36%,#ffc94a 44%,#fff4cc 50%,#e2a93c 58%,transparent 72%);
+ background-size:auto,250% 250%;background-position:calc(var(--sh) * 8px) 0,var(--pos) var(--pos);mix-blend-mode:overlay;opacity:.6}
+/* rainbow / secret rares: a soft rainbow tint across the card */
+.foil.prism{background-image:linear-gradient(115deg,#ff8ac655,#ffd88a55 20%,#8affc455 40%,#8ad4ff55 60%,#c68aff55 80%,#ff8ac655);background-size:250% 250%;mix-blend-mode:overlay;opacity:.7;
+ -webkit-mask-image:none;mask-image:none}
+.foil.holo{clip-path:inset(11% 8% 47% 8%)}.foil.full{clip-path:none}
+.foil.reverse{clip-path:polygon(evenodd,0 0,100% 0,100% 100%,0 100%,0 0,8% 11%,92% 11%,92% 53%,8% 53%,8% 11%)}
+/* the soft white glare where the light hits; moves with the shine */
+.glare{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:3;mix-blend-mode:soft-light;
+ background:radial-gradient(farthest-corner circle at calc((var(--sh) + var(--sd)) * 100%) 28%,#fffc,#fff3 22%,transparent 55%);animation:sway 3.4s ease-in-out infinite alternate}
+@media (prefers-reduced-motion:reduce){.foil,.glare{animation:none}}
+.shh .art{position:relative;flex:0 0 auto;border-radius:6px;overflow:hidden}.shh .art img{display:block}
+.fin{display:flex;flex-direction:column;gap:6px;margin:12px 0 0}#finp{flex-wrap:wrap}#finp button{flex:1 0 22%}.fin[hidden],.fin .seg[hidden]{display:none}.fin .seg button{font-size:.85rem;padding:7px 4px}
+.side{font-weight:600;font-size:.72rem;color:var(--mut);border:1px solid var(--line);border-radius:9px;padding:1px 7px;white-space:nowrap}
+.h .hl{display:flex;align-items:center;gap:6px}
 .pg.l,.face.back,.leaf.b .face.front{border-radius:12px 2px 2px 12px;background:linear-gradient(90deg,var(--page) 86%,var(--spine))}
 .pg.r,.face.front,.leaf.b .face.back{border-radius:2px 12px 12px 2px;background:linear-gradient(270deg,var(--page) 86%,var(--spine))}
 .leaf{position:absolute;top:0;height:100%;width:50%;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;z-index:4;visibility:hidden;will-change:transform;pointer-events:none}
@@ -83,15 +181,15 @@ textarea{resize:vertical}
 .c.top::before,.c.decent::before{content:'';position:absolute;left:0;right:0;bottom:0;height:4px;z-index:3}
 .c.top::before{background:var(--top)}.c.decent::before{background:var(--dec)}
 .c.top i{background:var(--top);color:#0b2015}.c.decent i{background:var(--dec);color:#2a1a05}
-.c.hit{outline:3px solid var(--hl);outline-offset:-1px;animation:pulse 1.2s ease-in-out 2;z-index:2}
-.c.hit:not(.im){background:var(--hl)!important}.c.hit:not(.im) span,.c.hit:not(.im) b{color:#1a1a1a!important}
-.c.hit.no img{filter:none}
+.c.hit{outline:3px solid var(--hl);outline-offset:-1px;box-shadow:0 0 18px 2px var(--hl);animation:pulse 1.2s ease-in-out 2;z-index:2}
+/* found by search: marked by the yellow outline only; a card you don't have keeps its grey look */
 @keyframes pulse{50%{transform:scale(1.07)}}
 .nav{display:flex;justify-content:center;align-items:center;gap:16px;margin-top:16px}
 .nav button{font-size:1.4rem;line-height:1;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--card);cursor:pointer;display:grid;place-items:center;padding:0 0 3px}
 .nav button:disabled{opacity:.3;cursor:default}
 #pi{font-size:.9rem;color:var(--mut);min-width:110px;text-align:center;font-variant-numeric:tabular-nums}
 .hint{font-size:.8rem;color:var(--dim);text-align:center;margin-top:10px}
+@media (max-width:599px){.hint{display:none}.nav{margin-top:10px}}
 .sheet{position:fixed;inset:0;background:#000b;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);display:flex;align-items:flex-end;justify-content:center;z-index:20;animation:fade .2s ease}
 .sheet[hidden]{display:none}
 .sb{position:relative;background:var(--card);border:1px solid var(--line);border-bottom:0;width:100%;max-width:560px;max-height:88vh;overflow:auto;overscroll-behavior:contain;border-radius:20px 20px 0 0;padding:22px 16px calc(16px + env(safe-area-inset-bottom));box-shadow:0 -8px 30px #0008;animation:up .28s var(--ease);scrollbar-width:thin;scrollbar-color:var(--line2) transparent}
@@ -144,7 +242,7 @@ details.wl[open] summary::after{transform:rotate(90deg)}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chips button{font-size:.78rem;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--cell);cursor:pointer}
 .chips.d button{border-color:var(--dec);background:var(--decbg)}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--tx);color:#111;padding:10px 16px;border-radius:999px;font-size:.85rem;font-weight:500;z-index:40;box-shadow:0 6px 20px #0009;animation:toast .25s var(--ease);max-width:calc(100% - 32px)}
+.toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--tx);color:#111;padding:10px 16px;border-radius:999px;font-size:.85rem;font-weight:500;z-index:40;box-shadow:0 6px 20px #0009;animation:toast .25s var(--ease);max-width:calc(100% - 32px)}
 @keyframes toast{from{opacity:0;transform:translate(-50%,10px)}}
 .toast[hidden]{display:none}
 .tabs.fr{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 48px),#0000);mask-image:linear-gradient(90deg,#000 calc(100% - 48px),#0000)}
@@ -182,20 +280,19 @@ a{color:var(--acc)}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style></head><body>
-<div class="top"><h1>Pokédex Binders <span class="ver" id="ver" title="App version" hidden></span></h1><button class="icon wb" id="wbtn" aria-label="Wants" title="Wants">♡</button><button class="icon" id="gear" aria-label="Settings">⚙︎</button></div>
-<p class="s"><span id="sub"></span><button class="lnk" id="bset" hidden>⚙︎ Binder settings</button></p>
-<div class="tabs" id="tabs"></div>
-<div class="search"><input id="q" type="search" placeholder="Search name or #number, then press Enter" enterkeyhint="search" autocomplete="off"><div id="r"></div></div>
+<div class="top"><button class="shelf" id="shelf" aria-label="Your binders" title="Your binders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 21h20"/><rect x="4" y="6" width="4" height="15" rx="1"/><rect x="9.5" y="3" width="4" height="18" rx="1"/><path d="M15.5 7.5l3.4-.9 3 13.5-3.4.9z"/></svg><span class="bn" id="bname"></span><span class="car">▾</span></button><span class="ver" id="ver" title="App version" hidden></span><span class="sp1"></span><button class="sync" id="sv" aria-label="Sync status"></button><button class="icon wb" id="wbtn" aria-label="Wants" title="Wants">♡</button><button class="icon" id="gear" aria-label="Settings">⚙︎</button></div>
+<button class="fab" id="fab" aria-label="Search" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg><span class="x">✕</span></button>
+<div class="sp" id="sp" hidden><div class="sr2"><input id="q" type="search" placeholder="Pokémon name or #number" enterkeyhint="search" autocomplete="off"><button class="btn pri" id="qgo">Search</button></div><div id="r"></div></div>
 <div class="stats" id="st"></div>
 <div class="book" id="book"><div class="pg l" id="L"></div><div class="pg r" id="R"></div>
 <div class="leaf" id="F"><div class="face front" id="FF"></div><div class="face back" id="FB"></div></div></div>
 <div class="nav"><button id="pv" aria-label="Previous">‹</button><span id="pi"></span><button id="nx" aria-label="Next">›</button></div>
 <div class="hint">Tap a pocket to mark it (★ Top · ↻ Upgrade needed), choose your print, or replace the Pokémon</div>
-<details class="wl" id="wl"><summary>Missing &amp; upgrades (this binder)</summary><div id="wlc"></div></details>
 
 <div class="sheet" id="sh" hidden><div class="sb">
- <div class="shh"><img id="shimg" alt="" hidden><div><div id="shn"></div><div id="shm"></div></div></div>
+ <div class="shh"><div class="art"><img id="shimg" alt="" hidden><b class="foil" id="shfoil" hidden></b><b class="glare" id="shglare" hidden></b></div><div><div id="shn"></div><div id="shm"></div></div></div>
  <div class="opts"><button data-s="">Don't have</button><button data-s="decent">↻ Upgrade needed</button><button data-s="top">★ Top</button></div>
+ <div class="fin" id="fin" hidden><div class="seg" id="finv"></div><div class="seg" id="finp"></div></div>
  <div class="pkh">Your print <input id="pf" type="text" placeholder="Filter: set or name"></div>
  <div class="seg" id="plang"><button data-l="">All</button><button data-l="en">English</button><button data-l="ja">Japanese</button><button data-l="zh-tw">Chinese (Trad.)</button><button data-l="zh-cn">Chinese (Simp.)</button></div>
  <div class="pgrid" id="pk"></div>
@@ -204,11 +301,14 @@ a{color:var(--acc)}
 </div></div>
 
 <div class="sheet set" id="wn" hidden><div class="sb">
- <h3>♡ Wants</h3>
+ <div class="seg" id="wtab" style="margin-bottom:12px"><button data-t="w" class="on">♥ Wants</button><button data-t="m">Missing &amp; upgrades</button></div>
+ <div id="mpane" hidden><p id="mph" style="margin-top:0"></p><div class="wl" id="wlc"></div></div>
+ <div id="wpane">
  <input type="search" id="wq" placeholder="Find a Pokémon to add cards: name or #number" autocomplete="off" enterkeyhint="search">
  <div id="wres"></div>
  <h3 id="wlh">Your want list</h3>
  <div class="pgrid" id="wlist"></div>
+ </div>
  <div class="row"><button class="btn pri" id="wx">Done</button></div>
 </div></div>
 
@@ -229,6 +329,12 @@ a{color:var(--acc)}
  <input type="text" id="adno" placeholder="Card number, e.g. 012/080" maxlength="20" autocomplete="off" style="margin-top:8px">
  <select id="adlang"><option value="zh-cn">Chinese (Simplified)</option><option value="zh-tw">Chinese (Traditional)</option><option value="ja">Japanese</option><option value="ko">Korean</option><option value="en">English</option><option value="other">Other</option></select>
  <div class="row" style="margin-top:16px"><button class="btn warn" id="addel" hidden>Delete</button><button class="btn" id="adx">Cancel</button><button class="btn pri" id="ads">Save card</button></div>
+</div></div>
+
+<div class="sheet set" id="shf" hidden><div class="sb">
+ <h3>Your binders</h3>
+ <div class="tabs shelfl" id="tabs"></div>
+ <div class="row"><button class="btn pri" id="shfx">Done</button></div>
 </div></div>
 
 <div class="sheet set" id="bs" hidden><div class="sb">
@@ -363,8 +469,9 @@ let saveT;
 function save(){clearTimeout(saveT);saveT=setTimeout(()=>{saveT=null;ls.set('pb-col',col);note('Saved on this device ✓')},300)}
 // Leaving the app: save a change still waiting on the timer, so it isn't lost (sync.js then uploads it).
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&saveT){clearTimeout(saveT);saveT=null;ls.set('pb-col',col)}});
-function toast(t){const e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(e._t);e._t=setTimeout(()=>e.hidden=true,2600)}
-let nt0='';function note(t){nt0=t;const e=$('sv');if(e)e.textContent=t}
+function toast(t,ms=2600){const e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(e._t);e._t=setTimeout(()=>e.hidden=true,ms)}
+let nt0='';function note(t){nt0=t;const e=$('sv');if(!e)return;e.title=t;e.setAttribute('aria-label',t);
+ e.className='sync'+(/Synced/.test(t)?' ok':/Syncing/.test(t)?' busy':/fail|offline|Offline|will sync/i.test(t)?' warn':'')}
 
 /* ---------- card data (TCGdex) ---------- */
 let setInfo=ls.get('pb-sets2',null);    // {order:{'lang|set':i}, name:{'lang|set':name}, pocket:[ids]}
@@ -409,15 +516,38 @@ function pickDefault(all){const arr=all.filter(c=>c.lang==='en'&&c.img);if(!arr.
 const pending=new Set();let rrT;
 function rerenderSoon(){clearTimeout(rrT);rrT=setTimeout(()=>{if(!busy)show()},120)}
 function ensureDefaults(sp){
- const ns=[];for(const s of [sp,sp+1,sp-1])for(let k=0;k<PER;k++){const p=P[vp(s,k)];if(p)p.it.forEach(n=>{if(n)ns.push(n)})}
+ const ns=[];for(const s of PER===1?[sp,sp+1,sp-1,sp+2,sp-2,sp+3]:[sp,sp+1,sp-1])for(let k=0;k<PER;k++){   /* phones: also the pages a turn reveals */const p=P[vp(s,k)];if(p)p.it.forEach(n=>{if(n)ns.push(n)})}
  ns.filter(n=>!(col[n]&&col[n].c)&&!defs[n]&&!pending.has(n)).forEach(async n=>{
   pending.add(n);
   try{const d=pickDefault(await list(n));defs[n]=d?{c:d.id,img:d.img}:{none:1};ls.set('pb-defs-'+opt.ord,defs);rerenderSoon()}
   catch(e){note('Offline — card images will load when you’re back online')}
   finally{pending.delete(n)}});
 }
-async function priceOf(id){if(isCustom(id))return null;const [l,raw]=splitId(id);if(l!=='en')return null; // Cardmarket prices only exist for English prints
- const d=await getJSON(`${TCG}/${l}/cards/${encodeURIComponent(raw)}`);
+const varsOf=d=>{const v=d&&d.variants||{};return ['normal','holo','reverse'].filter(k=>v[k])};
+// How the foil sits on a card, by rarity (TCGdex names): the whole card, or the artwork only (classic holo)
+// Full-card foil, by rarity: the pattern ('era' = the set's own holo pattern, see eraPattern)
+const RAR_FULL={'Illustration rare':'sparkle','Special illustration rare':'glitter','Shiny rare':'silver','Shiny rare V':'silver','Shiny rare VMAX':'silver','Shiny Ultra Rare':'silver',
+ 'Hyper rare':'gold','Mega Hyper Rare':'gold','Ultra Rare':'sparkle','Full Art Trainer':'sparkle','Secret Rare':'prism','Double rare':'era',
+ 'Holo Rare V':'era','Holo Rare VMAX':'era','Holo Rare VSTAR':'era','Radiant Rare':'cosmos','Amazing Rare':'prism','ACE SPEC Rare':'era',
+ 'Rare Holo LV.X':'era','Rare PRIME':'era','LEGEND':'era','Black White Rare':'prism','Mega Attack Rare':'era'};
+// The holo pattern a set's era used: Starlight (Base, Jungle, Fossil), Cosmos (Base Set 2 .. Call of Legends),
+// Sheen (Black & White .. Sword & Shield), Mirage (Scarlet & Violet onward: light refracted horizontally)
+function eraPattern(id){const raw=splitId(id||'')[1]||'',set=raw.slice(0,raw.lastIndexOf('-'));
+ if(/^(base[123]|basep)$/i.test(set))return 'starlight';
+ if(/^(sv|me|rsv|zsv|30th|SV|M\d)/.test(set))return 'mirage';
+ if(/^(bw|xy|g1|dc|sm|det|cel|swsh|pgo|fut|tk-(bw|xy|sm)|mcd1[4-9]|mcd2|BW|XY|SM|S\d|S-|SC|SI|SK|SJ|SL|SN|SP|SD|SH)/.test(set))return 'sheen';
+ return 'cosmos'}
+const PATTERNS=[['starlight','Starlight'],['cosmos','Cosmos'],['sheen','Sheen'],['mirage','Mirage'],['sparkle','Etched'],['glitter','Glitter'],['silver','Silver'],['gold','Gold'],['prism','Rainbow']];
+function autoPattern(e){const r=e.f==='full'&&RAR_FULL[e.rar];return r&&r!=='era'?r:eraPattern(e.c)}
+const patternOf=e=>PATTERNS.some(([k])=>k===e.fp)?e.fp:autoPattern(e);   // only known patterns go into the class name
+const RAR_HOLO=new Set(['Holo Rare','Rare Holo','Classic Collection']);
+function autoFinish(x){   // set the finish a print can only have; x: the collection entry
+ if(RAR_FULL[x.rar]){x.f='full';return}
+ if(RAR_HOLO.has(x.rar)&&!(x.vars||[]).includes('normal')){x.f='holo';return}
+ if(x.vars&&x.vars.length===1&&x.vars[0]!=='normal')x.f=x.vars[0]}
+async function priceOf(id,info){if(isCustom(id))return null;const [l,raw]=splitId(id);
+ const d=await getJSON(`${TCG}/${l}/cards/${encodeURIComponent(raw)}`);if(info){info.vars=varsOf(d);info.rar=d.rarity||''}
+ if(l!=='en')return null; // Cardmarket prices only exist for English prints
  const cm=d.pricing&&d.pricing.cardmarket;if(!cm)return null;
  const v=d.variants||{};const holoOnly=v.holo&&!v.normal;
  const p=holoOnly?(cm['trend-holo']??cm['avg-holo']??cm.trend??cm.avg):(cm.trend??cm.avg??cm['trend-holo']);
@@ -432,32 +562,47 @@ function cell(n,i){if(!n)return `<div class="c e add" data-i="${i}" title="Add a
  const cls='c'+(s?' '+s:' no')+(img?' im':'')+(hits.has(n)?' hit':'');
  const badge=s==='top'?'<i>★</i>':s==='decent'?'<i>↻</i>':'';
  const inner=img?`<img src="${esc(pic(img,'low'))}" alt="${esc(nm)}" loading="lazy" decoding="async">`:`<b>#${pad(n)}</b><span>${esc(nm)}</span>${e.c?`<small class="ps">${e.lang&&e.lang!=='en'&&LTAG[e.lang]?LTAG[e.lang]+' · ':''}${esc(setEn(e.set,e.c))} ${esc(e.no||'')}</small>`:''}`;
- return `<div class="${cls}" data-n="${n}" data-i="${i}" data-l="#${pad(n)} ${esc(nm)}">${inner}${badge}</div>`}
+ const foil=img&&e.c&&(e.f==='holo'||e.f==='reverse'||e.f==='full')?`<b class="foil ${e.f} ${patternOf(e)}"></b><b class="glare"></b>`:'';
+ return `<div class="${cls}" data-n="${n}" data-i="${i}" data-l="#${pad(n)} ${esc(nm)}">${inner}${foil}${badge}</div>`}
+const sideOf=i=>(i+(binders[bi]&&binders[bi].right?1:0))%2===0?'left':'right';   // where page i sits in the real binder
 function page(i){const p=P[i];if(!p)return i<0?'<div class="cover">Inside cover</div>':'';
  const sz=SZ(),[cols]=SIZES[sz],c=p.it.map((n,k)=>cell(n,i*sz+k)).join('');
- return `<div class="g${p.g}" style="--cols:${cols};--k:${cols>3?(cols>4?.75:.85):1}"><div class="h">Page ${p.n}${p.g?`<small>Gen ${p.g}</small>`:''}</div><div class="g">${c}</div></div>`}
+ return `<div class="g${p.g}" style="--cols:${cols};--k:${cols>3?(cols>4?.75:.85):1}"><div class="h"><span class="hl">Page ${p.n}${PER===1?`<span class="side" title="Side of the binder">${sideOf(i)==='left'?'◧ Left page':'Right page ◨'}</span>`:''}</span>${p.g?`<small>Gen ${p.g}</small>`:''}</div><div class="g">${c}</div></div>`}
 function show(){if(!binders.length){$('L').innerHTML=$('R').innerHTML='';$('pi').textContent='';return}
- $('book').classList.toggle('one',PER===1);$('L').innerHTML=page(vp(spread,0));$('R').innerHTML=PER===1?'':page(vp(spread,1));
+ requestAnimationFrame(fitBook);
+ $('book').classList.toggle('sr',PER===1&&sideOf(vp(spread,0))==='right');
+ $('book').classList.toggle('one',PER===1);
+ if(PER===1){const i=vp(spread,0),sd=sideOf(i),lp=sd==='left'?i:i-1;     // the open spread: left page lp, right page lp+1
+  $('L').innerHTML=page(lp)||'<div class="blank"></div>';$('R').innerHTML=page(lp+1)||'<div class="blank"></div>';
+  if(lp>0)$('L').insertAdjacentHTML('beforeend','<button class="curl l" data-curl="-1" aria-label="Turn the page back" title="Turn the page back"></button>');
+  if(lp+2<P.length)$('R').insertAdjacentHTML('beforeend','<button class="curl r" data-curl="1" aria-label="Turn the page" title="Turn the page"></button>');
+  for(const el of [$('L'),$('R')]){el.style.removeProperty('--ry');el.style.transformOrigin='';el.title=''}
+  setTx(focusTx(sd));preloadAround(lp)}
+ else{$('L').innerHTML=page(vp(spread,0));$('R').innerHTML=page(vp(spread,1));$('R').title=''}
  const vis=[...Array(PER).keys()].map(k=>vp(spread,k)).filter(i=>P[i]);if(PER===1||!vis.includes(lastPg))lastPg=vis[0]??0;
  $('pi').textContent=vis.length>1?`Pages ${vis[0]+1}–${vis[1]+1} of ${P.length}`:`Page ${(vis[0]??0)+1} of ${P.length}`;$('pv').disabled=spread==0;$('nx').disabled=spread==S-1;ensureDefaults(spread)}
 function nums(b=bi){return binders[b]?[...new Set(binders[b].slots.filter(Boolean))]:[]}
-function tabFade(){const t=$('tabs'),m=t.scrollWidth-t.clientWidth;t.classList.toggle('fl',t.scrollLeft>2);t.classList.toggle('fr',m>2&&t.scrollLeft<m-2)}
+function tabFade(){const bnm=$('bname');if(bnm)bnm.textContent=binders[bi]?binders[bi].name:'Binders';const t=$('tabs'),m=t.scrollWidth-t.clientWidth;t.classList.toggle('fl',t.scrollLeft>2);t.classList.toggle('fr',m>2&&t.scrollLeft<m-2)}
 function tabs(){$('tabs').innerHTML=binders.map((b,i)=>{const ns=nums(i),h=ns.filter(n=>col[n]&&col[n].s).length;
- return `<button class="${i===bi?'on':''}" data-b="${i}">${esc(b.name)}<small>${h}/${ns.length}</small></button>`}).join('')+'<button class="new" data-new="1" aria-label="New binder">＋<small>New</small></button>';
- const ns=nums(),sorted=[...ns].sort((a,b)=>a-b),run=ns.length>1&&sorted[sorted.length-1]-sorted[0]===ns.length-1;
- $('bset').hidden=!binders.length;$('sub').textContent=binders.length?`${SZ()}-pocket · ${run?`#${sorted[0]}–${sorted[sorted.length-1]} · `:''}${ns.length} Pokémon · ${P.length} pages`:'';tabFade()}
+ return `<button class="${i===bi?'on':''}" data-b="${i}"${i===bi?` title="${esc(binfo())}"`:''}>${esc(b.name)}<small>${h}/${ns.length}</small>${i===bi?'<span class="tm" data-bset="1" role="button" aria-label="Binder settings" title="Binder settings">⋯</span>':''}</button>`}).join('')+'<button class="new" data-new="1" aria-label="New binder">＋ New binder</button>';
+ tabFade()}
+function binfo(){const ns=nums(),sorted=[...ns].sort((a,b)=>a-b),run=ns.length>1&&sorted[sorted.length-1]-sorted[0]===ns.length-1;
+ return binders.length?`${SZ()}-pocket · ${run?`#${sorted[0]}–${sorted[sorted.length-1]} · `:''}${ns.length} Pokémon · ${P.length} pages`:''}
 function stats(){if(!binders.length){tabs();$('st').innerHTML='';return}const bn=nums(),v=bn.map(n=>col[n]).filter(e=>e&&e.s),t=v.filter(e=>e.s==='top').length,d=v.length-t;
  const val=v.reduce((a,e)=>a+(e.p||0),0);
- tabs();$('st').innerHTML=`<span class="pill"><b>${v.length}</b>/${bn.length} owned</span><span class="pill t" title="Top">★ ${t}</span><span class="pill d" title="Upgrade needed">↻ ${d}</span><span class="pill">${bn.length-v.length} missing</span>${val?`<span class="pill">≈ ${eur(val)}</span>`:''}<span id="sv"></span>`;
- $('sv').textContent=nt0;if($('wl').open)wl()}
+ tabs();const pct=bn.length?Math.round(v.length/bn.length*100):0;
+ $('st').innerHTML=`<div class="prog" title="${v.length} of ${bn.length} owned · ${bn.length-v.length} missing"><span><b>${v.length}</b>/${bn.length}</span><span class="bar"><i style="width:${pct}%"></i></span><span class="pt" title="Top">★ ${t}</span><span class="pd" title="Upgrade needed">↻ ${d}</span>${val?`<span class="pv" title="Cardmarket value">${eur(val)}</span>`:''}</div>`;
+ if(!$('wn').hidden&&wTab==='m')wl()}
 function wl(){const ns=nums(),dec=ns.filter(n=>col[n]&&col[n].s==='decent'),mis=ns.filter(n=>!(col[n]&&col[n].s));
  const ch=a=>a.map(n=>`<button data-n="${n}">#${pad(n)} ${esc(N[n])}</button>`).join('')||'<span style="color:var(--dim);font-size:.8rem">None</span>';
  $('wlc').innerHTML=`<h3>↻ Upgrade needed (${dec.length})</h3><div class="chips d">${ch(dec)}</div><h3>Missing (${mis.length})</h3><div class="chips">${ch(mis)}</div>`}
 function refresh(){if(!busy)show();else idle().then(()=>{if(!busy)show()});stats()}
 
 /* ---------- page flipping ---------- */
-function flip(dir,ms){if(PER===1)return new Promise(res=>{spread+=dir;show(); // phone: quick slide instead of a page turn
-  const a=$('L').animate([{transform:`translateX(${dir*40}px)`,opacity:.2},{transform:'none',opacity:1}],{duration:Math.min(ms,240),easing:'ease-out'});a.onfinish=a.oncancel=res});
+function flip(dir,ms){if(PER===1){const m=moveKind(dir);   // phone: slide across the spread, or turn the sheet over
+  const dur=m==='turn'?Math.max(160,Math.min(ms,520)):Math.max(120,Math.min(ms,260));
+  if(m==='slide')return tween(0,1,dur,p=>slideTo(dir,p)).then(()=>{spread+=dir;show()});
+  const st=turnStart(dir);return tween(0,1,dur,p=>turnTo(st,p)).then(()=>turnEnd(st,true))}
  return new Promise(res=>{const F=$('F'),nx=spread+dir;
  F.className='leaf '+(dir>0?'f':'b');F.style.transition='none';F.style.transform='rotateY(0deg)';F.style.visibility='visible';
  if(dir>0){$('FF').innerHTML=page(vp(spread,1));$('FB').innerHTML=page(vp(nx,0));$('R').innerHTML=page(vp(nx,1))}
@@ -473,15 +618,93 @@ async function run(){if(busy)return;busy=true;
 function go(s){target=Math.max(0,Math.min(S-1,s));const b=$('book').getBoundingClientRect();
  if(b.top<0||b.bottom>innerHeight){try{scrollTo({top:b.top+scrollY-8,behavior:'smooth'})}catch(e){}}run()}
 const idle=()=>new Promise(r=>{const w=()=>busy?setTimeout(w,50):r();w()});
+
+/* ---------- phone: move between pages with your finger ---------- */
+// The open spread is two pages side by side (each --W wide); the book shows one and PEEK px of the other.
+// Within a spread you slide the pair (--tx). Past the edge you turn the sheet: the page swings over the spine
+// (rotateY), and halfway the next spread is put in place and its page comes down on the other side.
+const PEEK=26;
+const oneW=()=>Math.max(100,$('book').clientWidth-PEEK);
+const focusTx=sd=>sd==='left'?0:-(oneW()-PEEK);
+function setTx(px){$('book').style.setProperty('--tx',px+'px');shBase=.25+.5*Math.min(1,Math.max(0,-px/Math.max(1,oneW()-PEEK)));shine()}
+// foil shine position: follows the pages (shBase), plus the phone's tilt or the mouse (shTilt)
+let shBase=.5,shTilt=0;
+function shine(){document.documentElement.style.setProperty('--sh',(shBase+shTilt).toFixed(3))}
+addEventListener('deviceorientation',e=>{if(e.gamma==null)return;shTilt=Math.max(-.35,Math.min(.35,e.gamma/60));shine()});
+addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;shTilt=(e.clientX/innerWidth-.5)*.7;shine()},{passive:true});
+function moveKind(dir){const sd=sideOf(vp(spread,0));return (dir>0&&sd==='right')||(dir<0&&sd==='left')?'turn':'slide'}
+function slideTo(dir,p){const a=dir>0?0:-(oneW()-PEEK),b=dir>0?-(oneW()-PEEK):0;setTx(a+(b-a)*p)}
+// Turning a sheet, like a real binder: the sheet stays hinged at the spine. Its front is the page you leave,
+// its back the page you land on, the page underneath is already in place, and the view follows the sheet over.
+const blank='<div class="blank"></div>';
+function turnStart(dir){const i=vp(spread,0),lp=sideOf(i)==='left'?i:i-1,W=oneW(),F=$('F');
+ const st={dir,W,tx0:dir>0?-(W-PEEK):0,tx1:dir>0?0:-(W-PEEK)};
+ if(dir>0){$('FF').innerHTML=page(lp+1)||blank;$('FB').innerHTML=page(lp+2)||blank;$('R').innerHTML=page(lp+3)||blank}   // right page turns forward
+ else{$('FF').innerHTML=page(lp)||blank;$('FB').innerHTML=page(lp-1)||blank;$('L').innerHTML=page(lp-2)||blank}         // left page turns back
+ F.className='leaf '+(dir>0?'one-f':'one-b');F.style.left=(dir>0?W:0)+'px';F.style.width=W+'px';
+ F.style.transformOrigin=dir>0?'left center':'right center';F.style.transition='none';F.style.visibility='visible';
+ turnTo(st,0);return st}
+function turnTo(st,p){const a=(st.dir>0?-180:180)*p,tx=st.tx0+(st.tx1-st.tx0)*p,F=$('F'),back=Math.abs(a)>90;
+ setTx(tx);shBase+=(st.dir>0?-.55:.55)*Math.sin(p*Math.PI);shine();   /* the light sweeps over the foil as the sheet lifts */
+ F.style.transform=`translateX(${tx}px) rotateY(${a}deg)`;
+ $('FF').style.visibility=back?'hidden':'visible';$('FB').style.visibility=back?'visible':'hidden';
+}
+function turnEnd(st,done){const F=$('F');F.style.visibility='hidden';F.style.transform='';F.style.left='';F.style.width='';F.className='leaf';
+ for(const el of [$('FF'),$('FB')]){el.style.visibility='';el.style.filter='';el.innerHTML=''}
+ if(done)spread+=st.dir;show()}
+const ease=t=>1-Math.pow(1-t,3);   // starts at finger speed, settles softly
+function tween(from,to,ms,fn){return new Promise(res=>{const t0=performance.now();
+ const step=now=>{const k=Math.min(1,(now-t0)/ms);fn(from+(to-from)*ease(k));k<1?requestAnimationFrame(step):res()};requestAnimationFrame(step)})}
+// load the pictures of the neighbouring spreads before you get there
+const preloaded=new Set();
+function preloadAround(lp){for(const pg of [lp-2,lp-1,lp+2,lp+3]){const p=P[pg];if(!p)continue;
+ p.it.forEach(n=>{const im=n&&imgOf(n);if(im&&!preloaded.has(im)){preloaded.add(im);const x=new Image();x.decoding='async';x.src=pic(im,'low')}})}}
+let drag=null,noClick=false;
+$('book').addEventListener('pointerdown',e=>{if(PER!==1||busy||e.button>0||e.target.closest('[data-curl]'))return;
+ drag={x:e.clientX,y:e.clientY,t:performance.now(),mode:null,p:0}});
+$('book').addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
+ if(!drag.mode){if(Math.abs(dx)<8)return;if(Math.abs(dy)>Math.abs(dx)){drag=null;return}
+  const dir=dx<0?1:-1,ok=dir>0?spread<S-1:spread>0;if(!ok){drag=null;return}
+  drag.dir=dir;drag.mode=moveKind(dir);busy=true;target=spread;if(drag.mode==='turn')drag.st=turnStart(dir);
+  try{$('book').setPointerCapture(e.pointerId)}catch(_){}}
+ const dist=drag.mode==='turn'?oneW()*.62:(oneW()-PEEK)*.8;drag.p=Math.max(0,Math.min(1,-drag.dir*dx/dist));
+ const now=performance.now();drag.v=-drag.dir*(e.clientX-(drag.lx??drag.x))/Math.max(1,now-(drag.lt??drag.t));drag.lx=e.clientX;drag.lt=now;   // speed of the last move
+ drag.mode==='turn'?turnTo(drag.st,drag.p):slideTo(drag.dir,drag.p)});
+function dragEnd(){if(!drag)return;const d=drag;drag=null;if(!d.mode)return;if(performance.now()-(d.lt||d.t)>120)d.v=0;   // paused before letting go: not a flick
+ noClick=true;setTimeout(()=>noClick=false,0);
+ const done=d.v>.25||(d.v>-.25&&d.p>.22),to=done?1:0,ms=Math.max(80,(d.mode==='turn'?380:220)*Math.abs(to-d.p));
+ tween(d.p,to,ms,p=>d.mode==='turn'?turnTo(d.st,p):slideTo(d.dir,p)).then(()=>{
+  if(d.mode==='slide'){if(done)spread+=d.dir;show()}else turnEnd(d.st,done);
+  target=spread;busy=false;if(binders[bi])mem[binders[bi].id]=Math.max(0,vp(spread,0));ls.set('pb-mem2',mem)})}
+$('book').addEventListener('pointerup',dragEnd);$('book').addEventListener('pointercancel',dragEnd);
+$('book').addEventListener('click',e=>{if(noClick){e.stopPropagation();e.preventDefault();noClick=false}},true);
 async function setBinder(i,sp,force){if(i===bi&&sp==null&&!force)return;target=spread;await idle();
  if(binders[bi])mem[binders[bi].id]=Math.max(0,vp(spread,0));bi=Math.max(0,Math.min(i,binders.length-1));layout();spread=target=Math.min(pv(sp??(binders[bi]?mem[binders[bi].id]||0:0)),S-1);
  const bk=$('book');bk.classList.remove('sw');bk.offsetWidth;bk.classList.add('sw');
  if(binders[bi])ls.set('pb-curid',binders[bi].id);ls.set('pb-mem2',mem);show();stats();
  const on=$('tabs').querySelector('button.on');if(on)try{on.scrollIntoView({block:'nearest',inline:'nearest'})}catch(e){}}
 $('tabs').addEventListener('scroll',tabFade,{passive:true});addEventListener('resize',tabFade);
-$('tabs').addEventListener('click',e=>{if(e.target.closest('button[data-new]'))return openNew(false);const b=e.target.closest('button[data-b]');if(b)setBinder(+b.dataset.b)});
+$('tabs').addEventListener('click',e=>{if(e.target.closest('button[data-new]'))return openNew(false);if(e.target.closest('[data-bset]'))return openBset();const b=e.target.closest('button[data-b]');if(b){$('shf').hidden=true;setBinder(+b.dataset.b)}});
+$('shelf').onclick=()=>{closeAll();tabs();$('shf').hidden=false};
+$('shfx').onclick=closeAll;
+/* Fit one page (phone) or the spread (wide screens) between the top bar and the page arrows, so no scrolling is needed. */
+let fitH=0;
+function fitBook(){const bk=$('book');if(!binders.length)return;
+ if(document.activeElement&&/INPUT|TEXTAREA/.test(document.activeElement.tagName))return;   // the on-screen keyboard shrinks the window: ignore
+ const H=innerHeight;fitH=H;const [cols,rows]=SIZES[SZ()],gap=4;
+ const top=bk.getBoundingClientRect().top+scrollY,nav=$('pi').parentElement,navH=nav.offsetHeight+parseFloat(getComputedStyle(nav).marginTop||0);
+ const avail=H-top-navH-14;                                        // room left for the page itself
+ const over=10+12+30;                                               // page padding + "Page N" header
+ const cardH=(avail-over-(rows-1)*gap)/rows,cardW=cardH*63/88;
+ const padX=PER===1?30+26:15,pageW=cols*cardW+(cols-1)*gap+padX;
+ let w=Math.round(Math.max(240,Math.min(900,pageW*PER)));bk.style.maxWidth=w+'px';
+ // measure the result and shrink once if the arrows still fall below the screen
+ const over2=nav.getBoundingClientRect().bottom+scrollY-(H-8),bh=bk.offsetHeight;
+ if(over2>0&&bh>0){w=Math.round(Math.max(240,w*(bh-over2)/bh));bk.style.maxWidth=w+'px'}
+ if(PER===1){bk.style.setProperty('--W',oneW()+'px');if(!drag)setTx(focusTx(sideOf(vp(spread,0))))}}
+addEventListener('resize',fitBook);
 $('pv').onclick=()=>go(target-1);$('nx').onclick=()=>go(target+1);
-let tx=null;$('book').addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
+let tx=null;$('book').addEventListener('touchstart',e=>{tx=PER===1?null:e.touches[0].clientX},{passive:true});
 $('book').addEventListener('touchend',e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>40)go(target+(dx<0?1:-1));tx=null});
 document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA/.test(e.target.tagName))return;if(e.key==='ArrowRight')go(target+1);if(e.key==='ArrowLeft')go(target-1);if(e.key==='Escape')closeAll()});
 
@@ -498,10 +721,18 @@ function search(){
  r.textContent=(found.length>1?found.length+' matches · first: ':'')+`Page ${pn}, row ${Math.floor(f.k/f.cols)+1}, slot ${f.k%f.cols+1}`+d;
  cur={b:f.b,pn};lastPg=f.pi;if(other)setBinder(f.b,f.pi);else setTimeout(()=>go(pv(f.pi)),350)}
 MQ.addEventListener('change',async()=>{target=spread;await idle();const vis=[vp(spread,0),vp(spread,1)];const pg=PER===2&&vis.includes(lastPg)?lastPg:Math.max(0,vp(spread,0));PER=MQ.matches?1:2;layout();spread=target=Math.min(pv(pg),S-1);show()});
-$('q').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('q').blur();search()}});
+/* search lives behind the floating 🔍 button */
+function openSearch(){$('q').value='';hits=new Set();$('r').textContent='';if(!busy)show();$('sp').hidden=false;$('fab').classList.add('on');$('fab').setAttribute('aria-label','Close search');setTimeout(()=>$('q').focus(),30)}
+function closeSearch(){$('sp').hidden=true;$('fab').classList.remove('on');$('fab').setAttribute('aria-label','Search')}
+function runSearch(){if(!$('q').value.trim())return;$('q').blur();search();const t=$('r').textContent;
+ if(t&&t!=='No match'){closeSearch();toast(t,5000)}}
+$('fab').onclick=()=>$('sp').hidden?openSearch():closeSearch();
+$('qgo').onclick=runSearch;
+$('q').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();runSearch()}if(e.key==='Escape')closeSearch()});
+$('q').addEventListener('focus',()=>{if(!$('q').value&&!hits.size)return;$('q').value='';hits=new Set();$('r').textContent='';if(!busy)show()});
 $('q').addEventListener('input',()=>{if(!$('q').value){hits=new Set();$('r').textContent='';if(!busy)show()}});
-$('wl').addEventListener('toggle',()=>{if($('wl').open)wl()});
-$('wlc').addEventListener('click',e=>{const b=e.target.closest('button[data-n]');if(!b)return;$('q').value='#'+b.dataset.n;search()});
+
+$('wlc').addEventListener('click',e=>{const b=e.target.closest('button[data-n]');if(!b)return;closeAll();$('q').value='#'+b.dataset.n;search();if($('r').textContent)toast($('r').textContent,5000)});
 
 /* ---------- card sheet ---------- */
 function entry(n){return col[n]||(col[n]={})}
@@ -510,7 +741,18 @@ function sheetHead(){const n=sel,e=col[n]||{},img=imgOf(n);
  $('shn').textContent=`#${pad(n)} ${N[n]}`;
  const im=$('shimg');if(img){im.src=pic(img,'high');im.hidden=false}else im.hidden=true;
  $('shm').innerHTML=e.c?`${isCustom(e.c)?'<i class="lt cu">Custom</i>':''}${e.lang&&e.lang!=='en'?`<i class="lt">${LTAG[e.lang]||''}</i>`:''}${esc(setEn(e.set,e.c))} · #${esc(e.no||'')}${img?'':' · no picture'}${isCustom(e.c)?' <button class="lnk" data-edit="1">Edit</button>':''}${e.p!=null?`<br>Cardmarket trend: <b>${eur(e.p)}</b>`:''}`:(defs[n]&&defs[n].img?'Showing default art — pick your print below':'');
- $('sh').querySelectorAll('.opts button').forEach(b=>b.classList.toggle('on',(b.dataset.s||'')===(e.s||'')))}
+ $('sh').querySelectorAll('.opts button').forEach(b=>b.classList.toggle('on',(b.dataset.s||'')===(e.s||'')));
+ const fo=$('shfoil'),foilOn=!!(img&&e.c&&(e.f==='holo'||e.f==='reverse'||e.f==='full'));fo.hidden=!foilOn;fo.className='foil '+(foilOn?e.f+' '+patternOf(e):'');$('shglare').hidden=!foilOn;
+ $('fin').hidden=!e.c||isCustom(e.c);if(!e.c||isCustom(e.c))return;
+ $('fin').title=e.rar?'Rarity: '+e.rar:'';
+ const av=e.vars&&e.vars.length?[...e.vars]:['normal','holo','reverse'],F={normal:'Normal',holo:'✦ Holo',reverse:'✧ Reverse',full:'✦ Full card'};
+ if(RAR_FULL[e.rar]||av.includes('holo'))av.push('full');
+ $('finv').innerHTML=['normal','holo','reverse','full'].filter(k=>av.includes(k)).map(k=>`<button data-f="${k}" class="${(e.f||'normal')===k?'on':''}">${F[k]}</button>`).join('');
+ $('finp').hidden=!foilOn;const ap=autoPattern(e),APN=Object.fromEntries(PATTERNS);
+ $('finp').innerHTML=foilOn?`<button data-fp="" class="${e.fp?'':'on'}" title="Chosen from the card's set and rarity">Auto · ${APN[ap]}</button>`+PATTERNS.map(([k,t])=>`<button data-fp="${k}" class="${e.fp===k?'on':''}">${t}</button>`).join(''):''}
+$('fin').addEventListener('click',ev=>{const en=col[sel];if(!en||!en.c)return;const b=ev.target.closest('[data-f],[data-fp]');if(!b)return;
+ if(b.dataset.f){if(b.dataset.f==='normal')delete en.f;else en.f=b.dataset.f}else if(b.dataset.fp)en.fp=b.dataset.fp;else delete en.fp;   // Auto = no own choice
+ save();refresh();sheetHead()});
 const customList=n=>Object.entries(customs).filter(([,c])=>c.n===n).map(([id,c])=>({id:'custom:'+id,lang:c.lang,custom:1,name:N[n],no:c.no,img:c.img,os:c.set,set:setEn(c.set),sid:''}));
 const addTile='<button data-add="1" class="addc"><div class="ph">＋<small>Card not listed</small></div><span>Add your own card</span></button>';
 const wantN=n=>Object.values(wants).filter(w=>w.n===n).length;
@@ -527,7 +769,11 @@ async function picker(){const n=sel,box=$('pk');box.innerHTML=addTile+customList
   box.innerHTML=addTile+(a.length?a.map(c=>tile(c,e)).join(''):`<div class="msg">${f||lg?'No prints match that filter':'No prints found'}</div>`)
    +(hid?`<div class="msg">${hid} print${hid>1?'s':''} without a picture hidden · <button class="lnk" data-shownopic="1" style="padding:0">Show them</button></div>`:'')}
  catch(err){if(sel===n)box.innerHTML=addTile+customList(n).map(c=>tile(c,col[n]||{})).join('')+'<div class="msg">Couldn’t load prints — check your connection.</div>'}}
-$('book').addEventListener('click',e=>{const a=e.target.closest('.c.add[data-i]');if(a&&!busy){selI=+a.dataset.i;sel=null;return openPick()}
+$('book').addEventListener('click',e=>{const cu=e.target.closest('[data-curl]');if(cu){if(!busy){const sd=sideOf(vp(spread,0)),d=+cu.dataset.curl;
+  go(target+(d>0?(sd==='right'?1:2):(sd==='left'?-1:-2)))}return}
+ if(PER===1){const pg=e.target.closest('.pg'),sr=$('book').classList.contains('sr');
+  if(pg&&((pg.id==='R'&&!sr)||(pg.id==='L'&&sr))){if(!busy)go(target+(pg.id==='R'?1:-1));return}}
+ const a=e.target.closest('.c.add[data-i]');if(a&&!busy){selI=+a.dataset.i;sel=null;return openPick()}
  const c=e.target.closest('.c[data-n]');if(!c||busy)return;sel=+c.dataset.n;selI=+c.dataset.i;$('pf').value='';sheetHead();$('sh').hidden=false;$('pk').scrollTop=0;picker()});
 $('sh').querySelector('.opts').addEventListener('click',e=>{const b=e.target.closest('button[data-s]');if(!b)return;const s=b.dataset.s,en=entry(sel);
  if((en.s||'')!==s){if(s)en.s=s;else delete en.s;tidy(sel);save();refresh();sheetHead()}});
@@ -538,15 +784,22 @@ $('pk').addEventListener('click',async e=>{if(e.target.closest('button[data-add]
  const en=entry(n);Object.assign(en,{c:c.id,img:c.custom?'':c.img,set:c.set,no:c.no});if(c.lang!=='en')en.lang=c.lang;else delete en.lang;delete en.p;if(!en.s)en.s='top';save();refresh();sheetHead();
  if(wants[c.id]){delete wants[c.id];saveWants();b.classList.remove('want');const h=b.querySelector('.wh');if(h){h.classList.remove('on');h.textContent='♡'}toast('You have it now – removed from your want list')}
  $('pk').querySelectorAll('button.on').forEach(x=>x.classList.remove('on'));b.classList.add('on');
- try{const p=await priceOf(c.id);if(col[n]&&col[n].c===c.id){if(p!=null)col[n].p=p;save();stats();if(sel===n)sheetHead()}}catch(err){}});
+ delete en.f;delete en.fp;delete en.vars;delete en.rar;
+ try{const info={},p=await priceOf(c.id,info);if(col[n]&&col[n].c===c.id){const x=col[n];if(p!=null)x.p=p;
+  if(info.vars&&info.vars.length)x.vars=info.vars;if(info.rar)x.rar=info.rar;autoFinish(x);   // e.g. an Illustration rare: foil on the whole card
+  save();refresh();if(sel===n)sheetHead()}}catch(err){}});
 /* ---------- want list: specific cards you want, across all binders ---------- */
 function saveWants(){ls.set('pb-wants',wants);wbtn()}
-function wbtn(){const k=Object.keys(wants).length;$('wbtn').textContent=k?'♥':'♡';$('wbtn').title=k?`Wants (${k})`:'Wants'}
+function wbtn(){const k=Object.keys(wants).length;$('wbtn').textContent=k?'♥':'♡';$('wbtn').title=k?`Wants (${k}) · Missing & upgrades`:'Wants · Missing & upgrades'}
 function toggleWant(n,id){if(wants[id]){delete wants[id];saveWants();toast('Removed from your want list');return}
  const c=[...customList(n),...(lists[n]||[])].find(x=>x.id===id);if(!c)return;
  wants[id]={n,set:c.set,no:c.no,lang:c.lang||'en',img:c.custom?'':(c.img||''),at:Date.now()};saveWants();toast(`♥ Added to your want list`)}
 let wSel=null,wT;
-function openWants(){closeAll();wSel=null;$('wq').value='';wres();wlist();$('wn').hidden=false}
+let wTab='w';
+function setWTab(t){wTab=t;$('wtab').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+ $('wpane').hidden=t!=='w';$('mpane').hidden=t!=='m';if(t==='m'){$('mph').textContent=binders[bi]?`In your binder “${binders[bi].name}”. Tap a Pokémon to jump to its pocket.`:'';wl()}}
+$('wtab').onclick=e=>{const b=e.target.closest('button[data-t]');if(b)setWTab(b.dataset.t)};
+function openWants(){closeAll();wSel=null;$('wq').value='';wres();wlist();setWTab(wTab);$('wn').hidden=false}
 function wres(){const box=$('wres'),v=$('wq').value.trim().toLowerCase().replace(/^#/,'');
  if(wSel){wPrints();return}
  if(!v){box.innerHTML='';return}
@@ -607,11 +860,11 @@ $('addel').onclick=()=>{const id=adId;if(!id||!confirm('Delete this card? Pocket
 $('shm').addEventListener('click',e=>{if(e.target.closest('[data-edit]')){const en=col[sel];if(en&&isCustom(en.c))openAdd(en.c.slice(7))}});
 
 $('plang').onclick=e=>{const b=e.target.closest('button[data-l]');if(!b)return;opt.lang=b.dataset.l;ls.set('pb-opt',opt);picker()};
-$('pclr').onclick=()=>{const en=col[sel];if(en){delete en.c;delete en.img;delete en.set;delete en.no;delete en.p;delete en.lang;tidy(sel);save();refresh();sheetHead();picker()}};
+$('pclr').onclick=()=>{const en=col[sel];if(en){delete en.c;delete en.img;delete en.set;delete en.no;delete en.p;delete en.lang;delete en.f;delete en.fp;delete en.vars;delete en.rar;tidy(sel);save();refresh();sheetHead();picker()}};
 let pfT;$('pf').addEventListener('input',()=>{clearTimeout(pfT);pfT=setTimeout(picker,200)});
 $('shimg').onclick=()=>{$('zmi').src=$('shimg').src;$('zm').hidden=false};
 $('zm').onclick=()=>$('zm').hidden=true;
-function closeAll(){$('wn').hidden=true;$('ad').hidden=true;$('bs').hidden=true;$('sh').hidden=true;$('setg').hidden=true;$('zm').hidden=true;$('ps').hidden=true;if(binders.length)$('nb').hidden=true}
+function closeAll(){closeSearch();$('shf').hidden=true;$('wn').hidden=true;$('ad').hidden=true;$('bs').hidden=true;$('sh').hidden=true;$('setg').hidden=true;$('zm').hidden=true;$('ps').hidden=true;if(binders.length)$('nb').hidden=true}
 
 /* ---------- replace / add a Pokémon in a pocket ---------- */
 function setSlot(i,n){const b=binders[bi];if(!b||i==null)return;b.slots[i]=n||0;b.slots=padSlots(b.slots,b.size);saveBinders();layout();refresh()}
@@ -660,7 +913,8 @@ function bsUI(){const b=binders[bi];if(!b)return;
  $('bsr').querySelectorAll('button').forEach(x=>x.classList.toggle('on',+x.dataset.r===+b.right));
  $('bsc').textContent=`${P.length} pages · ${b.slots.length} pockets`}
 function bsChanged(keepPage){const pg=Math.max(0,vp(spread,0));saveBinders();layout();spread=target=Math.min(pv(keepPage??pg),S-1);refresh();bsUI()}
-$('bset').onclick=()=>{const b=binders[bi];if(!b)return;closeAll();$('bsn').value=b.name;bsUI();$('bs').hidden=false};
+$('sv').onclick=()=>toast(nt0||'Saved on this device');
+function openBset(){const b=binders[bi];if(!b)return;closeAll();$('bsn').value=b.name;bsUI();$('bs').hidden=false};
 $('bsn').addEventListener('change',()=>{const b=binders[bi],v=$('bsn').value.trim();if(b&&v){b.name=v.slice(0,30);saveBinders();stats()}});
 $('bsz').onclick=e=>{const x=e.target.closest('button[data-z]'),b=binders[bi];if(!x||!b||+x.dataset.z===b.size)return;
  const first=b.slots[Math.max(0,vp(spread,0))*b.size];reflow(b,+x.dataset.z);const at=first?b.slots.indexOf(first):-1;
@@ -675,7 +929,7 @@ $('bsx').onclick=closeAll;
 $('bsd').onclick=()=>{const b=binders[bi];if(!b||!confirm(`Delete the binder “${b.name}”? Your owned cards stay saved.`))return;
  binders.splice(bi,1);delete mem[b.id];saveBinders();closeAll();if(binders.length)setBinder(Math.max(0,bi-1),null,true);else{bi=0;layout();refresh();openNew(true)}};
 $('shd').onclick=closeAll;
-['sh','setg','ps','nb','bs','ad','wn'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target===$(id))closeAll()}));
+['sh','setg','ps','nb','bs','ad','wn','shf'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target===$(id))closeAll()}));
 
 /* ---------- settings ---------- */
 function segs(){$('ord').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.o===opt.ord));
@@ -695,7 +949,10 @@ function importText(t){let d;try{d=JSON.parse(t)}catch(e){toast('That isn’t a 
   if(typeof v==='string'){if(v==='top'||v==='decent'){entry(n).s=v;k++}}
   else if(v&&typeof v==='object'){const en=entry(n);
    if(v.s==='top'||v.s==='decent')en.s=v.s;
-   if(typeof v.c==='string'&&(!v.img||(typeof v.img==='string'&&ARTHOST.test(v.img)))){en.c=v.c;en.img=v.img||'';en.set=String(v.set||'');en.no=String(v.no||'');if(LANGS.includes(v.lang)&&v.lang!=='en')en.lang=v.lang;if(typeof v.p==='number')en.p=v.p}
+   if(typeof v.c==='string'&&(!v.img||(typeof v.img==='string'&&ARTHOST.test(v.img)))){en.c=v.c;en.img=v.img||'';en.set=String(v.set||'');en.no=String(v.no||'');if(LANGS.includes(v.lang)&&v.lang!=='en')en.lang=v.lang;if(typeof v.p==='number')en.p=v.p
+    // holo finish and pattern, so restoring a backup keeps them
+    if(['holo','reverse','full'].includes(v.f))en.f=v.f;if(PATTERNS.some(([k])=>k===v.fp))en.fp=v.fp;
+    if(typeof v.rar==='string')en.rar=v.rar.slice(0,60);if(Array.isArray(v.vars))en.vars=v.vars.filter(x=>['normal','holo','reverse'].includes(x))}
    tidy(n);k++}}
  ls.set('pb-col',col);refresh();toast(`Imported ${k} card${k==1?'':'s'}`)}
 $('imf').onclick=()=>$('imfi').click();
@@ -711,6 +968,13 @@ $('cc').onclick=async()=>{try{await caches.delete('pb-img-v1');toast('Image cach
 
 /* ---------- start ---------- */
 note('Saved on this device');show();stats();
+try{if(!localStorage.getItem('pb-fp2')){const OLD={'Illustration rare':'sparkle','Special illustration rare':'sparkle','Shiny rare':'sparkle','Shiny rare V':'sparkle','Shiny rare VMAX':'sparkle','Shiny Ultra Rare':'sparkle','Hyper rare':'gold','Mega Hyper Rare':'gold','Radiant Rare':'cosmos'};
+ let ch=0;for(const x of Object.values(col))if(x.fp&&x.f==='full'&&(OLD[x.rar]||'rainbow')===x.fp){delete x.fp;ch++}
+ localStorage.setItem('pb-fp2','1');if(ch)save()}}catch(e){}
+setTimeout(async()=>{const todo=Object.entries(col).filter(([,x])=>x.c&&!isCustom(x.c)&&x.rar==null);let k=0;
+ const worker=async()=>{while(k<todo.length){const [n,x]=todo[k++];try{const info={};await priceOf(x.c,info);if(col[n]!==x||x.rar!=null)continue;
+  x.rar=info.rar||'';if(info.vars&&info.vars.length)x.vars=info.vars;if(!x.f)autoFinish(x)}catch(e){}}};
+ if(todo.length){await Promise.all([worker(),worker(),worker()]);save();refresh()}},2500);
 // Version label: the number in sw.js (pb-shell-vN), the single place it is bumped. Changes when an update arrives.
 fetch('sw.js',{cache:'no-cache'}).then(r=>r.text()).then(t=>{const m=t.match(/pb-shell-v(\d+)/);if(m){$('ver').textContent='v'+m[1];$('ver').hidden=false}}).catch(()=>{});artFill().then(()=>refresh());if(!binders.length)openNew(true);
 /* bridge for sync.js: read the state, or replace it with the cloud copy without re-uploading it */
@@ -723,7 +987,7 @@ window.pbApp={note,toast,state:()=>({col,binders,wants}),customs:()=>customs,
 
 /* ---------- phone back button: closes the open menu instead of leaving the app ---------- */
 // One history entry stands for "a menu is open". Back pops it and steps back one level; closing a menu with its own buttons removes it again.
-const OVS=['zm','ad','ps','bs','nb','setg','wn','sh'];  // topmost first
+const OVS=['zm','ad','ps','bs','nb','setg','wn','shf','sh','sp'];  // topmost first
 const ovOpen=()=>OVS.some(id=>!$(id).hidden&&!(id==='nb'&&$('nbx').hidden));  // the first-binder welcome can't be closed
 let ovHist=false,ovSkip=false;
 function ovSync(){const o=ovOpen();
