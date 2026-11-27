@@ -114,13 +114,26 @@ textarea{resize:vertical}
 .pkc{--radius:4px;--sl:calc(var(--sh) + var(--sd));
  --mx:calc(var(--sl) * 100%);--my:calc(36% + var(--sd) * 150%);
  --posx:calc(37% + var(--sl) * 26%);--posy:calc(40% + var(--sd) * 100%);
- --hyp:clamp(0, calc(max(var(--sl) - .5, .5 - var(--sl)) * 1.4 + .15), 1);--o:.5;animation:sway 3.4s ease-in-out infinite alternate}
+ --hyp:clamp(0, calc(max(var(--sl) - .5, .5 - var(--sl)) * 1.4 + .15), 1);--o:.5;--at:8.5%;--as:6.5%;--ab:51%}
 .pkc__shine,.pkc__glare{position:absolute;inset:0;border-radius:inherit;pointer-events:none}
 .pkc__shine{z-index:2}.pkc__glare{z-index:3}
-.pkc.win .pkc__shine{clip-path:inset(10% 8.5% 52.5% 8.5%)}                       /* classic holo: the artwork only */
-.pkc.rev .pkc__shine{clip-path:polygon(evenodd,0 0,100% 0,100% 100%,0 100%,0 0,8.5% 10%,91.5% 10%,91.5% 47.5%,8.5% 47.5%,8.5% 10%)}   /* reverse: all but the artwork */
+.pkc.win .pkc__shine{clip-path:inset(var(--at) var(--as) var(--ab) var(--as))}
+/* the artwork window differs per era: --at top, --as sides, --ab bottom */
+.pkc.a-w{--at:10.5%;--as:9%;--ab:51.5%}.pkc.a-e{--at:8%;--as:9%;--ab:53%}.pkc.a-x{--at:8%;--as:7%;--ab:52%}.pkc.a-d{--at:9%;--as:8%;--ab:51%}                       /* classic holo: the artwork only */
+.pkc.rev .pkc__shine{clip-path:polygon(evenodd,0 0,100% 0,100% 100%,0 100%,0 0,var(--as) var(--at),calc(100% - var(--as)) var(--at),calc(100% - var(--as)) calc(100% - var(--ab)),var(--as) calc(100% - var(--ab)),var(--as) var(--at))}   /* reverse: all but the artwork */
 .shh .art.pkc{--o:.6}
-@media (prefers-reduced-motion:reduce){.pkc{animation:none}}
+/* cheaper: no own GPU layer per foil layer (cards.css lifts each one with translateZ) */
+.pkc .pkc__shine,.pkc .pkc__glare,.pkc .pkc__shine:before,.pkc .pkc__shine:after{transform:none}
+/* Rainbow rares: the card is already rainbow-coloured, so keep its colours and add a fine glitter with a soft
+   prismatic band that travels with the light, instead of the original's milky wash. */
+.pkc[data-rarity='rare rainbow'] .pkc__shine{
+ background-image:url('holo/img/glitter.png'),
+  linear-gradient(115deg,transparent 30%,hsla(0,100%,72%,.55) 38%,hsla(55,100%,70%,.55) 43%,hsla(150,100%,68%,.55) 48%,hsla(200,100%,70%,.55) 53%,hsla(290,100%,74%,.55) 58%,transparent 66%);
+ background-size:22% 16%,260% 260%;background-position:center,var(--posx) var(--posy);background-blend-mode:overlay,normal;
+ mix-blend-mode:color-dodge;filter:brightness(.7) contrast(1.4) saturate(1.3);opacity:var(--o)}
+.pkc[data-rarity='rare rainbow'] .pkc__shine:after{display:none}
+.zart.pkc{animation:sway 3.4s ease-in-out infinite alternate}   /* only the big card sways; in the binder the light moves with the pages, so idle pockets cost nothing */
+@media (prefers-reduced-motion:reduce){.zart.pkc{animation:none}}
 .shh .art{position:relative;flex:0 0 auto;border-radius:6px;overflow:hidden}.shh .art img{display:block}
 .fin{display:flex;flex-direction:column;gap:6px;margin:12px 0 0}#finp{flex-wrap:wrap}#finp button{flex:1 0 22%}.fin[hidden],.fin .seg[hidden]{display:none}.fin .seg button{font-size:.85rem;padding:7px 4px}
 .side{font-weight:600;font-size:.72rem;color:var(--mut);border:1px solid var(--line);border-radius:9px;padding:1px 7px;white-space:nowrap}
@@ -531,7 +544,13 @@ function autoPattern(e){if(e.f!=='full')return eraPattern(e.c)==='cosmos'?'galax
 const patternOf=e=>{const f=e.fp&&(FX_ATTR[e.fp]?e.fp:OLD_FX[e.fp]);return f||autoPattern(e)};
 const isFoil=e=>!!(e&&e.c&&(e.f==='holo'||e.f==='reverse'||e.f==='full'));
 const holoAttrs=e=>` data-rarity="${FX_ATTR[patternOf(e)]}" data-supertype="pokémon"`;
-const holoCls=e=>' pkc'+(e.f==='holo'?' win':e.f==='reverse'?' rev':'');
+function artBox(id){const raw=splitId(id||'')[1]||'',set=raw.slice(0,raw.lastIndexOf('-'));   // which era's artwork window
+ if(/^(base\d|basep|gym\d|neo\d|lc|si1|wp)$/i.test(set))return ' a-w';
+ if(/^ecard/i.test(set))return ' a-e';
+ if(/^(ex\d|np|pop[1-5]$)/i.test(set))return ' a-x';
+ if(/^(dp|pl|hgss|col1|pop[6-9]|ru1)/i.test(set))return ' a-d';
+ return ''}
+const holoCls=e=>' pkc'+(e.f==='holo'?' win':e.f==='reverse'?' rev':'')+artBox(e.c);
 const RAR_HOLO=new Set(['Holo Rare','Rare Holo','Classic Collection']);
 function autoFinish(x){   // set the finish a print can only have; x: the collection entry
  if(RAR_FULL[x.rar]){x.f='full';return}
@@ -622,7 +641,9 @@ function setTx(px){$('book').style.setProperty('--tx',px+'px');shBase=.25+.5*Mat
 // foil shine position: follows the pages (shBase), plus the phone's tilt or the mouse (shTilt)
 let shBase=.5,shTilt=0;
 function shine(){document.documentElement.style.setProperty('--sh',(shBase+shTilt).toFixed(3))}
-addEventListener('deviceorientation',e=>{if(e.gamma==null)return;shTilt=Math.max(-.35,Math.min(.35,e.gamma/60));shine()});
+let tiltRaf=0;   // tilt events come very often: redraw the foil at most once a frame, and only for a visible change
+addEventListener('deviceorientation',e=>{if(e.gamma==null)return;const t=Math.max(-.35,Math.min(.35,e.gamma/60));if(Math.abs(t-shTilt)<.015||tiltRaf)return;
+ tiltRaf=requestAnimationFrame(()=>{tiltRaf=0;shTilt=t;shine()})});
 addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;shTilt=(e.clientX/innerWidth-.5)*.7;shine()},{passive:true});
 function moveKind(dir){const sd=sideOf(vp(spread,0));return (dir>0&&sd==='right')||(dir<0&&sd==='left')?'turn':'slide'}
 function slideTo(dir,p){const a=dir>0?0:-(oneW()-PEEK),b=dir>0?-(oneW()-PEEK):0;setTx(a+(b-a)*p)}
