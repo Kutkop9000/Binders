@@ -45,6 +45,7 @@ async function start() {
   $('gout').onclick = async () => {
     if (!confirm('Sign out? Your binders stay saved in your Google account.')) return;
     if (dirty) await write();
+    localStorage.removeItem(SYNCED);
     await A.signOut(auth);
     app.loadCustoms({});
     app.load({ col: {}, binders: [], wants: {} });
@@ -52,6 +53,9 @@ async function start() {
   gate('Checking your sign-in…', true);
   A.getRedirectResult(auth).catch(e => app.toast('Sign-in failed: ' + (e.code || e.message)));
 
+  // Which account this device's local copy was last synced with. When it matches, the cloud copy is the truth
+  // (so cards, binders and wants deleted on another device stay deleted); otherwise local and cloud are merged.
+  const SYNCED = 'pb-sync-uid';
   let ref = null, ready = false, unsub = null, unsubC = null, pushT = null, dirty = false;
   // Cards you added yourself (with photos) live in their own documents: users/{uid}/custom/{id}
   const cdoc = id => F.doc(ref, 'custom', id);
@@ -60,11 +64,11 @@ async function start() {
     const c = app.customs()[id];
     (c ? F.setDoc(cdoc(id), c) : F.deleteDoc(cdoc(id))).catch(e => console.warn('custom card sync', e.code || e));
   };
-  async function syncCustoms() {
+  async function syncCustoms(known) {
     try {
       const snap = await F.getDocs(F.collection(ref, 'custom')), cloud = {};
       snap.forEach(d => { cloud[d.id] = d.data(); });
-      const local = app.customs();
+      const local = known ? {} : app.customs();
       app.loadCustoms(Object.assign({}, local, cloud));
       Object.keys(local).filter(id => !cloud[id]).forEach(id => window.pbSyncCustom(id));
       unsubC = F.onSnapshot(F.collection(ref, 'custom'), s => {
@@ -97,11 +101,14 @@ async function start() {
     pushT = setTimeout(write, 600);
   };
   window.pbSync = push;
+  // Leaving the app (tab closed, phone locked): upload now instead of waiting for the timer.
+  document.addEventListener('visibilitychange', () => { if (document.hidden && dirty) write(); });
 
   A.onAuthStateChanged(auth, async user => {
     if (unsub) { unsub(); unsub = null; }
     if (unsubC) { unsubC(); unsubC = null; }
     ready = false; ref = null; dirty = false; clearTimeout(pushT);
+    let knownNow = false;
     if (!user) { gate('Sign in with Google to use your binders. Your collection syncs across all your devices.', true); return; }
 
     $('gate').hidden = true;
@@ -114,12 +121,14 @@ async function start() {
     try {
       const snap = await F.getDoc(ref), d = snap.exists() ? snap.data() : {};
       const cloudCol = JSON.parse(d.col || '{}'), cloudBinders = JSON.parse(d.binders || '[]'), cloudWants = JSON.parse(d.wants || '{}');
-      const local = app.state();
+      const known = snap.exists() && localStorage.getItem(SYNCED) === user.uid;
+      const local = known ? { col: {}, binders: [], wants: {} } : app.state();
       const col = Object.assign({}, local.col, cloudCol);
       const binders = cloudBinders.concat(local.binders.filter(b => !cloudBinders.some(c => c.id === b.id)));
       const wants = Object.assign({}, local.wants, cloudWants);   // want list: both devices' wants
       app.load({ col, binders, wants });
-      ready = true;
+      ready = true; knownNow = known;
+      localStorage.setItem(SYNCED, user.uid);
       const now = app.state();
       if (JSON.stringify(now.col) !== (d.col || '{}') || JSON.stringify(now.binders) !== (d.binders || '[]') || JSON.stringify(now.wants) !== (d.wants || '{}')) write(); // applied to the local cache at once, so the listener below sees it as a pending write
       else app.note('Synced to your Google account ✓');
@@ -131,12 +140,14 @@ async function start() {
     unsub = F.onSnapshot(ref, snap => {
       if (!snap.exists() || snap.metadata.hasPendingWrites || dirty) return;
       const d = snap.data(), st = app.state();
+      try {
       const c = d.col ?? JSON.stringify(st.col), b = d.binders ?? JSON.stringify(st.binders), w = d.wants ?? JSON.stringify(st.wants);
       if (c !== JSON.stringify(st.col) || b !== JSON.stringify(st.binders) || w !== JSON.stringify(st.wants)) {
         app.load({ col: JSON.parse(c), binders: JSON.parse(b), wants: JSON.parse(w) });
         app.note('Synced to your Google account ✓');
       }
-    });
-    syncCustoms();
+      } catch (e) { console.warn('cloud copy unreadable', e); }
+    }, e => console.warn('sync listener', e.code || e));
+    syncCustoms(knownNow);
   });
 }
