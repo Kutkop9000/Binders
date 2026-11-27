@@ -2,3 +2,7 @@
 .agents/
 .claude/skills/
 skills-lock.json
+
+# Python build cache
+__pycache__/
+*.pyc
