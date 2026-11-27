@@ -85,7 +85,7 @@ textarea{resize:vertical}
 .curl.r{transform-origin:100% 100%}.curl.l{transform-origin:0 100%}
 /* phone: the open spread (left + right page) sits side by side; one page fills the screen and the other
    peeks out next to the spine. --tx slides the pair, a page's own --ry turns it over the spine. */
-.book.one{overflow:hidden;touch-action:pan-y;--tx:0px}
+.book.one{overflow:hidden;touch-action:pan-y;--tx:0px;perspective:1100px}
 .book.one::after{display:none}
 .book.one .pg{flex:0 0 var(--W,300px);width:var(--W,300px);min-width:0;position:relative;background:var(--page);
  transform:translateX(var(--tx)) rotateY(var(--ry,0deg));will-change:transform;backface-visibility:hidden}
@@ -131,6 +131,10 @@ textarea{resize:vertical}
 .leaf.f{left:50%;transform-origin:left center}.leaf.b{left:0;transform-origin:right center}
 .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .face.back{transform:rotateY(180deg)}
+/* phone: the turning sheet bends. #F is the half at the spine, #G the outer half, which trails a little behind,
+   so the sheet never goes flat edge-on and out of sight halfway over. */
+.leaf.one-f.in .face.front,.leaf.one-f.out .face.back,.leaf.one-b.in .face.back,.leaf.one-b.out .face.front{clip-path:inset(0 calc(50% - .5px) 0 0)}
+.leaf.one-f.in .face.back,.leaf.one-f.out .face.front,.leaf.one-b.in .face.front,.leaf.one-b.out .face.back{clip-path:inset(0 0 0 calc(50% - .5px))}
 .h{font-weight:700;font-size:.85rem;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:4px;font-variant-numeric:tabular-nums}
 .h small{font-weight:600;font-size:.75rem;color:var(--tx);background:var(--raise);border:1px solid var(--line);padding:1px 8px 1px 6px;border-radius:999px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
 .h small::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--gc,var(--mut))}
@@ -200,7 +204,11 @@ select{padding:10px;margin-top:8px;cursor:pointer}
 .btn{flex:1;min-height:44px;padding:10px 12px;border-radius:var(--r2);border:1px solid var(--line);background:var(--raise);cursor:pointer;font-weight:600}
 .btn.pri{background:var(--tx);color:#111;border-color:var(--tx)}
 .zoom{position:fixed;inset:0;background:#000e;z-index:30;display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out;animation:fade .2s ease}
-.zoom[hidden]{display:none}.zoom img{max-width:100%;max-height:100%;border-radius:14px;animation:up .25s var(--ease)}
+.zoom[hidden]{display:none}.zoom.plain .fin,.zoom.plain #zmd,.zoom.plain .zart b{display:none}.zc{display:flex;flex-direction:column;align-items:center;gap:12px;width:min(440px,100%);max-height:100%;overflow-y:auto;cursor:default;animation:up .25s var(--ease)}
+.zart{position:relative;border-radius:14px;overflow:hidden;flex:0 0 auto;--radius:14px;box-shadow:0 10px 30px #000c}.zart.pkc{--o:.6}
+.zart img{display:block;max-width:100%;max-height:calc(100dvh - 380px);border-radius:14px}
+.zoom .fin{width:100%;margin:0;background:var(--raise);border:1px solid var(--line);border-radius:14px;padding:10px}.fl{font-size:.75rem;font-weight:600;color:var(--mut)}
+#zmd{width:100%}.hbtn{margin-top:8px;font:inherit;font-size:.8rem;font-weight:600;color:var(--tx);background:var(--raise);border:1px solid var(--line);border-radius:999px;padding:4px 11px;cursor:pointer}
 .set h3{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:22px 0 8px}.set h3:first-of-type{margin-top:2px}
 #adh,#nbh{font-size:1.1rem;text-transform:none;letter-spacing:-.01em;color:var(--tx)}
 .set p{color:var(--mut);font-size:.82rem;margin:6px 0;line-height:1.45}
@@ -260,15 +268,14 @@ a{color:var(--acc)}
 <div class="sp" id="sp" hidden><div class="sr2"><input id="q" type="search" placeholder="Pokémon name or #number" enterkeyhint="search" autocomplete="off"><button class="btn pri" id="qgo">Search</button></div><div id="r"></div></div>
 <div class="stats" id="st"></div>
 <div class="book" id="book"><div class="pg l" id="L"></div><div class="pg r" id="R"></div>
-<div class="leaf" id="F"><div class="face front" id="FF"></div><div class="face back" id="FB"></div></div></div>
+<div class="leaf" id="F"><div class="face front" id="FF"></div><div class="face back" id="FB"></div></div><div class="leaf" id="G"><div class="face front" id="GF"></div><div class="face back" id="GB"></div></div></div>
 <div class="nav"><button id="pv" aria-label="Previous">‹</button><span id="pi"></span><button id="nx" aria-label="Next">›</button></div>
 <div class="hint">Tap a pocket to mark it (★ Top · ↻ Upgrade needed), choose your print, or replace the Pokémon</div>
 
 <div class="sheet" id="sh" hidden><div class="sb">
- <div class="shh"><div class="art"><img id="shimg" alt="" hidden><b class="pkc__shine" id="shfoil" hidden></b><b class="pkc__glare" id="shglare" hidden></b></div><div><div id="shn"></div><div id="shm"></div></div></div>
+ <div class="shh"><div class="art"><img id="shimg" alt="" hidden><b class="pkc__shine" id="shfoil" hidden></b><b class="pkc__glare" id="shglare" hidden></b></div><div><div id="shn"></div><div id="shm"></div><button class="hbtn" id="shfx" hidden></button></div></div>
  <div class="opts"><button data-s="">Don't have</button><button data-s="decent">↻ Upgrade needed</button><button data-s="top">★ Top</button></div>
- <div class="fin" id="fin" hidden><div class="seg" id="finv"></div><div class="seg" id="finp"></div></div>
- <div class="pkh">Your print <input id="pf" type="text" placeholder="Filter: set or name"></div>
+  <div class="pkh">Your print <input id="pf" type="text" placeholder="Filter: set or name"></div>
  <div class="seg" id="plang"><button data-l="">All</button><button data-l="en">English</button><button data-l="ja">Japanese</button><button data-l="zh-tw">Chinese (Trad.)</button><button data-l="zh-cn">Chinese (Simp.)</button></div>
  <div class="pgrid" id="pk"></div>
  <div class="row"><button class="btn" id="srep">⇄ Replace Pokémon</button><button class="btn" id="srem">Empty pocket</button></div>
@@ -362,7 +369,9 @@ a{color:var(--acc)}
  <p>Card data and images: TCGdex (tcgdex.dev). Prices: Cardmarket via TCGdex. Pokémon card images © The Pokémon Company, Nintendo, Game Freak, Creatures. For personal use; not affiliated.</p>
  <div class="row"><button class="btn pri" id="setd">Done</button></div>
 </div></div>
-<div class="zoom" id="zm" hidden><img id="zmi" alt=""></div>
+<div class="zoom" id="zm" hidden><div class="zc"><div class="art zart" id="zart"><img id="zmi" alt=""><b class="pkc__shine"></b><b class="pkc__glare"></b></div>
+ <div class="fin" id="fin" hidden><div class="fl">Finish</div><div class="seg" id="finv"></div><div class="fl" id="finpl">Holo pattern</div><div class="seg" id="finp"></div></div>
+ <button class="btn pri" id="zmd">Done</button></div></div>
 <div class="toast" id="toast" hidden></div>
 <div class="gate" id="gate"><div class="gb"><img src="icon-192.png" alt=""><h2>Pokédex Binders</h2>
  <p id="gmsg">Loading…</p><button class="btn pri" id="gin" disabled>Sign in with Google</button></div></div>
@@ -624,16 +633,20 @@ function turnStart(dir){const i=vp(spread,0),lp=sideOf(i)==='left'?i:i-1,W=oneW(
  const st={dir,W,tx0:dir>0?-(W-PEEK):0,tx1:dir>0?0:-(W-PEEK)};
  if(dir>0){$('FF').innerHTML=page(lp+1)||blank;$('FB').innerHTML=page(lp+2)||blank;$('R').innerHTML=page(lp+3)||blank}   // right page turns forward
  else{$('FF').innerHTML=page(lp)||blank;$('FB').innerHTML=page(lp-1)||blank;$('L').innerHTML=page(lp-2)||blank}         // left page turns back
- F.className='leaf '+(dir>0?'one-f':'one-b');F.style.left=(dir>0?W:0)+'px';F.style.width=W+'px';
- F.style.transformOrigin=dir>0?'left center':'right center';F.style.transition='none';F.style.visibility='visible';
+ $('GF').innerHTML=$('FF').innerHTML;$('GB').innerHTML=$('FB').innerHTML;
+ for(const [L,k] of [[F,'in'],[$('G'),'out']]){L.className='leaf '+(dir>0?'one-f ':'one-b ')+k;L.style.left=(dir>0?W:0)+'px';L.style.width=W+'px';
+  L.style.transformOrigin=dir>0?'left center':'right center';L.style.transition='none';L.style.visibility='visible'}
  turnTo(st,0);return st}
 function turnTo(st,p){const a=(st.dir>0?-180:180)*p,tx=st.tx0+(st.tx1-st.tx0)*p,F=$('F'),back=Math.abs(a)>90;
  setTx(tx);shBase+=(st.dir>0?-.55:.55)*Math.sin(p*Math.PI);shine();   /* the light sweeps over the foil as the sheet lifts */
  F.style.transform=`translateX(${tx}px) rotateY(${a}deg)`;
  $('FF').style.visibility=back?'hidden':'visible';$('FB').style.visibility=back?'visible':'hidden';
+ const bend=(st.dir>0?1:-1)*40*Math.sin(p*Math.PI),h=st.dir>0?st.W/2:-st.W/2,b2=Math.abs(a+bend)>90;   // the outer half trails behind
+ $('G').style.transform=`translateX(${tx}px) rotateY(${a}deg) translateX(${h}px) rotateY(${bend}deg) translateX(${-h}px)`;
+ $('GF').style.visibility=b2?'hidden':'visible';$('GB').style.visibility=b2?'visible':'hidden';
 }
-function turnEnd(st,done){const F=$('F');F.style.visibility='hidden';F.style.transform='';F.style.left='';F.style.width='';F.className='leaf';
- for(const el of [$('FF'),$('FB')]){el.style.visibility='';el.style.filter='';el.innerHTML=''}
+function turnEnd(st,done){for(const F of [$('F'),$('G')]){F.style.visibility='hidden';F.style.transform='';F.style.left='';F.style.width='';F.className='leaf'}
+ for(const el of [$('FF'),$('FB'),$('GF'),$('GB')]){el.style.visibility='';el.style.filter='';el.innerHTML=''}
  if(done)spread+=st.dir;show()}
 const ease=t=>1-Math.pow(1-t,3);   // starts at finger speed, settles softly
 function tween(from,to,ms,fn){return new Promise(res=>{const t0=performance.now();
@@ -725,14 +738,18 @@ function sheetHead(){const n=sel,e=col[n]||{},img=imgOf(n);
  const im=$('shimg');if(img){im.src=pic(img,'high');im.hidden=false}else im.hidden=true;
  $('shm').innerHTML=e.c?`${isCustom(e.c)?'<i class="lt cu">Custom</i>':''}${e.lang&&e.lang!=='en'?`<i class="lt">${LTAG[e.lang]||''}</i>`:''}${esc(setEn(e.set,e.c))} · #${esc(e.no||'')}${img?'':' · no picture'}${isCustom(e.c)?' <button class="lnk" data-edit="1">Edit</button>':''}${e.p!=null?`<br>Cardmarket trend: <b>${eur(e.p)}</b>`:''}`:(defs[n]&&defs[n].img?'Showing default art — pick your print below':'');
  $('sh').querySelectorAll('.opts button').forEach(b=>b.classList.toggle('on',(b.dataset.s||'')===(e.s||'')));
- const foilOn=!!(img&&isFoil(e)),art=$('shimg').parentElement;$('shfoil').hidden=$('shglare').hidden=!foilOn;
- art.className='art'+(foilOn?holoCls(e):'');if(foilOn){art.dataset.rarity=FX_ATTR[patternOf(e)];art.dataset.supertype='pokémon'}else{delete art.dataset.rarity;delete art.dataset.supertype}
- $('fin').hidden=!e.c||isCustom(e.c);if(!e.c||isCustom(e.c))return;
+ const foilOn=!!(img&&isFoil(e));$('shfoil').hidden=$('shglare').hidden=!foilOn;
+ for(const art of [$('shimg').parentElement,$('zart')]){art.className='art'+(art.id?' zart':'')+(foilOn?holoCls(e):'');
+  if(foilOn){art.dataset.rarity=FX_ATTR[patternOf(e)];art.dataset.supertype='pokémon'}else{delete art.dataset.rarity;delete art.dataset.supertype}}
+ $('zart').querySelectorAll('b').forEach(b=>b.hidden=!foilOn);if(img)$('zmi').src=pic(img,'high');
+ const hasFin=!!e.c&&!isCustom(e.c);$('fin').hidden=!hasFin;$('shfx').hidden=!hasFin||!img;
+ $('shfx').textContent=!isFoil(e)?'✧ Holo: off':'✦ '+{holo:'Holo',reverse:'Reverse',full:'Full card'}[e.f]+' · '+Object.fromEntries(PATTERNS)[patternOf(e)];
+ if(!hasFin)return;
  $('fin').title=e.rar?'Rarity: '+e.rar:'';
  const av=e.vars&&e.vars.length?[...e.vars]:['normal','holo','reverse'],F={normal:'Normal',holo:'✦ Holo',reverse:'✧ Reverse',full:'✦ Full card'};
  if(RAR_FULL[e.rar]||av.includes('holo'))av.push('full');
  $('finv').innerHTML=['normal','holo','reverse','full'].filter(k=>av.includes(k)).map(k=>`<button data-f="${k}" class="${(e.f||'normal')===k?'on':''}">${F[k]}</button>`).join('');
- $('finp').hidden=!foilOn;const ap=autoPattern(e),APN=Object.fromEntries(PATTERNS),own=e.fp&&(FX_ATTR[e.fp]?e.fp:OLD_FX[e.fp]);
+ $('finp').hidden=$('finpl').hidden=!foilOn;const ap=autoPattern(e),APN=Object.fromEntries(PATTERNS),own=e.fp&&(FX_ATTR[e.fp]?e.fp:OLD_FX[e.fp]);
  $('finp').innerHTML=foilOn?`<button data-fp="" class="${own?'':'on'}" title="Chosen from the card's set and rarity">Auto · ${APN[ap]}</button>`+PATTERNS.map(([k,t])=>`<button data-fp="${k}" class="${own===k?'on':''}">${t}</button>`).join(''):''}
 $('fin').addEventListener('click',ev=>{const en=col[sel];if(!en||!en.c)return;const b=ev.target.closest('[data-f],[data-fp]');if(!b)return;
  if(b.dataset.f){if(b.dataset.f==='normal')delete en.f;else en.f=b.dataset.f}else if(b.dataset.fp)en.fp=b.dataset.fp;else delete en.fp;   // Auto = no own choice
@@ -808,7 +825,7 @@ $('wres').addEventListener('click',e=>{const p=e.target.closest('[data-wp]');if(
  if(e.target.closest('[data-wback]')){wSel=null;return wres()}
  const t=e.target.closest('[data-wid]');if(t){toggleWant(wSel,t.dataset.wid);wPrints();wlist()}});
 $('wlist').addEventListener('click',e=>{const h=e.target.closest('[data-want]');if(h){delete wants[h.dataset.want];saveWants();toast('Removed from your want list');wlist();if(wSel)wPrints();return}
- const t=e.target.closest('[data-wl]');if(t){const im=t.querySelector('img');if(im){$('zmi').src=im.src.replace(/\/low\.webp$/,'/high.webp');$('zm').hidden=false}}});
+ const t=e.target.closest('[data-wl]');if(t){const im=t.querySelector('img');if(im){$('zmi').src=im.src.replace(/\/low\.webp$/,'/high.webp');$('zm').classList.add('plain');$('zm').hidden=false}}});
 wbtn();
 
 /* ---------- cards that aren't on TCGdex ---------- */
@@ -846,8 +863,8 @@ $('shm').addEventListener('click',e=>{if(e.target.closest('[data-edit]')){const 
 $('plang').onclick=e=>{const b=e.target.closest('button[data-l]');if(!b)return;opt.lang=b.dataset.l;ls.set('pb-opt',opt);picker()};
 $('pclr').onclick=()=>{const en=col[sel];if(en){delete en.c;delete en.img;delete en.set;delete en.no;delete en.p;delete en.lang;delete en.f;delete en.fp;delete en.vars;delete en.rar;tidy(sel);save();refresh();sheetHead();picker()}};
 let pfT;$('pf').addEventListener('input',()=>{clearTimeout(pfT);pfT=setTimeout(picker,200)});
-$('shimg').onclick=()=>{$('zmi').src=$('shimg').src;$('zm').hidden=false};
-$('zm').onclick=()=>$('zm').hidden=true;
+const openZoom=()=>{sheetHead();$('zm').classList.remove('plain');$('zm').hidden=false};$('shimg').onclick=$('shfx').onclick=openZoom;   // the card big, with its holo settings underneath
+$('zm').onclick=ev=>{if($('zm').classList.contains('plain')||ev.target===$('zm')||ev.target===$('zmd')||ev.target===$('zmi'))$('zm').hidden=true};
 function closeAll(){closeSearch();$('shf').hidden=true;$('wn').hidden=true;$('ad').hidden=true;$('bs').hidden=true;$('sh').hidden=true;$('setg').hidden=true;$('zm').hidden=true;$('ps').hidden=true;if(binders.length)$('nb').hidden=true}
 
 /* ---------- replace / add a Pokémon in a pocket ---------- */
