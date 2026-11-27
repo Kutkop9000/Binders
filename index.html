@@ -191,12 +191,13 @@ textarea{resize:vertical}
 .shh{display:flex;gap:14px;align-items:center;margin-bottom:14px}
 .shh img{width:96px;border-radius:var(--r1);cursor:zoom-in;box-shadow:0 4px 12px #0008}
 #shn{font-weight:700;font-size:1.1rem;letter-spacing:-.01em}#shm{color:var(--mut);font-size:.82rem;margin-top:4px;line-height:1.45}
-.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.opts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+#sh .sb{position:relative}.xrm{position:absolute;top:14px;right:14px;font:inherit;font-size:.78rem;font-weight:600;color:#f08a8a;background:none;border:1px solid #6b2c2c;border-radius:999px;padding:4px 10px;cursor:pointer}.xrm[hidden]{display:none}
+#sh .shh{padding-right:84px}.btn.del{color:#f08a8a;border-color:#6b2c2c}.pkh .hbtn{margin:0 0 0 auto}#plang[hidden]{display:none}
 .opts button{padding:12px 4px;font-size:.95rem;font-weight:600;border-radius:var(--r2);border:1.5px solid var(--line);background:var(--cell);cursor:pointer}
 .opts [data-s=decent]{border-color:var(--dec);background:var(--decbg)}.opts [data-s=top]{border-color:var(--top);background:var(--topbg)}
 .opts button.on{box-shadow:0 0 0 2px var(--tx) inset}
 .pkh{display:flex;align-items:center;gap:8px;margin:18px 0 8px;font-weight:700;font-size:.9rem}
-.pkh input{flex:1;font-size:.85rem;padding:7px 10px}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
 .pgrid button{border:2px solid transparent;border-radius:var(--r2);background:var(--cell);padding:3px;cursor:pointer;display:flex;flex-direction:column;gap:3px;font-size:.75rem;color:var(--mut);text-align:left;line-height:1.25}
 .pgrid button img{width:100%;aspect-ratio:63/88;object-fit:cover;border-radius:5px;background:var(--raise)}
@@ -286,13 +287,13 @@ a{color:var(--acc)}
 <div class="hint">Tap a pocket to mark it (★ Top · ↻ Upgrade needed), choose your print, or replace the Pokémon</div>
 
 <div class="sheet" id="sh" hidden><div class="sb">
+ <button class="xrm" id="srm" title="Remove this card from your collection">✕ Remove</button>
  <div class="shh"><div class="art"><img id="shimg" alt="" hidden><b class="pkc__shine" id="shfoil" hidden></b><b class="pkc__glare" id="shglare" hidden></b></div><div><div id="shn"></div><div id="shm"></div><button class="hbtn" id="shfx" hidden></button></div></div>
- <div class="opts"><button data-s="">Don't have</button><button data-s="decent">↻ Upgrade needed</button><button data-s="top">★ Top</button></div>
-  <div class="pkh">Your print <input id="pf" type="text" placeholder="Filter: set or name"></div>
- <div class="seg" id="plang"><button data-l="">All</button><button data-l="en">English</button><button data-l="ja">Japanese</button><button data-l="zh-tw">Chinese (Trad.)</button><button data-l="zh-cn">Chinese (Simp.)</button></div>
+ <div class="opts"><button data-s="decent">↻ Upgrade needed</button><button data-s="top">★ Top</button></div>
+  <div class="pkh">Your print <button class="hbtn" id="pfb" aria-expanded="false">Filter ▾</button></div>
+ <div class="seg" id="plang" hidden><button data-l="">All</button><button data-l="en">English</button><button data-l="ja">Japanese</button><button data-l="zh-tw">Chinese (Trad.)</button><button data-l="zh-cn">Chinese (Simp.)</button></div>
  <div class="pgrid" id="pk"></div>
- <div class="row"><button class="btn" id="srep">⇄ Replace Pokémon</button><button class="btn" id="srem">Empty pocket</button></div>
- <div class="row"><button class="btn" id="pclr">Use default art</button><button class="btn pri" id="shd">Done</button></div>
+ <div class="row"><button class="btn del" id="srem">🗑 Empty pocket</button><button class="btn pri" id="shd">Done</button></div>
 </div></div>
 
 <div class="sheet set" id="wn" hidden><div class="sb">
@@ -758,7 +759,7 @@ function sheetHead(){const n=sel,e=col[n]||{},img=imgOf(n);
  $('shn').textContent=`#${pad(n)} ${N[n]}`;
  const im=$('shimg');if(img){im.src=pic(img,'high');im.hidden=false}else im.hidden=true;
  $('shm').innerHTML=e.c?`${isCustom(e.c)?'<i class="lt cu">Custom</i>':''}${e.lang&&e.lang!=='en'?`<i class="lt">${LTAG[e.lang]||''}</i>`:''}${esc(setEn(e.set,e.c))} · #${esc(e.no||'')}${img?'':' · no picture'}${isCustom(e.c)?' <button class="lnk" data-edit="1">Edit</button>':''}${e.p!=null?`<br>Cardmarket trend: <b>${eur(e.p)}</b>`:''}`:(defs[n]&&defs[n].img?'Showing default art — pick your print below':'');
- $('sh').querySelectorAll('.opts button').forEach(b=>b.classList.toggle('on',(b.dataset.s||'')===(e.s||'')));
+ $('sh').querySelectorAll('.opts button').forEach(b=>b.classList.toggle('on',(b.dataset.s||'')===(e.s||'')));$('srm').hidden=!e.s&&!e.c;
  const foilOn=!!(img&&isFoil(e));$('shfoil').hidden=$('shglare').hidden=!foilOn;
  for(const art of [$('shimg').parentElement,$('zart')]){art.className='art'+(art.id?' zart':'')+(foilOn?holoCls(e):'');
   if(foilOn){art.dataset.rarity=FX_ATTR[patternOf(e)];art.dataset.supertype='pokémon'}else{delete art.dataset.rarity;delete art.dataset.supertype}}
@@ -782,12 +783,13 @@ const heart=c=>`<span class="wh${wants[c.id]?' on':''}" data-want="${esc(c.id)}"
 const tile=(c,e)=>`<button data-id="${esc(c.id)}" class="${c.id===e.c?'on':''}${wants[c.id]?' want':''}">${heart(c)}${c.img?`<img src="${esc(pic(c.img,'low'))}" alt="" loading="lazy" decoding="async">`:`<div class="ph">${esc(c.name)}<small>No picture yet</small></div>`}<span>${c.custom?'<i class="lt cu">Custom</i>':''}${c.lang!=='en'&&LTAG[c.lang]?`<i class="lt">${LTAG[c.lang]}</i>`:''}${esc(c.set)} · ${esc(c.no)}</span></button>`;
 async function picker(){const n=sel,box=$('pk');box.innerHTML=addTile+customList(n).map(c=>tile(c,col[n]||{})).join('')+'<div class="msg">Loading prints…</div>';
  try{let arr=[...customList(n),...await list(n)];if(sel!==n)return;
-  const f=$('pf').value.trim().toLowerCase(),e=col[n]||{};
+  const e=col[n]||{};
   const hid=(opt.nopic||'hide')==='hide'?arr.filter(c=>!c.img&&!c.custom&&c.id!==e.c).length:0;if(hid)arr=arr.filter(c=>c.img||c.custom||c.id===e.c);
   const lg=opt.lang||'';$('plang').querySelectorAll('button').forEach(b=>{const k=b.dataset.l,c=k?arr.filter(x=>x.lang===k).length:arr.length;
    b.classList.toggle('on',k===lg);b.textContent=(k?{en:'English',ja:'Japanese','zh-tw':'Chinese (Trad.)','zh-cn':'Chinese (Simp.)'}[k]:'All')+` ${c}`});
+  $('pfb').textContent='Filter'+(lg?' · '+{en:'English',ja:'Japanese','zh-tw':'Chinese (Trad.)','zh-cn':'Chinese (Simp.)'}[lg]:'')+' ▾';
   let a=arr;if(opt.ord==='new')a=LANGS.flatMap(l=>arr.filter(c=>c.lang===l).reverse());
-  if(lg)a=a.filter(c=>c.lang===lg);if(f)a=a.filter(c=>(c.set+' '+c.os+' '+c.name+' '+c.sid).toLowerCase().includes(f));
+  if(lg)a=a.filter(c=>c.lang===lg);
   box.innerHTML=addTile+(a.length?a.map(c=>tile(c,e)).join(''):`<div class="msg">${f||lg?'No prints match that filter':'No prints found'}</div>`)
    +(hid?`<div class="msg">${hid} print${hid>1?'s':''} without a picture hidden · <button class="lnk" data-shownopic="1" style="padding:0">Show them</button></div>`:'')}
  catch(err){if(sel===n)box.innerHTML=addTile+customList(n).map(c=>tile(c,col[n]||{})).join('')+'<div class="msg">Couldn’t load prints — check your connection.</div>'}}
@@ -796,9 +798,9 @@ $('book').addEventListener('click',e=>{const cu=e.target.closest('[data-curl]');
  if(PER===1){const pg=e.target.closest('.pg'),sr=$('book').classList.contains('sr');
   if(pg&&((pg.id==='R'&&!sr)||(pg.id==='L'&&sr))){if(!busy)go(target+(pg.id==='R'?1:-1));return}}
  const a=e.target.closest('.c.add[data-i]');if(a&&!busy){selI=+a.dataset.i;sel=null;return openPick()}
- const c=e.target.closest('.c[data-n]');if(!c||busy)return;sel=+c.dataset.n;selI=+c.dataset.i;$('pf').value='';sheetHead();$('sh').hidden=false;$('pk').scrollTop=0;picker()});
+ const c=e.target.closest('.c[data-n]');if(!c||busy)return;sel=+c.dataset.n;selI=+c.dataset.i;sheetHead();$('sh').hidden=false;$('pk').scrollTop=0;picker()});
 $('sh').querySelector('.opts').addEventListener('click',e=>{const b=e.target.closest('button[data-s]');if(!b)return;const s=b.dataset.s,en=entry(sel);
- if((en.s||'')!==s){if(s)en.s=s;else delete en.s;tidy(sel);save();refresh();sheetHead()}});
+ if((en.s||'')!==s){en.s=s;tidy(sel);save();refresh();sheetHead()}});
 $('pk').addEventListener('click',async e=>{if(e.target.closest('button[data-add]'))return openAdd(null);
  const wt=e.target.closest('[data-want]');if(wt){e.stopPropagation();toggleWant(sel,wt.dataset.want);return picker()}
  if(e.target.closest('[data-shownopic]')){opt.nopic='show';ls.set('pb-opt',opt);return picker()}
@@ -882,8 +884,8 @@ $('addel').onclick=()=>{const id=adId;if(!id||!confirm('Delete this card? Pocket
 $('shm').addEventListener('click',e=>{if(e.target.closest('[data-edit]')){const en=col[sel];if(en&&isCustom(en.c))openAdd(en.c.slice(7))}});
 
 $('plang').onclick=e=>{const b=e.target.closest('button[data-l]');if(!b)return;opt.lang=b.dataset.l;ls.set('pb-opt',opt);picker()};
-$('pclr').onclick=()=>{const en=col[sel];if(en){delete en.c;delete en.img;delete en.set;delete en.no;delete en.p;delete en.lang;delete en.f;delete en.fp;delete en.vars;delete en.rar;tidy(sel);save();refresh();sheetHead();picker()}};
-let pfT;$('pf').addEventListener('input',()=>{clearTimeout(pfT);pfT=setTimeout(picker,200)});
+$('srm').onclick=()=>{const en=col[sel];if(en){for(const k of ['s','c','img','set','no','p','lang','f','fp','vars','rar'])delete en[k];tidy(sel);save();refresh();sheetHead();picker();toast(`Removed your ${N[sel]}`)}};   // back to "don't have"
+$('pfb').onclick=()=>{const h=!$('plang').hidden;$('plang').hidden=h;$('pfb').setAttribute('aria-expanded',String(!h))};
 const openZoom=()=>{sheetHead();$('zm').classList.remove('plain');$('zm').hidden=false};$('shimg').onclick=$('shfx').onclick=openZoom;   // the card big, with its holo settings underneath
 $('zm').onclick=ev=>{if($('zm').classList.contains('plain')||ev.target===$('zm')||ev.target===$('zmd')||ev.target===$('zmi'))$('zm').hidden=true};
 function closeAll(){closeSearch();$('shf').hidden=true;$('wn').hidden=true;$('ad').hidden=true;$('bs').hidden=true;$('sh').hidden=true;$('setg').hidden=true;$('zm').hidden=true;$('ps').hidden=true;if(binders.length)$('nb').hidden=true}
@@ -906,7 +908,6 @@ let psT;$('psq').addEventListener('input',()=>{clearTimeout(psT);psT=setTimeout(
 $('psl').addEventListener('click',e=>{const b=e.target.closest('button[data-p]');if(!b)return;const n=+b.dataset.p;
  setSlot(selI,n);$('ps').hidden=true;toast(`Placed #${pad(n)} ${N[n]}`)});
 $('psx').onclick=()=>{$('ps').hidden=true};
-$('srep').onclick=()=>openPick();
 $('srem').onclick=()=>{const n=sel;setSlot(selI,0);closeAll();toast(`Removed ${N[n]} from this pocket`)};
 
 /* ---------- new binder ---------- */
